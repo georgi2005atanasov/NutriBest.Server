@@ -18,21 +18,32 @@ namespace NutriBest.Server.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [Route(nameof(Create))]
-        public async Task<ActionResult> Create(CreateProductRequestModel productModel)
+        public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
-            //var userName = this.User.GetId();
-
             var product = new Product
             {
+                Name = productModel.Name,
                 Description = productModel.Description,
-                Name = productModel.Name
+                Price = productModel.Price
             };
 
-            db.Products.Add(product);
+            if (productModel.Image != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await productModel.Image.CopyToAsync(memoryStream);
+                    product.Image = memoryStream.ToArray();
+                }
 
-            await db.SaveChangesAsync();
+                db.Products.Add(product);
+                await db.SaveChangesAsync();
 
-            return Created(nameof(Create), product.Id);
+                return Created(nameof(Create), product.Id);
+            }
+            else
+            {
+                return BadRequest("Image is required");
+            }
         }
     }
 }

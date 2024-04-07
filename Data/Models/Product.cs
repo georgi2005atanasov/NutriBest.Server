@@ -6,9 +6,10 @@
 
         public string Name { get; set; } = null!;
 
+        public decimal Price { get; set; }
+
         public string Description { get; set; } = null!;
 
-        //public IFormFile Image { get; set; } = null!;
-
+        public byte[] Image { get; set; } = null!;
     }
 }

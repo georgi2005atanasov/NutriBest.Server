@@ -22,6 +22,7 @@ namespace NutriBest.Server.Infrastructure
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config = serviceProvider.GetService<IConfiguration>();
 
             Task.Run(async () =>
             {
@@ -34,8 +35,8 @@ namespace NutriBest.Server.Infrastructure
 
                 await roleManager.CreateAsync(role);
 
-                const string adminEmail = "admin@ps.com";
-                const string adminPassword = "11111111";
+                string adminEmail = config.GetValue<string>("Admin:UserName");
+                string adminPassword = config.GetValue<string>("Admin:Password"); ;
 
                 var user = new User
                 {
