@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240407172556_AddedPriceColumnForProduct")]
-    partial class AddedPriceColumnForProduct
+    [Migration("20240408180025_InitMigrationAfterEdit")]
+    partial class InitMigrationAfterEdit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -159,11 +159,11 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -176,7 +176,13 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.Property<int>("ProductImageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("ProductImageId")
+                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -201,8 +207,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ProductImageId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductsImages");
                 });
@@ -323,20 +327,21 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductImage", b =>
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
                 {
-                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("NutriBest.Server.Data.Models.ProductImage", "ProductImage")
+                        .WithOne("Product")
+                        .HasForeignKey("NutriBest.Server.Data.Models.Product", "ProductImageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("ProductImage");
                 });
 
-            modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductImage", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("Product")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

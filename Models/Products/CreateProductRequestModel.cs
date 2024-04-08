@@ -1,15 +1,19 @@
-﻿namespace NutriBest.Server.Models.Products
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NutriBest.Server.Models.Products
 {
     public class CreateProductRequestModel
     {
-        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
 
-        public string Name { get; set; } = null!;
-
+        [Required]
         public decimal Price { get; set; }
 
-        public string Description { get; set; } = null!;
+        [Required]
+        public string Description { get; set; }
 
-        public IFormFile Image { get; set; } = null!;
+        [Required]
+        public IFormFile Image { get; set; }
     }
 }

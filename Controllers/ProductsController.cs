@@ -32,13 +32,17 @@ namespace NutriBest.Server.Controllers
                 using (var memoryStream = new MemoryStream())
                 {
                     await productModel.Image.CopyToAsync(memoryStream);
-                    product.Image = memoryStream.ToArray();
+                    product.ProductImage = new ProductImage
+                    {
+                        ImageData = memoryStream.ToArray(),
+                        ContentType = productModel.Image.ContentType
+                    };
                 }
 
                 db.Products.Add(product);
                 await db.SaveChangesAsync();
 
-                return Created(nameof(Create), product.Id);
+                return Created(nameof(Create), product.ProductId);
             }
             else
             {
