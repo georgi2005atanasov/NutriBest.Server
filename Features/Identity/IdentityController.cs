@@ -12,6 +12,7 @@ namespace NutriBest.Server.Features.Identity
         }
 
         [Route(nameof(Register))]
+        [HttpPost]
         public async Task<ActionResult> Register(RegisterRequestModel userModel)
         {
             var result = await identityService
@@ -28,6 +29,7 @@ namespace NutriBest.Server.Features.Identity
         }
 
         [Route(nameof(Login))]
+        [HttpPost]
         public async Task<ActionResult<string>> Login(LoginRequestModel userModel)
         {
             var user = await identityService.FindUserByName(userModel.UserName);

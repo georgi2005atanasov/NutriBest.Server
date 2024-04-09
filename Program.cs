@@ -15,15 +15,15 @@ var applicationSettings = builder
     .Configuration
     .GetSection("ApplicationSettings");
 
-//make extension method for adding services
-builder.Services
-    .AddTransient<IIdentityService, IdentityService>()
-    .AddTransient<IProductService, ProductService>();
-
 var appSettings = applicationSettings
     .Get<ApplicationSettings>();
 
 var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+//make extension method for adding services
+builder.Services
+    .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<IProductService, ProductService>();
 
 builder
     .Services
@@ -34,6 +34,8 @@ builder
     .AddJwtAuthentication(secret)
     .Configure<ApplicationSettings>(applicationSettings)
     .AddControllers();
+
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -55,5 +57,12 @@ app.UseCors(x => x
             .AllowAnyHeader())
     .UseEndpoints(endpoints => endpoints.MapControllers())
     .ApplyMigrations();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee API V1");
+    c.RoutePrefix = string.Empty;
+});
 
 app.Run();
