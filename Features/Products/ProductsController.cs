@@ -12,7 +12,6 @@ namespace NutriBest.Server.Features.Products
 
         [Authorize(Roles = "Administrator")]
         [HttpPost]
-        [Route(nameof(Create))]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
             if (productModel.Price <= 0)
