@@ -7,6 +7,8 @@ namespace NutriBest.Server.Data.Models
         public int ProductImageId { get; set; }
         public byte[] ImageData { get; set; } = null!;
         public string ContentType { get; set; } = null!;
+
+        [NotMapped]
         public int ProductId { get; set; }
 
         [NotMapped]

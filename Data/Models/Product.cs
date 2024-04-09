@@ -1,15 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NutriBest.Server.Data.Models
 {
+    using static WebConstants.ProductConstants;
+
     public class Product
     {
+        [Required]
         public int ProductId { get; set; }
 
+        [Required]
+        [MaxLength(MaxNameLength)]
         public string Name { get; set; } = null!;
 
+        [Required]
+        [Range(MinPrice, MaxPrice)]
         public decimal Price { get; set; }
 
+        [Required]
+        [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
         public int ProductImageId { get; set; }

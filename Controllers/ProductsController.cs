@@ -27,6 +27,11 @@ namespace NutriBest.Server.Controllers
                 Price = productModel.Price
             };
 
+            if (product.Price <= 0)
+            {
+                return BadRequest("Price must be bigger than zero!");
+            }
+
             if (productModel.Image != null)
             {
                 using (var memoryStream = new MemoryStream())
