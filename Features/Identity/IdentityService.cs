@@ -1,64 +1,50 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NutriBest.Server.Data.Models;
-using NutriBest.Server.Data.Models.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace NutriBest.Server.Controllers
+namespace NutriBest.Server.Features.Identity
 {
-    public class IdentityController : ApiController
+    public class IdentityService : IIdentityService
     {
         private readonly UserManager<User> userManager;
         private readonly ApplicationSettings appSettings;
 
-        public IdentityController(
-            UserManager<User> userManager,
+        public IdentityService(UserManager<User> userManager, 
             IOptions<ApplicationSettings> appSettings)
         {
             this.userManager = userManager;
             this.appSettings = appSettings.Value;
         }
 
-        [Route(nameof(Register))]
-        public async Task<ActionResult> Register(RegisterRequestModel userModel)
+        public async Task<bool> CheckUserPassword(User user, string password)
+        {
+            return await userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<IdentityResult> CreateUser(string userName, string email, string password)
         {
             var user = new User
             {
-                UserName = userModel.UserName,
-                Email = userModel.Email,
+                UserName = userName,
+                Email = email,
             };
 
-            var result = await this.userManager.CreateAsync(user, userModel.Password);
+            var result = await userManager.CreateAsync(user, password);
 
-            if (result.Succeeded)
-            {
-                return Ok("Successfully added new user!");
-            }
-
-            return BadRequest(result.Errors);
+            return result;
         }
 
-        [Route(nameof(Login))]
-        public async Task<ActionResult<string>> Login(LoginRequestModel userModel)
+        public async Task<User> FindUserByName(string userName)
         {
-            var user = await this.userManager.FindByNameAsync(userModel.UserName);
+            return await userManager.FindByNameAsync(userName);
+        }
 
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var passwordValid = await this.userManager.CheckPasswordAsync(user, userModel.Password);
-
-            if (!passwordValid)
-            {
-                return Unauthorized();
-            }
-
+        public async Task<string> GetEncryptedToken(User user)
+        {
             var roles = await userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
@@ -77,7 +63,8 @@ namespace NutriBest.Server.Controllers
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                                        SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var encryptedToken = tokenHandler.WriteToken(token);

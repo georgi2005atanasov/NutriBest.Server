@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NutriBest.Server;
+using NutriBest.Server.Features.Identity;
+using NutriBest.Server.Features.Products;
 using NutriBest.Server.Infrastructure;
 using System.Text;
 
@@ -12,6 +14,11 @@ var connectionString = builder
 var applicationSettings = builder
     .Configuration
     .GetSection("ApplicationSettings");
+
+//make extension method for adding services
+builder.Services
+    .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<IProductService, ProductService>();
 
 var appSettings = applicationSettings
     .Get<ApplicationSettings>();

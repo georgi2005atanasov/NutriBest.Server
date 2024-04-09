@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NutriBest.Server.Models.Products
+namespace NutriBest.Server.Features.Products
 {
     public class CreateProductRequestModel
     {
