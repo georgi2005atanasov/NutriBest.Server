@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace NutriBest.Server.Infrastructure
+namespace NutriBest.Server.Infrastructure.Extensions
 {
     public static class ConfigurationExtensions
     {

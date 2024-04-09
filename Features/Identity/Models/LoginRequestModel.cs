@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NutriBest.Server.Features.Identity
+namespace NutriBest.Server.Features.Identity.Models
 {
     public class LoginRequestModel
     {

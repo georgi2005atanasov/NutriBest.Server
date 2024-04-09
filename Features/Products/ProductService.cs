@@ -1,5 +1,7 @@
-﻿using NutriBest.Server.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using NutriBest.Server.Data;
 using NutriBest.Server.Data.Models;
+using NutriBest.Server.Features.Products.Models;
 
 namespace NutriBest.Server.Features.Products
 {
@@ -7,13 +9,23 @@ namespace NutriBest.Server.Features.Products
     {
         private readonly NutriBestDbContext db;
 
-        public ProductService(NutriBestDbContext db) 
+        public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<int> Create(string name, 
-            string description, 
-            decimal price, 
-            byte[] imageData, 
+        public async Task<IEnumerable<ProductListingModel>> All()
+            => await db.Products
+                        .Select(x => new ProductListingModel
+                        {
+                            Id = x.ProductId,
+                            Name = x.Name
+                        })
+                        .ToListAsync();
+
+        public async Task<int> Create(string name,
+            string description,
+            decimal price,
+            List<string> categories,
+            byte[] imageData,
             string contentType)
         {
             var productImage = new ProductImage
@@ -29,6 +41,8 @@ namespace NutriBest.Server.Features.Products
                 Price = price,
                 ProductImage = productImage
             };
+
+            // i gotta process the cateogories and add them to the product. 
 
             db.Products.Add(product);
             await db.SaveChangesAsync();

@@ -1,4 +1,5 @@
 ﻿using NutriBest.Server.Data.Models;
+using NutriBest.Server.Features.Products.Models;
 
 namespace NutriBest.Server.Features.Products
 {
@@ -8,7 +9,10 @@ namespace NutriBest.Server.Features.Products
         Task<int> Create(string name, 
             string description, 
             decimal price, 
+            List<string> categories,
             byte[] imageData,
             string contentType);
+
+        Task<IEnumerable<ProductListingModel>> All();
     }
 }

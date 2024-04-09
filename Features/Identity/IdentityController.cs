@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NutriBest.Server.Features.Identity.Models;
 
 namespace NutriBest.Server.Features.Identity
 {

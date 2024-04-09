@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NutriBest.Server.Features.Products
+namespace NutriBest.Server.Features.Products.Models
 {
     public class CreateProductRequestModel
     {
@@ -12,6 +12,9 @@ namespace NutriBest.Server.Features.Products
 
         [Required]
         public string Description { get; set; } = null!;
+
+        [Required]
+        public List<string> Category { get; set; } = null!;
 
         [Required]
         public IFormFile Image { get; set; } = null!;

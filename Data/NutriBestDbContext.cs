@@ -8,6 +8,7 @@ namespace NutriBest.Server.Data
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductsImages { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options)
             : base(options)
@@ -24,7 +25,13 @@ namespace NutriBest.Server.Data
                 .WithOne(x => x.Product)
                 .HasForeignKey<Product>(x => x.ProductImageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasMany(x => x.Categories)
+                .WithMany(x => x.Products)
+                .UsingEntity("ProductsCategories");
             });
+
+
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace NutriBest.Server.Infrastructure
+namespace NutriBest.Server.Infrastructure.Extensions
 {
     public static class IdentityExtensions
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NutriBest.Server.Data;
 using NutriBest.Server.Data.Models;
 
-namespace NutriBest.Server.Infrastructure
+namespace NutriBest.Server.Infrastructure.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

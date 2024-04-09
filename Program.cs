@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using NutriBest.Server;
 using NutriBest.Server.Features.Identity;
 using NutriBest.Server.Features.Products;
-using NutriBest.Server.Infrastructure;
+using NutriBest.Server.Infrastructure.Extensions;
+using NutriBest.Server.Infrastructure.FIlters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +34,7 @@ builder
     .AddCors()
     .AddJwtAuthentication(secret)
     .Configure<ApplicationSettings>(applicationSettings)
-    .AddControllers();
+    .AddApiControllers();
 
 builder.Services.AddSwaggerGen();
 

@@ -1,11 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NutriBest.Server.Data.Models
 {
     public class ProductImage
     {
         public int ProductImageId { get; set; }
+
+        [Required]
         public byte[] ImageData { get; set; } = null!;
+
+        [Required]
         public string ContentType { get; set; } = null!;
 
         [NotMapped]

@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NutriBest.Server.Data;
 using NutriBest.Server.Data.Models;
+using NutriBest.Server.Infrastructure.FIlters;
 
-namespace NutriBest.Server.Infrastructure
+namespace NutriBest.Server.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -53,6 +54,16 @@ namespace NutriBest.Server.Infrastructure
         {
             services.AddDbContext<NutriBestDbContext>
                     (options => options.UseSqlServer(connectionString));
+
+            return services;
+        }
+
+        public static IServiceCollection AddApiControllers(this IServiceCollection services)
+        {
+            services.AddControllers(options =>
+            {
+                options.Filters.Add<ModelOrNotFoundActionFilter>();
+            });
 
             return services;
         }
