@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Enums;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.Products
+﻿namespace NutriBest.Server.Features.Products
 {
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Features.Products.Models;
+
     public class ProductsController : ApiController
     {
         private readonly IProductService productService;
@@ -33,7 +32,7 @@ namespace NutriBest.Server.Features.Products
             {
                 return BadRequest("You have to choose at least 1 category!");
             }
-            
+
             if (productModel.Image != null)
             {
                 var productImage = await productService
@@ -57,7 +56,9 @@ namespace NutriBest.Server.Features.Products
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductListingModel>>> All()
+        public async Task<ActionResult<IEnumerable<ProductListingModel>>> All(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10) //might add from the query filters
         {
             var products = await productService.All();
 
@@ -66,16 +67,19 @@ namespace NutriBest.Server.Features.Products
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details(int id)
+        public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details([FromRoute] int id)
         {
-            var products = await productService.All();
-
-            if (products == null)
-            {
-                return NotFound();
-            }
+            var products = await productService.GetById(id);
 
             return Ok(products);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPut]
+        public async Task<ActionResult<int>> Update([FromRoute] int id)
+        {
+            var products = await productService.GetById(id);
+
         }
     }
 }

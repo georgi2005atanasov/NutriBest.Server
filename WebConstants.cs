@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Data
+﻿namespace NutriBest.Server
 {
     public static class WebConstants
     {

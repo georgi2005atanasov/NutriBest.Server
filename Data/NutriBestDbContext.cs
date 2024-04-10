@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data.Models;
-
-namespace NutriBest.Server.Data
+﻿namespace NutriBest.Server.Data
 {
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data.Models;
+
     public class NutriBestDbContext : IdentityDbContext<User>
     {
         public DbSet<Product> Products { get; set; }

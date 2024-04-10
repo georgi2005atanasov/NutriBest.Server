@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-
-namespace NutriBest.Server.Infrastructure.Extensions
+﻿namespace NutriBest.Server.Infrastructure.Extensions
 {
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+
     public static class ApplicationBuilderExtensions
     {
         public static void ApplyMigrations(this IApplicationBuilder app)

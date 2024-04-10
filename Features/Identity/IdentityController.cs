@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NutriBest.Server.Features.Identity.Models;
-
-namespace NutriBest.Server.Features.Identity
+﻿namespace NutriBest.Server.Features.Identity
 {
+    using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Features.Identity.Models;
+
     public class IdentityController : ApiController
     {
         private readonly IIdentityService identityService;

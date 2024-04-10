@@ -1,8 +1,8 @@
-﻿using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.Products
+﻿namespace NutriBest.Server.Features.Products
 {
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products.Models;
+
     public interface IProductService
     {
         Task<ProductImage> GetImage(IFormFile image, string contentType);
@@ -14,6 +14,8 @@ namespace NutriBest.Server.Features.Products
             string contentType);
 
         Task<IEnumerable<ProductListingModel>> All();
+
+        Task<ProductDetailsModel?> GetById(int id);
 
         Task<List<int>> GetCategoriesIds(List<string> categories);
     }

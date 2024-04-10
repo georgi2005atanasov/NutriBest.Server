@@ -1,7 +1,8 @@
-﻿using System.Security.Claims;
-
+﻿
 namespace NutriBest.Server.Infrastructure.Extensions
 {
+    using System.Security.Claims;
+
     public static class IdentityExtensions
     {
         public static string GetId(this ClaimsPrincipal user)

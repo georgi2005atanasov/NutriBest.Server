@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace NutriBest.Server.Data.Models
+﻿namespace NutriBest.Server.Data.Models
 {
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+
     public class ProductImage
     {
         public int ProductImageId { get; set; }

@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-using NutriBest.Server.Infrastructure.FIlters;
-
-namespace NutriBest.Server.Infrastructure.Extensions
+﻿namespace NutriBest.Server.Infrastructure.Extensions
 {
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.IdentityModel.Tokens;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Infrastructure.Filters;
+
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddIdentity(this IServiceCollection services)

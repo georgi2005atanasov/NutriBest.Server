@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.Products
+﻿namespace NutriBest.Server.Features.Products
 {
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products.Models;
+
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
@@ -59,6 +59,27 @@ namespace NutriBest.Server.Features.Products
             await db.SaveChangesAsync();
 
             return product.ProductId;
+        }
+
+        public async Task<ProductDetailsModel?> GetById(int id)
+        {
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == id);
+
+            if (product == null)
+            {
+                return null;
+            }
+
+            var productDetailsModel = new ProductDetailsModel
+            {
+                ProductId = product.ProductId,
+                Description = product.Description,
+                Name = product.Name,
+                Price = product.Price,
+            };
+
+            return productDetailsModel;
         }
 
         public async Task<List<int>> GetCategoriesIds(List<string> categories)

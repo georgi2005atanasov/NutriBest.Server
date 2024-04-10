@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NutriBest.Server.Data.Models
+﻿namespace NutriBest.Server.Data.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class ProductCategory
     {
         [Required]

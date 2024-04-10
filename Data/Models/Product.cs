@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace NutriBest.Server.Data.Models
+﻿namespace NutriBest.Server.Data.Models
 {
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
     using static WebConstants.ProductConstants;
 
     public class Product

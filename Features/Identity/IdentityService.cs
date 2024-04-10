@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using NutriBest.Server.Data.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-
-namespace NutriBest.Server.Features.Identity
+﻿namespace NutriBest.Server.Features.Identity
 {
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
+    using NutriBest.Server.Data.Models;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using System.Text;
+
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<User> userManager;
         private readonly ApplicationSettings appSettings;
 
-        public IdentityService(UserManager<User> userManager, 
+        public IdentityService(UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings)
         {
             this.userManager = userManager;

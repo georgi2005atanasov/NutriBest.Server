@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using NutriBest.Server.Data.Models;
-
-namespace NutriBest.Server.Features.Identity
+﻿namespace NutriBest.Server.Features.Identity
 {
+    using Microsoft.AspNetCore.Identity;
+    using NutriBest.Server.Data.Models;
+
     public interface IIdentityService
     {
         Task<string> GetEncryptedToken(User user);

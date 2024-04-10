@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NutriBest.Server.Features.Identity.Models
+﻿namespace NutriBest.Server.Features.Identity.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class RegisterRequestModel
     {
         [Required]
