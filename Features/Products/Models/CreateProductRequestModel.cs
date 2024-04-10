@@ -14,7 +14,7 @@ namespace NutriBest.Server.Features.Products.Models
         public string Description { get; set; } = null!;
 
         [Required]
-        public List<string> Category { get; set; } = null!;
+        public List<string> Categories { get; set; } = null!;
 
         [Required]
         public IFormFile Image { get; set; } = null!;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NutriBest.Server.Data;
 using NutriBest.Server.Data.Enums;
 using NutriBest.Server.Features.Products.Models;
@@ -27,9 +26,12 @@ namespace NutriBest.Server.Features.Products
                 return BadRequest("Price must be bigger than zero!");
             }
 
-            if (!Enum.IsDefined(typeof(Category), productModel.Category))
+            var categoriesIds = await productService
+                .GetCategoriesIds(productModel.Categories);
+
+            if (categoriesIds.Count() == 0)
             {
-                return BadRequest("Category is not defined!");
+                return BadRequest("You have to choose at least 1 category!");
             }
 
             if (productModel.Image != null)
@@ -41,7 +43,7 @@ namespace NutriBest.Server.Features.Products
                     .Create(productModel.Name,
                     productModel.Description,
                     productModel.Price,
-                    productModel.Category,
+                    categoriesIds,
                     productImage.ImageData,
                     productImage.ContentType
                     );

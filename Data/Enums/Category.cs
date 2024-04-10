@@ -2,18 +2,17 @@
 {
     public enum Category
     {
-        Protein = 0,
+        Proteins = 0,
         AminoAcids = 1,
-        PreWorkout = 2,
+        PreWorkouts = 2,
         Vitamins = 3,
-        Creatine = 4,
-        FatBurner = 5,
-        MassGainer = 6,
-        PostWorkout = 7,
-        IntraWorkout = 8,
-        Vegan = 9,
-        Recovery = 10,
-        FishOil = 11,
-        Offer = 12,
+        Creatines = 4,
+        FatBurners = 5,
+        MassGainers = 6,
+        PostWorkouts = 7,
+        Vegan = 8,
+        Recovery = 9,
+        FishOils = 10,
+        Offers = 11,
     }
 }

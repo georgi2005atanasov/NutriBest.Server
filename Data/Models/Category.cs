@@ -10,6 +10,6 @@ namespace NutriBest.Server.Data.Models
         [Required]
         public string Name { get; set; } = null!;
 
-        public List<Product> Products { get; set; } = new List<Product>();
+        public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
     }
 }

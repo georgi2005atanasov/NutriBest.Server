@@ -16,6 +16,38 @@ namespace NutriBest.Server.Infrastructure.Extensions
             dbContext.Database.Migrate();
 
             SeedAdministrator(services.ServiceProvider);
+            SeedCategories(dbContext);
+        }
+
+        private static void SeedCategories(NutriBestDbContext db)
+        {
+            if (db.Categories != null && db.Categories.Any())
+            {
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                await db.Categories!.AddRangeAsync(new List<Category>
+                {
+                    new Category{ Name="Proteins" },
+                    new Category{ Name="Pre-Workout" },
+                    new Category{ Name="Vitamins" },
+                    new Category{ Name="Creatines" },
+                    new Category{ Name="Fat Burners" },
+                    new Category{ Name="Mass Gainers" },
+                    new Category{ Name="Post-Workout" },
+                    new Category{ Name="Vegan" },
+                    new Category{ Name="Recovery" },
+                    new Category{ Name="Fish Oils" },
+                    new Category{ Name="Offers" },
+                });
+
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
+
         }
 
         private static void SeedAdministrator(IServiceProvider serviceProvider)

@@ -24,7 +24,7 @@ namespace NutriBest.Server.Features.Products
         public async Task<int> Create(string name,
             string description,
             decimal price,
-            List<string> categories,
+            List<int> categoriesIds,
             byte[] imageData,
             string contentType)
         {
@@ -39,15 +39,52 @@ namespace NutriBest.Server.Features.Products
                 Name = name,
                 Description = description,
                 Price = price,
-                ProductImage = productImage
+                ProductImage = productImage,
+                ProductsCategories = new List<ProductCategory>()
             };
 
-            // i gotta process the cateogories and add them to the product. 
+
+            foreach (var id in categoriesIds)
+            {
+                if (!product.ProductsCategories.Any(x => x.CategoryId == id))
+                {
+                    product.ProductsCategories
+                        .Add(new ProductCategory { CategoryId = id });
+                }
+            }
+
 
             db.Products.Add(product);
             await db.SaveChangesAsync();
 
             return product.ProductId;
+        }
+
+        public async Task<List<int>> GetCategoriesIds(List<string> categories)
+        {
+            var allCategories = await db.Categories
+                .Select(x => new
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                })
+                .ToListAsync();
+
+            var categoriesIds = new List<int>();
+
+            foreach (var category in categories)
+            {
+                var isCategory = allCategories.FirstOrDefault(x => x.Name == category);
+
+                if (isCategory != null)
+                {
+                    var categoryToAdd = isCategory.Id;
+
+                    categoriesIds.Add(categoryToAdd);
+                }
+            }
+
+            return categoriesIds;
         }
 
         public async Task<ProductImage> GetImage(IFormFile image, string contentType)

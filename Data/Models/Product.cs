@@ -1,5 +1,4 @@
-﻿using NutriBest.Server.Data.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NutriBest.Server.Data.Models
@@ -29,6 +28,6 @@ namespace NutriBest.Server.Data.Models
         public ProductImage ProductImage { get; set; } = null!;
 
         [Required]
-        public List<Category> Categories { get; set; } = new List<Category>();
+        public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
     }
 }

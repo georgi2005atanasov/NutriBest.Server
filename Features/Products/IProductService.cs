@@ -8,11 +8,13 @@ namespace NutriBest.Server.Features.Products
         Task<ProductImage> GetImage(IFormFile image, string contentType);
         Task<int> Create(string name, 
             string description, 
-            decimal price, 
-            List<string> categories,
+            decimal price,
+            List<int> categoriesIds,
             byte[] imageData,
             string contentType);
 
         Task<IEnumerable<ProductListingModel>> All();
+
+        Task<List<int>> GetCategoriesIds(List<string> categories);
     }
 }
