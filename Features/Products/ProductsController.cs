@@ -84,19 +84,52 @@
             return Ok(product);
         }
 
-        //[Authorize(Roles = "Administrator")]
-        //[HttpPut]
-        //public async Task<ActionResult<int>> Update(UpdateProductModel productModel)
-        //{
-        //    var product = await db.Products
-        //        .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
+        [Authorize(Roles = "Administrator")]
+        [HttpPut]
+        public async Task<ActionResult<int>> Update([FromForm] UpdateProductModel productModel)
+        {
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (product == null)
+            {
+                return NotFound();
+            }
 
-        //    product = productService.
-        //}
+            if (productModel.Price <= 0)
+            {
+                return BadRequest("Price must be bigger than zero!");
+            }
+
+            var categoriesIds = await categoryService
+                .GetCategoriesIds(productModel.Categories);
+
+            if (categoriesIds.Count == 0)
+            {
+                return BadRequest("You have to choose at least 1 category!");
+            }
+
+            if (productModel.Image != null)
+            {
+                var productImage = await imageService
+                    .GetImage(productModel.Image, productModel.Image.ContentType);
+
+                int productId = await productService
+                    .Update(productModel.ProductId,
+                    productModel.Name,
+                    productModel.Description,
+                    productModel.Price,
+                    categoriesIds,
+                    productImage.ImageData,
+                    productImage.ContentType
+                );
+
+                return productId;
+            }
+            else
+            {
+                return BadRequest("Image is required!");
+            }
+        }
     }
 }

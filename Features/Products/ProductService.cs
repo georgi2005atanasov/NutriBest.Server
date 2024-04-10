@@ -81,5 +81,43 @@
 
             return productDetailsModel;
         }
+
+        public async Task<int> Update(int productId,
+            string name,
+            string description,
+            decimal price,
+            List<int> categoriesIds,
+            byte[] imageData,
+            string contentType)
+        {
+            var product = await db.Products
+                .FirstAsync(x => x.ProductId == productId);
+
+            var productImage = new ProductImage
+            {
+                ImageData = imageData,
+                ContentType = contentType
+            };
+
+            product.Name = name;
+            product.Description = description;
+            product.Price = price;
+            product.ProductImage = productImage;
+            product.ProductsCategories = new List<ProductCategory>();
+
+            var existingMappings = db.ProductsCategories.Where(pc => pc.ProductId == productId);
+            db.ProductsCategories.RemoveRange(existingMappings);
+
+            foreach (var id in categoriesIds)
+            {
+                product.ProductsCategories
+                    .Add(new ProductCategory { CategoryId = id });
+            }
+
+            db.Products.Update(product);
+            await db.SaveChangesAsync();
+
+            return productId;
+        }
     }
 }
