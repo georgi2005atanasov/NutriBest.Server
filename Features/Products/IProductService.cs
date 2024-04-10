@@ -5,7 +5,6 @@
 
     public interface IProductService
     {
-        Task<ProductImage> GetImage(IFormFile image, string contentType);
         Task<int> Create(string name, 
             string description, 
             decimal price,
@@ -16,7 +15,5 @@
         Task<IEnumerable<ProductListingModel>> All();
 
         Task<ProductDetailsModel?> GetById(int id);
-
-        Task<List<int>> GetCategoriesIds(List<string> categories);
     }
 }

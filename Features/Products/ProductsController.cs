@@ -2,18 +2,28 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Features.Categories;
+    using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
 
     public class ProductsController : ApiController
     {
-        private readonly IProductService productService;
         private readonly NutriBestDbContext db;
+        private readonly IProductService productService;
+        private readonly IImageService imageService;
+        private readonly ICategoryService categoryService;
 
-        public ProductsController(IProductService productService, NutriBestDbContext db)
+        public ProductsController(IProductService productService,
+            NutriBestDbContext db,
+            IImageService imageService,
+            ICategoryService categoryService)
         {
-            this.productService = productService;
             this.db = db;
+            this.productService = productService;
+            this.imageService = imageService;
+            this.categoryService = categoryService;
         }
 
         [Authorize(Roles = "Administrator")]
@@ -25,7 +35,7 @@
                 return BadRequest("Price must be bigger than zero!");
             }
 
-            var categoriesIds = await productService
+            var categoriesIds = await categoryService
                 .GetCategoriesIds(productModel.Categories);
 
             if (categoriesIds.Count == 0)
@@ -35,7 +45,7 @@
 
             if (productModel.Image != null)
             {
-                var productImage = await productService
+                var productImage = await imageService
                     .GetImage(productModel.Image, productModel.Image.ContentType);
 
                 var productId = await productService
@@ -69,17 +79,24 @@
         [Route("{id}")]
         public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details([FromRoute] int id)
         {
-            var products = await productService.GetById(id);
+            var product = await productService.GetById(id);
 
-            return Ok(products);
+            return Ok(product);
         }
 
-        [Authorize(Roles = "Administrator")]
-        [HttpPut]
-        public async Task<ActionResult<int>> Update([FromRoute] int id)
-        {
-            var products = await productService.GetById(id);
+        //[Authorize(Roles = "Administrator")]
+        //[HttpPut]
+        //public async Task<ActionResult<int>> Update(UpdateProductModel productModel)
+        //{
+        //    var product = await db.Products
+        //        .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
-        }
+        //    if (product == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    product = productService.
+        //}
     }
 }

@@ -44,7 +44,6 @@
                 CreatedOn = DateTime.Now
             };
 
-
             foreach (var id in categoriesIds)
             {
                 if (!product.ProductsCategories.Any(x => x.CategoryId == id))
@@ -77,50 +76,10 @@
                 Description = product.Description,
                 Name = product.Name,
                 Price = product.Price,
+                ProductImageId = product.ProductImageId,
             };
 
             return productDetailsModel;
-        }
-
-        public async Task<List<int>> GetCategoriesIds(List<string> categories)
-        {
-            var allCategories = await db.Categories
-                .Select(x => new
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                })
-                .ToListAsync();
-
-            var categoriesIds = new List<int>();
-
-            foreach (var category in categories)
-            {
-                var isCategory = allCategories.FirstOrDefault(x => x.Name == category);
-
-                if (isCategory != null)
-                {
-                    var categoryToAdd = isCategory.Id;
-
-                    categoriesIds.Add(categoryToAdd);
-                }
-            }
-
-            return categoriesIds;
-        }
-
-        public async Task<ProductImage> GetImage(IFormFile image, string contentType)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await image.CopyToAsync(memoryStream);
-
-                return new ProductImage
-                {
-                    ImageData = memoryStream.ToArray(),
-                    ContentType = contentType
-                };
-            }
         }
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using NutriBest.Server;
+using NutriBest.Server.Features.Categories;
 using NutriBest.Server.Features.Identity;
+using NutriBest.Server.Features.Images;
 using NutriBest.Server.Features.Products;
 using NutriBest.Server.Infrastructure.Extensions;
 using NutriBest.Server.Infrastructure.Filters;
@@ -24,7 +26,9 @@ var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 //make extension method for adding services
 builder.Services
     .AddTransient<IIdentityService, IdentityService>()
-    .AddTransient<IProductService, ProductService>();
+    .AddTransient<IProductService, ProductService>()
+    .AddTransient<IImageService, ImageService>()
+    .AddTransient<ICategoryService, CategoryService>();
 
 builder
     .Services
