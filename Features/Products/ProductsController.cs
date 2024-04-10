@@ -29,11 +29,11 @@ namespace NutriBest.Server.Features.Products
             var categoriesIds = await productService
                 .GetCategoriesIds(productModel.Categories);
 
-            if (categoriesIds.Count() == 0)
+            if (categoriesIds.Count == 0)
             {
                 return BadRequest("You have to choose at least 1 category!");
             }
-
+            
             if (productModel.Image != null)
             {
                 var productImage = await productService
@@ -64,18 +64,18 @@ namespace NutriBest.Server.Features.Products
             return Ok(products);
         }
 
-        //[HttpGet]
-        //[Route("{id}")]
-        //public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details(int id)
-        //{
-        //    var products = await productService.All();
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details(int id)
+        {
+            var products = await productService.All();
 
-        //    if (products == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (products == null)
+            {
+                return NotFound();
+            }
 
-        //    return Ok(products);
-        //}
+            return Ok(products);
+        }
     }
 }

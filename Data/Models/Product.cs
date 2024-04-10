@@ -22,6 +22,9 @@ namespace NutriBest.Server.Data.Models
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
+        [Required]
+        public DateTime CreatedOn { get; set; }
+
         public int ProductImageId { get; set; }
 
         [NotMapped]

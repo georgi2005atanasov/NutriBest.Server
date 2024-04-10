@@ -40,7 +40,8 @@ namespace NutriBest.Server.Features.Products
                 Description = description,
                 Price = price,
                 ProductImage = productImage,
-                ProductsCategories = new List<ProductCategory>()
+                ProductsCategories = new List<ProductCategory>(),
+                CreatedOn = DateTime.Now
             };
 
 
