@@ -165,6 +165,24 @@
             }
         }
 
+        [Authorize(Roles = "Administrator")]
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult<bool>> Delete(int id)
+        {
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var result = await productService.Delete(id);
+
+            return result;
+        }
+
         private async Task<bool> ProductExists(string productName)
         {
             var products = await db.Products

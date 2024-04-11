@@ -22,5 +22,7 @@
             List<int> categoriesIds,
             string imageData,
             string contentType);
+
+        Task<bool> Delete(int productId);
     }
 }

@@ -4,7 +4,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Models;
-    using static WebConstants.PaginationConstants; // make separate constants class
+    using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
     {
@@ -126,6 +126,35 @@
             await db.SaveChangesAsync();
 
             return productId;
+        }
+
+        public async Task<bool> Delete(int productId)
+        {
+            try
+            {
+
+                var product = await db.Products
+                    .FirstAsync(x => x.ProductId == productId);
+
+                var productsCategories = await db.ProductsCategories
+                    .Where(x => x.ProductId == productId)
+                    .ToListAsync();
+
+                var productImage = await db.ProductsImages
+                    .FirstAsync(x => x.ProductImageId == product.ProductImageId);
+
+                db.ProductsCategories.RemoveRange(productsCategories);
+                db.Products.Remove(product);
+                db.ProductsImages.Remove(productImage);
+
+                await db.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
