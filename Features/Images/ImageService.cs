@@ -4,7 +4,7 @@
 
     public class ImageService : IImageService
     {
-        public async Task<ProductImage> GetImage(IFormFile image, string contentType)
+        public async Task<ProductImage> CreateImage(IFormFile image, string contentType)
         {
             using (var memoryStream = new MemoryStream())
             {

@@ -9,5 +9,10 @@
             public const double MinPrice = 0.1;
             public const double MaxPrice = 3000;
         }
+
+        public static class PaginationConstants
+        {
+            public const int productsPerPage = 1; // just for testing purposes, gotta change this
+        }
     }
 }

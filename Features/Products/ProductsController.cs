@@ -30,9 +30,22 @@
         [HttpPost]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
+            if (await ProductExists(productModel.Name))
+            {
+                return BadRequest(new
+                {
+                    Key = "Name",
+                    Message = "Product with this name already exists!"
+                });
+            }
+
             if (productModel.Price <= 0)
             {
-                return BadRequest("Price must be bigger than zero!");
+                return BadRequest(new
+                {
+                    Key = "Price",
+                    Message = "Price must be bigger than zero!"
+                });
             }
 
             var categoriesIds = await categoryService
@@ -40,13 +53,17 @@
 
             if (categoriesIds.Count == 0)
             {
-                return BadRequest("You have to choose at least 1 category!");
+                return BadRequest(new
+                {
+                    Key = "Category",
+                    Message = "You have to choose at least 1 category!"
+                });
             }
 
             if (productModel.Image != null)
             {
                 var productImage = await imageService
-                    .GetImage(productModel.Image, productModel.Image.ContentType);
+                    .CreateImage(productModel.Image, productModel.Image.ContentType);
 
                 var productId = await productService
                     .Create(productModel.Name,
@@ -61,16 +78,20 @@
             }
             else
             {
-                return BadRequest("Image is required");
+                return BadRequest(new
+                {
+                    Key = "Image",
+                    Message = "Image is required!"
+                });
             }
         }
 
+        //products?page=0
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductListingModel>>> All(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10) //might add from the query filters
+            [FromQuery] int page = 0) //might add from the query filters
         {
-            var products = await productService.All();
+            var products = await productService.All(page);
 
             return Ok(products);
         }
@@ -98,7 +119,11 @@
 
             if (productModel.Price <= 0)
             {
-                return BadRequest("Price must be bigger than zero!");
+                return BadRequest(new
+                {
+                    Key = "Price",
+                    Message = "Price must be bigger than zero!"
+                });
             }
 
             var categoriesIds = await categoryService
@@ -106,13 +131,17 @@
 
             if (categoriesIds.Count == 0)
             {
-                return BadRequest("You have to choose at least 1 category!");
+                BadRequest(new
+                {
+                    Key = "Category",
+                    Message = "You have to choose at least 1 category!"
+                });
             }
 
             if (productModel.Image != null)
             {
                 var productImage = await imageService
-                    .GetImage(productModel.Image, productModel.Image.ContentType);
+                    .CreateImage(productModel.Image, productModel.Image.ContentType);
 
                 int productId = await productService
                     .Update(productModel.ProductId,
@@ -128,8 +157,26 @@
             }
             else
             {
-                return BadRequest("Image is required!");
+                return BadRequest(new
+                {
+                    Key = "Image",
+                    Message = "Image is required!"
+                });
             }
+        }
+
+        private async Task<bool> ProductExists(string productName)
+        {
+            var products = await db.Products
+                .Select(x => x.Name)
+                .ToListAsync();
+
+            if (products.Any(name => name == productName))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

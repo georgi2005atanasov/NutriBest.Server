@@ -4,6 +4,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Models;
+    using static WebConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
     {
@@ -12,13 +13,20 @@
         public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<IEnumerable<ProductListingModel>> All()
-            => await db.Products
+        public async Task<IEnumerable<ProductListingModel>> All(int page)
+        => await db.Products
                         .Select(x => new ProductListingModel
                         {
-                            Id = x.ProductId,
-                            Name = x.Name
+                            ProductId = x.ProductId,
+                            Name = x.Name,
+                            ProductImage = new ImageListingModel
+                            {
+                                ImageData = x.ProductImage.ImageData,
+                                ContentType = x.ProductImage.ContentType
+                            }
                         })
+                        .Skip(page * productsPerPage)
+                        .Take(productsPerPage)
                         .ToListAsync();
 
         public async Task<int> Create(string name,
