@@ -10,9 +10,12 @@
             {
                 await image.CopyToAsync(memoryStream);
 
+                var imageByteArray = memoryStream.ToArray();
+                var imageData = Convert.ToBase64String(imageByteArray);
+
                 return new ProductImage
                 {
-                    ImageData = memoryStream.ToArray(),
+                    ImageData = imageData,
                     ContentType = contentType
                 };
             }

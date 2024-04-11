@@ -25,7 +25,7 @@
             string description,
             decimal price,
             List<int> categoriesIds,
-            byte[] imageData,
+            string imageData,
             string contentType)
         {
             var productImage = new ProductImage
@@ -87,7 +87,7 @@
             string description,
             decimal price,
             List<int> categoriesIds,
-            byte[] imageData,
+            string imageData,
             string contentType)
         {
             var product = await db.Products

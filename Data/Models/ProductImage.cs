@@ -8,7 +8,7 @@
         public int ProductImageId { get; set; }
 
         [Required]
-        public byte[] ImageData { get; set; } = null!;
+        public string ImageData { get; set; } = null!;
 
         [Required]
         public string ContentType { get; set; } = null!;

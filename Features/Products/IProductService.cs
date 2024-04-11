@@ -8,7 +8,7 @@
             string description, 
             decimal price,
             List<int> categoriesIds,
-            byte[] imageData,
+            string imageData,
             string contentType);
 
         Task<IEnumerable<ProductListingModel>> All();
@@ -20,7 +20,7 @@
             string description,
             decimal price,
             List<int> categoriesIds,
-            byte[] imageData,
+            string imageData,
             string contentType);
     }
 }
