@@ -11,7 +11,7 @@
             string imageData,
             string contentType);
 
-        Task<IEnumerable<ProductListingModel>> All(int page);
+        Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page);
 
         Task<ProductDetailsModel?> GetById(int id);
 

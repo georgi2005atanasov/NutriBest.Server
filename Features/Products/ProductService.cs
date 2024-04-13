@@ -13,12 +13,14 @@
         public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<IEnumerable<ProductListingModel>> All(int page)
-        => await db.Products
+        public async Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page)
+        {
+            var products = await db.Products
                         .Select(x => new ProductListingModel
                         {
                             ProductId = x.ProductId,
                             Name = x.Name,
+                            Price = x.Price,
                             ProductImage = new ImageListingModel
                             {
                                 ImageData = x.ProductImage.ImageData,
@@ -28,6 +30,34 @@
                         .Skip(page * productsPerPage)
                         .Take(productsPerPage)
                         .ToListAsync();
+
+            var productsRows = GetProductsRows(products);
+
+            return productsRows;
+        }
+
+        private List<List<ProductListingModel>> GetProductsRows(List<ProductListingModel> products)
+        {
+            var productsRows = new List<List<ProductListingModel>>();
+            int i = 0;
+            var row = new List<ProductListingModel>();
+
+            for (int j = i; j < products.Count; j++)
+            {
+                if (j % productsPerRow == 0 && j != 0)
+                {
+                    productsRows.Add(row);
+                    row = new List<ProductListingModel>();
+                }
+
+                row.Add(products[j]);
+            }
+
+            if (row.Count > 0)
+                productsRows.Add(row);
+
+            return productsRows;
+        }
 
         public async Task<int> Create(string name,
             string description,
@@ -55,10 +85,8 @@
             foreach (var id in categoriesIds)
             {
                 if (!product.ProductsCategories.Any(x => x.CategoryId == id))
-                {
                     product.ProductsCategories
                         .Add(new ProductCategory { CategoryId = id });
-                }
             }
 
 
@@ -74,9 +102,7 @@
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
-            {
                 return null;
-            }
 
             var productDetailsModel = new ProductDetailsModel
             {

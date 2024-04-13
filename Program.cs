@@ -32,6 +32,7 @@ builder.Services
 
 builder
     .Services
+    .AddMemoryCache()
     .AddDatabase(connectionString)
     .AddDatabaseDeveloperPageExceptionFilter()
     .AddIdentity()

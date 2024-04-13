@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
@@ -14,22 +15,29 @@
         private readonly IProductService productService;
         private readonly IImageService imageService;
         private readonly ICategoryService categoryService;
+        private readonly IMemoryCache memoryCache;
 
         public ProductsController(IProductService productService,
             NutriBestDbContext db,
             IImageService imageService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IMemoryCache memoryCache)
         {
             this.db = db;
             this.productService = productService;
             this.imageService = imageService;
             this.categoryService = categoryService;
+            this.memoryCache = memoryCache;
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
+            var passedCategories = productModel.Categories[0]
+                .Split(",")
+                .ToList();
+
             if (await ProductExists(productModel.Name))
             {
                 return BadRequest(new
@@ -49,7 +57,7 @@
             }
 
             var categoriesIds = await categoryService
-                .GetCategoriesIds(productModel.Categories);
+                .GetCategoriesIds(passedCategories);
 
             if (categoriesIds.Count == 0)
             {
@@ -88,17 +96,27 @@
 
         //products?page=0
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductListingModel>>> All(
+        public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
             [FromQuery] int page = 0) //might add from the query filters
         {
-            var products = await productService.All(page);
+            string cacheKey = $"products_page_{page}";
+            if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
+            {
+                var products = await productService.All(page);
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
 
-            return Ok(products);
+                memoryCache.Set(cacheKey, products, cacheEntryOptions);
+                return Ok(products);
+            }
+
+            return Ok(cachedProducts);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<IEnumerable<ProductListingModel>>> Details([FromRoute] int id)
+        public async Task<ActionResult<ProductListingModel>> Details([FromRoute] int id)
         {
             var product = await productService.GetById(id);
 

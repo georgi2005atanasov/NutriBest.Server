@@ -13,6 +13,9 @@ namespace NutriBest.Server.Features.Products.Models
         public string Name { get; set; } = null!;
 
         [Required]
+        public decimal Price { get; set; }
+
+        [Required]
         public ImageListingModel ProductImage { get; set; } = null!;
     }
 }

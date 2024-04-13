@@ -4,7 +4,8 @@
     {
         public static class PaginationConstants
         {
-            public const int productsPerPage = 1; // just for testing purposes, gotta change this
+            public const int productsPerPage = 6;
+            public const int productsPerRow = 3;
         }
     }
 }
