@@ -1,6 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Products.Models
 {
     using System.ComponentModel.DataAnnotations;
+    using static WebConstants.ProductConstants;
 
     public class CreateProductRequestModel
     {
@@ -8,7 +9,8 @@
         public string Name { get; set; } = null!;
 
         [Required]
-        public decimal Price { get; set; }
+        [Range(MinPrice, MaxPrice)]
+        public double Price { get; set; }
 
         [Required]
         public string Description { get; set; } = null!;

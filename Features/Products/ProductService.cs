@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
@@ -13,55 +14,56 @@
         public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page)
+        public async Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page,
+            string? categoriesFilter,
+            string? priceFilter)
         {
-            var products = await db.Products
-                        .Select(x => new ProductListingModel
-                        {
-                            ProductId = x.ProductId,
-                            Name = x.Name,
-                            Price = x.Price,
-                            ProductImage = new ImageListingModel
-                            {
-                                ImageData = x.ProductImage.ImageData,
-                                ContentType = x.ProductImage.ContentType
-                            }
-                        })
-                        .Skip(page * productsPerPage)
-                        .Take(productsPerPage)
-                        .ToListAsync();
+            var query = db.Products.AsQueryable();
 
-            var productsRows = GetProductsRows(products);
-
-            return productsRows;
-        }
-
-        private List<List<ProductListingModel>> GetProductsRows(List<ProductListingModel> products)
-        {
-            var productsRows = new List<List<ProductListingModel>>();
-            int i = 0;
-            var row = new List<ProductListingModel>();
-
-            for (int j = i; j < products.Count; j++)
+            if (!string.IsNullOrEmpty(categoriesFilter))
             {
-                if (j % productsPerRow == 0 && j != 0)
-                {
-                    productsRows.Add(row);
-                    row = new List<ProductListingModel>();
-                }
-
-                row.Add(products[j]);
+                query = query.Where(x => x.ProductsCategories.Any(c => categoriesFilter.Split().Contains(c.Category.Name)));
             }
 
-            if (row.Count > 0)
-                productsRows.Add(row);
+            var queryProducts = query.OrderBy(x => x.CreatedOn)
+                         .Select(x => new ProductListingModel
+                         {
+                             ProductId = x.ProductId,
+                             Name = x.Name,
+                             Price = x.Price,
+                             ProductImage = new ImageListingModel
+                             {
+                                 ImageData = x.ProductImage.ImageData,
+                                 ContentType = x.ProductImage.ContentType
+                             },
+                             Categories = x.ProductsCategories
+                             .Select(c => c.Category.Name)
+                             .ToList()
+                         })
+                         .Skip((page - 1) * productsPerPage)
+                         .Take(productsPerPage)
+                         .AsQueryable();
+
+            if (!string.IsNullOrEmpty(priceFilter))
+            {
+                if (priceFilter == "desc")
+                    queryProducts = queryProducts
+                        .OrderByDescending(x => x.Price);
+                else if (priceFilter == "asc")
+                    queryProducts = queryProducts
+                        .OrderBy(x => x.Price);
+            }
+
+            var products = await queryProducts.ToListAsync();
+
+            var productsRows = this.GetProductsRows(products);
 
             return productsRows;
         }
 
         public async Task<int> Create(string name,
             string description,
-            decimal price,
+            double price,
             List<int> categoriesIds,
             string imageData,
             string contentType)
@@ -119,7 +121,7 @@
         public async Task<int> Update(int productId,
             string name,
             string description,
-            decimal price,
+            double price,
             List<int> categoriesIds,
             string imageData,
             string contentType)

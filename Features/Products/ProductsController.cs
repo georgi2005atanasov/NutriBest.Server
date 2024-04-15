@@ -97,12 +97,18 @@
         //products?page=0
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
-            [FromQuery] int page = 0) //might add from the query filters
+            [FromQuery] int page = 1, [FromQuery] string? categories = "", [FromQuery] string? price = "") //might add from the query filters
         {
-            string cacheKey = $"products_page_{page}";
+            if (page < 1)
+            {
+                //edit the error message
+                return BadRequest();
+            }
+
+            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}";
             if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
             {
-                var products = await productService.All(page);
+                var products = await productService.All(page, categories, price);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
@@ -199,6 +205,15 @@
             var result = await productService.Delete(id);
 
             return result;
+        }
+
+        [HttpGet]
+        [Route("by-category-count")]
+        public async Task<ActionResult<bool>> GetByCategoryCount(int id)
+        {
+            var products = await categoryService.GetProductsCountByCategory();
+
+            return Ok(products);
         }
 
         private async Task<bool> ProductExists(string productName)

@@ -5,24 +5,27 @@
     public interface IProductService
     {
         Task<int> Create(string name, 
-            string description, 
-            decimal price,
+            string description,
+            double price,
             List<int> categoriesIds,
             string imageData,
             string contentType);
 
-        Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page);
+        Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page,
+            string? categories,
+            string? priceFilter);
 
         Task<ProductDetailsModel?> GetById(int id);
 
         Task<int> Update(int id,
             string name,
             string description,
-            decimal price,
+            double price,
             List<int> categoriesIds,
             string imageData,
             string contentType);
 
         Task<bool> Delete(int productId);
+
     }
 }

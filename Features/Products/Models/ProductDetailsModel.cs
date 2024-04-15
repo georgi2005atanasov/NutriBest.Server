@@ -14,7 +14,7 @@
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         [Required]
         [StringLength(MaxNameLength, MinimumLength = 5)]

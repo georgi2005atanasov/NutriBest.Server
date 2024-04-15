@@ -7,7 +7,7 @@
     {
         private readonly NutriBestDbContext db;
 
-        public CategoryService(NutriBestDbContext db) 
+        public CategoryService(NutriBestDbContext db)
             => this.db = db;
 
         public async Task<List<int>> GetCategoriesIds(List<string> categories)
@@ -18,6 +18,7 @@
                     Id = x.Id,
                     Name = x.Name,
                 })
+                .OrderBy(x => x.Id)
                 .ToListAsync();
 
             var categoriesIds = new List<int>();
@@ -35,6 +36,19 @@
             }
 
             return categoriesIds;
+        }
+
+        public async Task<IEnumerable<CategoryCountModel>> GetProductsCountByCategory()
+        {
+            var categoriesCount = await db.Categories
+                .Select(x => new CategoryCountModel
+                {
+                    Category = x.Name,
+                    Count = x.ProductsCategories.Where(y => y.CategoryId == x.Id).Count(),
+                })
+                .ToListAsync();
+
+            return categoriesCount;
         }
     }
 }
