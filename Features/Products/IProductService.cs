@@ -11,7 +11,7 @@
             string imageData,
             string contentType);
 
-        Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page,
+        Task<AllProductsModel> All(int page,
             string? categories,
             string? priceFilter);
 

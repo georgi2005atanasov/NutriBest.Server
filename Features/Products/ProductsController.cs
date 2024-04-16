@@ -96,6 +96,7 @@
 
         //products?page=0
         [HttpGet]
+        //[Route("products/all")]
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
             [FromQuery] int page = 1, [FromQuery] string? categories = "", [FromQuery] string? price = "") //might add from the query filters
         {

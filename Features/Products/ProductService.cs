@@ -14,7 +14,7 @@
         public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<IEnumerable<IEnumerable<ProductListingModel>>> All(int page,
+        public async Task<AllProductsModel> All(int page,
             string? categoriesFilter,
             string? priceFilter)
         {
@@ -22,8 +22,17 @@
 
             if (!string.IsNullOrEmpty(categoriesFilter))
             {
-                query = query.Where(x => x.ProductsCategories.Any(c => categoriesFilter.Split().Contains(c.Category.Name)));
+                var categoriesToCheck = categoriesFilter
+                    .Split()
+                    .ToList();
+
+                query = query
+                    .Where(x => x.ProductsCategories
+                                .Select(x => x.Category.Name)
+                                .Any(x => categoriesToCheck.Contains(x)));
             }
+
+            int pagesToSkip = (page - 1) * productsPerPage;
 
             var queryProducts = query.OrderBy(x => x.CreatedOn)
                          .Select(x => new ProductListingModel
@@ -40,9 +49,9 @@
                              .Select(c => c.Category.Name)
                              .ToList()
                          })
-                         .Skip((page - 1) * productsPerPage)
-                         .Take(productsPerPage)
                          .AsQueryable();
+
+            var productsCount = queryProducts.Count();
 
             if (!string.IsNullOrEmpty(priceFilter))
             {
@@ -58,7 +67,11 @@
 
             var productsRows = this.GetProductsRows(products);
 
-            return productsRows;
+            return new AllProductsModel
+            {
+                ProductsRows = productsRows,
+                Count = productsCount,
+            };
         }
 
         public async Task<int> Create(string name,
