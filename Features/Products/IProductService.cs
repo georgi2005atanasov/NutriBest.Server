@@ -4,7 +4,7 @@
 
     public interface IProductService
     {
-        Task<int> Create(string name, 
+        Task<int> Create(string name,
             string description,
             double price,
             List<int> categoriesIds,
@@ -26,6 +26,5 @@
             string contentType);
 
         Task<bool> Delete(int productId);
-
     }
 }

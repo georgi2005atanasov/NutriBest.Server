@@ -40,11 +40,6 @@
                              ProductId = x.ProductId,
                              Name = x.Name,
                              Price = x.Price,
-                             ProductImage = new ImageListingModel
-                             {
-                                 ImageData = x.ProductImage.ImageData,
-                                 ContentType = x.ProductImage.ContentType
-                             },
                              Categories = x.ProductsCategories
                              .Select(c => c.Category.Name)
                              .ToList()
