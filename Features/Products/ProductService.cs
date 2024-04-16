@@ -16,7 +16,8 @@
 
         public async Task<AllProductsModel> All(int page,
             string? categoriesFilter,
-            string? priceFilter)
+            string? priceFilter,
+            string? alphaFilter)
         {
             var query = db.Products.AsQueryable();
 
@@ -45,6 +46,16 @@
                              .ToList()
                          })
                          .AsQueryable();
+
+            if (!string.IsNullOrEmpty(alphaFilter))
+            {
+                if (alphaFilter == "desc")
+                    queryProducts = queryProducts
+                        .OrderByDescending(x => x.Name);
+                else if (alphaFilter == "asc")
+                    queryProducts = queryProducts
+                        .OrderBy(x => x.Name);
+            }
 
             var productsCount = queryProducts.Count();
 

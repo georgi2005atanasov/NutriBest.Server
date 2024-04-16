@@ -13,7 +13,8 @@
 
         Task<AllProductsModel> All(int page,
             string? categories,
-            string? priceFilter);
+            string? priceFilter,
+            string? alpha);
 
         Task<ProductDetailsModel?> GetById(int id);
 

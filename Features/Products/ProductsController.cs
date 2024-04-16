@@ -98,7 +98,10 @@
         [HttpGet]
         //[Route("products/all")]
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
-            [FromQuery] int page = 1, [FromQuery] string? categories = "", [FromQuery] string? price = "") //might add from the query filters
+            [FromQuery] int page = 1, 
+            [FromQuery] string? categories = "", 
+            [FromQuery] string? price = "",
+            [FromQuery] string? alpha = "") //might add from the query filters
         {
             if (page < 1)
             {
@@ -106,10 +109,10 @@
                 return BadRequest();
             }
 
-            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}";
+            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}";
             if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
             {
-                var products = await productService.All(page, categories, price);
+                var products = await productService.All(page, categories, price, alpha);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
