@@ -15,7 +15,7 @@ namespace NutriBest.Server.Features.Products.Models
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         public List<string> Categories { get; set; } = null!;
     }

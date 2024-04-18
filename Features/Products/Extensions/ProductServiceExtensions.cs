@@ -1,4 +1,5 @@
-﻿using NutriBest.Server.Features.Products.Models;
+﻿using NutriBest.Server.Data.Models;
+using NutriBest.Server.Features.Products.Models;
 using System.IO.Compression;
 using System.Text;
 
@@ -100,6 +101,53 @@ namespace NutriBest.Server.Features.Products.Extensions
 
                 return Encoding.UTF8.GetString(mso.ToArray());
             }
+        }
+
+        public static IQueryable<Product> OrderByCategories(this IProductService service, IQueryable<Product> query, string categoriesFilter = "")
+        {
+            if (!string.IsNullOrEmpty(categoriesFilter))
+            {
+                var categoriesToCheck = categoriesFilter
+                    .Split()
+                    .ToList();
+
+                query = query
+                    .Where(x => x.ProductsCategories
+                                .Select(x => x.Category.Name)
+                                .Any(x => categoriesToCheck.Contains(x)));
+            }
+
+            return query;
+        }
+
+        public static IQueryable<ProductListingModel> OrderByPrice(this IProductService service, IQueryable<ProductListingModel> queryProducts, string priceFilter = "")
+        {
+            if (!string.IsNullOrEmpty(priceFilter))
+            {
+                if (priceFilter == "desc")
+                    queryProducts = queryProducts
+                        .OrderByDescending(x => x.Price);
+                else if (priceFilter == "asc")
+                    queryProducts = queryProducts
+                        .OrderBy(x => x.Price);
+            }
+
+            return queryProducts;
+        }
+
+        public static IQueryable<ProductListingModel> OrderByName(this IProductService service, IQueryable<ProductListingModel> queryProducts, string alphaFilter = "")
+        {
+            if (!string.IsNullOrEmpty(alphaFilter))
+            {
+                if (alphaFilter == "desc")
+                    queryProducts = queryProducts
+                        .OrderByDescending(x => x.Name);
+                else if (alphaFilter == "asc")
+                    queryProducts = queryProducts
+                        .OrderBy(x => x.Name);
+            }
+
+            return queryProducts;
         }
     }
 }

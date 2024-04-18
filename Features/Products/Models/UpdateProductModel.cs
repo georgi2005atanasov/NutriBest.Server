@@ -13,7 +13,7 @@
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [Required]
         public string Description { get; set; } = null!;
@@ -21,7 +21,8 @@
         [Required]
         public List<string> Categories { get; set; } = null!;
 
-        [Required]
-        public IFormFile Image { get; set; } = null!;
+        public IFormFile? Image { get; set; }
+
+        //more...
     }
 }

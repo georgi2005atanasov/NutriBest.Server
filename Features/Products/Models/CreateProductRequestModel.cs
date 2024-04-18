@@ -10,7 +10,7 @@
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [Required]
         public string Description { get; set; } = null!;

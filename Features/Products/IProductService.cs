@@ -6,7 +6,7 @@
     {
         Task<int> Create(string name,
             string description,
-            double price,
+            decimal price,
             List<int> categoriesIds,
             string imageData,
             string contentType);
@@ -21,7 +21,7 @@
         Task<int> Update(int id,
             string name,
             string description,
-            double price,
+            decimal price,
             List<int> categoriesIds,
             string imageData,
             string contentType);

@@ -213,7 +213,7 @@
 
         [HttpGet]
         [Route("by-category-count")]
-        public async Task<ActionResult<bool>> GetByCategoryCount(int id)
+        public async Task<ActionResult<bool>> GetByCategoryCount()
         {
             var products = await categoryService.GetProductsCountByCategory();
 

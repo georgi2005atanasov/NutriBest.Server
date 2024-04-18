@@ -43,12 +43,11 @@
                 .Select(x => new ImageListingModel
                 {
                     ContentType = x.ContentType,
-                    ImageData = x.ImageData
+                    ImageData = x.ImageData,
+                    
                 })
                 .FirstOrDefaultAsync();
-
             return image;
         }
-           
     }
 }

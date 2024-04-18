@@ -3,16 +3,22 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Images;
+    using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using static ServicesConstants.PaginationConstants; // make separate constants class
-
+    
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
+        private readonly IImageService imageService;
 
-        public ProductService(NutriBestDbContext db)
-            => this.db = db;
+        public ProductService(NutriBestDbContext db, IImageService imageService)
+        {
+            this.db = db;
+            this.imageService = imageService;
+        }
 
         public async Task<AllProductsModel> All(int page,
             string? categoriesFilter,
@@ -21,17 +27,7 @@
         {
             var query = db.Products.AsQueryable();
 
-            if (!string.IsNullOrEmpty(categoriesFilter))
-            {
-                var categoriesToCheck = categoriesFilter
-                    .Split()
-                    .ToList();
-
-                query = query
-                    .Where(x => x.ProductsCategories
-                                .Select(x => x.Category.Name)
-                                .Any(x => categoriesToCheck.Contains(x)));
-            }
+            query = this.OrderByCategories(query, categoriesFilter ?? "");
 
             int pagesToSkip = (page - 1) * productsPerPage;
 
@@ -47,27 +43,15 @@
                          })
                          .AsQueryable();
 
-            if (!string.IsNullOrEmpty(alphaFilter))
-            {
-                if (alphaFilter == "desc")
-                    queryProducts = queryProducts
-                        .OrderByDescending(x => x.Name);
-                else if (alphaFilter == "asc")
-                    queryProducts = queryProducts
-                        .OrderBy(x => x.Name);
-            }
+            queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
 
             var productsCount = queryProducts.Count();
 
-            if (!string.IsNullOrEmpty(priceFilter))
-            {
-                if (priceFilter == "desc")
-                    queryProducts = queryProducts
-                        .OrderByDescending(x => x.Price);
-                else if (priceFilter == "asc")
-                    queryProducts = queryProducts
-                        .OrderBy(x => x.Price);
-            }
+            queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
+
+            queryProducts = queryProducts
+                .Skip(pagesToSkip)
+                .Take(productsPerPage);
 
             var products = await queryProducts.ToListAsync();
 
@@ -82,7 +66,7 @@
 
         public async Task<int> Create(string name,
             string description,
-            double price,
+            decimal price,
             List<int> categoriesIds,
             string imageData,
             string contentType)
@@ -120,27 +104,34 @@
         public async Task<ProductDetailsModel?> GetById(int id)
         {
             var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == id);
+                         .Select(x => new ProductDetailsModel
+                         {
+                             ProductId = x.ProductId,
+                             Name = x.Name,
+                             Price = x.Price,
+                             Categories = x.ProductsCategories
+                             .Select(c => c.Category.Name)
+                             .ToList(),
+                             Description = x.Description,
+                             Image = new ImageListingModel
+                             {
+                                 ContentType = x.ProductImage.ContentType,
+                                 ImageData = x.ProductImage.ImageData
+                             }
+                             
+                         })
+                         .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
                 return null;
 
-            var productDetailsModel = new ProductDetailsModel
-            {
-                ProductId = product.ProductId,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                ProductImageId = product.ProductImageId,
-            };
-
-            return productDetailsModel;
+            return product;
         }
 
         public async Task<int> Update(int productId,
             string name,
             string description,
-            double price,
+            decimal price,
             List<int> categoriesIds,
             string imageData,
             string contentType)
@@ -179,7 +170,6 @@
         {
             try
             {
-
                 var product = await db.Products
                     .FirstAsync(x => x.ProductId == productId);
 
