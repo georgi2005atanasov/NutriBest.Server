@@ -108,7 +108,7 @@ namespace NutriBest.Server.Features.Products.Extensions
             if (!string.IsNullOrEmpty(categoriesFilter))
             {
                 var categoriesToCheck = categoriesFilter
-                    .Split()
+                    .Split(" and ")
                     .ToList();
 
                 query = query
