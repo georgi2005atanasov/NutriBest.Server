@@ -181,6 +181,8 @@
                     productImage.ContentType
                 );
 
+                memoryCache.Remove($"image_{productModel.ProductId}");
+
                 return productId;
             }
             else
@@ -196,7 +198,7 @@
         [Authorize(Roles = "Administrator")]
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult<bool>> Delete(int id)
+        public async Task<ActionResult<bool>> Delete([FromRoute] int id)
         {
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == id);
@@ -207,6 +209,8 @@
             }
 
             var result = await productService.Delete(id);
+
+            memoryCache.Remove($"image_{id}");
 
             return result;
         }
@@ -219,6 +223,15 @@
 
             return Ok(products);
         }
+
+        //[Authorize("Administrator")]
+        [HttpGet]
+        [Route("identifiers")]
+        public async Task<ActionResult<IEnumerable<int>>> GetProductsIds()
+            => Ok(await db.Products
+            .Select(x => x.ProductId)
+            .OrderBy(x => x)
+            .ToListAsync());
 
         private async Task<bool> ProductExists(string productName)
         {

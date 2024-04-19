@@ -8,17 +8,13 @@
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using static ServicesConstants.PaginationConstants; // make separate constants class
-    
+
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
-        private readonly IImageService imageService;
 
-        public ProductService(NutriBestDbContext db, IImageService imageService)
-        {
-            this.db = db;
-            this.imageService = imageService;
-        }
+        public ProductService(NutriBestDbContext db)
+            => this.db = db;
 
         public async Task<AllProductsModel> All(int page,
             string? categoriesFilter,
@@ -118,7 +114,7 @@
                                  ContentType = x.ProductImage.ContentType,
                                  ImageData = x.ProductImage.ImageData
                              }
-                             
+
                          })
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
