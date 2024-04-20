@@ -19,13 +19,14 @@
         public async Task<AllProductsModel> All(int page,
             string? categoriesFilter,
             string? priceFilter,
-            string? alphaFilter)
+            string? alphaFilter,
+            string? productsView)
         {
             var query = db.Products.AsQueryable();
 
             query = this.OrderByCategories(query, categoriesFilter ?? "");
 
-            int pagesToSkip = (page - 1) * productsPerPage;
+            int pagesToSkip = (page - 1) * ((productsView == "all" || productsView == "") ? productsPerPage : productsPerTable);
 
             var queryProducts = query.OrderBy(x => x.CreatedOn)
                          .Select(x => new ProductListingModel
@@ -47,11 +48,12 @@
 
             queryProducts = queryProducts
                 .Skip(pagesToSkip)
-                .Take(productsPerPage);
+                .Take((productsView == "all" || productsView == "") ? productsPerPage : productsPerTable);
 
             var products = await queryProducts.ToListAsync();
 
-            var productsRows = this.GetProductsRows(products);
+            var productsRows = this.GetProductsRows(products, 
+                (productsView == "all" || productsView == "") ? productsPerRow : productsPerRowInTable);
 
             return new AllProductsModel
             {

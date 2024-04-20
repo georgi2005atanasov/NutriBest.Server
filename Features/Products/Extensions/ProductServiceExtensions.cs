@@ -5,10 +5,9 @@ using System.Text;
 
 namespace NutriBest.Server.Features.Products.Extensions
 {
-    using static ServicesConstants.PaginationConstants;
     public static class ProductServiceExtensions
     {
-        public static List<List<ProductListingModel>> GetProductsRows(this IProductService service, List<ProductListingModel> products)
+        public static List<List<ProductListingModel>> GetProductsRows(this IProductService service, List<ProductListingModel> products, int productsPerRow)
         {
             var productsRows = new List<List<ProductListingModel>>();
             int i = 0;
