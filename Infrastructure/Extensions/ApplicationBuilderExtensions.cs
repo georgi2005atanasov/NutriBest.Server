@@ -31,6 +31,7 @@
                 await db.Categories!.AddRangeAsync(new List<Category>
                 {
                     new Category{ Name="Proteins" },
+                    new Category{ Name="Amino Acids" },
                     new Category{ Name="Pre-Workout" },
                     new Category{ Name="Vitamins" },
                     new Category{ Name="Creatines" },

@@ -94,9 +94,7 @@
             }
         }
 
-        //products?page=0
         [HttpGet]
-        //[Route("products/all")]
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
             [FromQuery] int page = 1, 
             [FromQuery] string? categories = "", 
@@ -139,6 +137,15 @@
         {
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
+
+            if (await ProductExists(productModel.Name) && product!.Name != productModel.Name)
+            {
+                return BadRequest(new
+                {
+                    Key = "Name",
+                    Message = "Product with this name already exists!"
+                });
+            }
 
             if (product == null)
             {
