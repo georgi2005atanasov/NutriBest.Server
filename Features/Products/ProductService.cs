@@ -20,13 +20,15 @@
             string? categoriesFilter,
             string? priceFilter,
             string? alphaFilter,
-            string? productsView)
+            string? productsView,
+            string? search)
         {
             var query = db.Products.AsQueryable();
 
-            query = this.OrderByCategories(query, categoriesFilter ?? "");
+            query = this.SelectByCategories(query, categoriesFilter ?? "");
+            query = this.GetBySearch(query, search ?? "");
 
-            int pagesToSkip = (page - 1) * ((productsView == "all" || productsView == "") ? productsPerPage : productsPerTable);
+            int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
             var queryProducts = query.OrderBy(x => x.CreatedOn)
                          .Select(x => new ProductListingModel
@@ -40,20 +42,22 @@
                          })
                          .AsQueryable();
 
+
             queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
 
             var productsCount = queryProducts.Count();
 
             queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
 
+
             queryProducts = queryProducts
                 .Skip(pagesToSkip)
-                .Take((productsView == "all" || productsView == "") ? productsPerPage : productsPerTable);
+                .Take((productsView == "all") ? productsPerPage : productsPerTable);
 
             var products = await queryProducts.ToListAsync();
 
             var productsRows = this.GetProductsRows(products, 
-                (productsView == "all" || productsView == "") ? productsPerRow : productsPerRowInTable);
+                (productsView == "all") ? productsPerRow : productsPerRowInTable);
 
             return new AllProductsModel
             {

@@ -30,20 +30,6 @@ namespace NutriBest.Server.Features.Products.Extensions
             return productsRows;
         }
 
-        public static List<ProductListingModel> FilterByPrice(this IProductService service, List<ProductListingModel> products, string? priceFilter)
-        {
-            if (priceFilter == "desc")
-                products = products
-                    .OrderByDescending(x => x)
-                    .ToList();
-            else if (priceFilter == "asc")
-                products = products
-                    .OrderBy(x => x)
-                    .ToList();
-
-            return products;
-        }
-
         public static bool HasValidCategory(this IProductService service, List<string> categories, string categoriesFilter)
         {
             var categoriesFilterList = categoriesFilter.Split();
@@ -102,7 +88,7 @@ namespace NutriBest.Server.Features.Products.Extensions
             }
         }
 
-        public static IQueryable<Product> OrderByCategories(this IProductService service, IQueryable<Product> query, string categoriesFilter = "")
+        public static IQueryable<Product> SelectByCategories(this IProductService service, IQueryable<Product> query, string categoriesFilter = "")
         {
             if (!string.IsNullOrEmpty(categoriesFilter))
             {
@@ -148,5 +134,13 @@ namespace NutriBest.Server.Features.Products.Extensions
 
             return queryProducts;
         }
+
+        public static IQueryable<Product> GetBySearch(this IProductService service, IQueryable<Product> queryProducts, string search)
+        => search != ""
+            ? queryProducts = queryProducts
+                .Where(x => x.Name.ToLower().Contains(search.ToLower()) || x.ProductsCategories
+                                .Select(x => x.Category.Name)
+                                .Any(y => y.ToLower() == search.ToLower()))
+            : queryProducts;
     }
 }

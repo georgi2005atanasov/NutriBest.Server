@@ -1,10 +1,12 @@
 ﻿namespace NutriBest.Server.Features.Products
 {
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
@@ -100,11 +102,11 @@
             [FromQuery] string? categories = "", 
             [FromQuery] string? price = "",
             [FromQuery] string? alpha = "",
-            [FromQuery] string? productsView = "") //might add from the query filters
+            [FromQuery] string? productsView = "all",
+            [FromQuery] string? search = "") //might add from the query filters
         {
             if (page < 1)
             {
-                //edit the error message
                 return BadRequest();
             }
 
@@ -113,10 +115,10 @@
                 return BadRequest();
             }
 
-            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}";
+            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
             if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
             {
-                var products = await productService.All(page, categories, price, alpha, productsView);
+                var products = await productService.All(page, categories, price, alpha, productsView, search);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
