@@ -5,5 +5,7 @@
         public IEnumerable<IEnumerable<ProductListingModel>>? ProductsRows { get; set; }
 
         public int Count { get; set; }
+
+        public int MaxPrice { get; set; }
     }
 }

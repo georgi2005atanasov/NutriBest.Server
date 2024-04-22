@@ -21,12 +21,16 @@
             string? priceFilter,
             string? alphaFilter,
             string? productsView,
-            string? search)
+            string? search,
+            string? priceRange)
         {
             var query = db.Products.AsQueryable();
 
+            var maxPrice = (int)Math.Ceiling(query.Select(x => x.Price).Max());
+
             query = this.SelectByCategories(query, categoriesFilter ?? "");
             query = this.GetBySearch(query, search ?? "");
+            query = this.GetByPriceRange(query, priceRange ?? "");
 
             int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
@@ -63,6 +67,7 @@
             {
                 ProductsRows = productsRows,
                 Count = productsCount,
+                MaxPrice = maxPrice
             };
         }
 

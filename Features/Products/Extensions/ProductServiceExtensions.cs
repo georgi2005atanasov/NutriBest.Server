@@ -1,10 +1,9 @@
-﻿using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Products.Models;
-using System.IO.Compression;
-using System.Text;
-
+﻿
 namespace NutriBest.Server.Features.Products.Extensions
 {
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products.Models;
+
     public static class ProductServiceExtensions
     {
         public static List<List<ProductListingModel>> GetProductsRows(this IProductService service, List<ProductListingModel> products, int productsPerRow)
@@ -44,48 +43,6 @@ namespace NutriBest.Server.Features.Products.Extensions
             }
 
             return false;
-        }
-
-        public static void CopyTo(this IProductService service, Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[4096];
-
-            int cnt;
-
-            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                dest.Write(bytes, 0, cnt);
-            }
-        }
-
-        public static byte[] Zip(this IProductService service, string str)
-        {
-            var bytes = Encoding.UTF8.GetBytes(str);
-
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream())
-            {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    msi.CopyTo(gs);
-                }
-
-                return mso.ToArray();
-            }
-        }
-
-        public static string Unzip(this IProductService service, byte[] bytes)
-        {
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream())
-            {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-                {
-                    gs.CopyTo(mso);
-                }
-
-                return Encoding.UTF8.GetString(mso.ToArray());
-            }
         }
 
         public static IQueryable<Product> SelectByCategories(this IProductService service, IQueryable<Product> query, string categoriesFilter = "")
@@ -142,5 +99,29 @@ namespace NutriBest.Server.Features.Products.Extensions
                                 .Select(x => x.Category.Name)
                                 .Any(y => y.ToLower() == search.ToLower()))
             : queryProducts;
+
+        public static IQueryable<Product> GetByPriceRange(this IProductService service, IQueryable<Product> query, string priceRange = "")
+        {
+            if (priceRange == "")
+            {
+                return query;
+            }
+
+            try
+            {
+                var numbers = priceRange.Split();
+                var minPrice = int.Parse(numbers[0]);
+                var maxPrice = int.Parse(numbers[1]);
+
+                query = query
+                    .Where(x => x.Price >= minPrice && x.Price <= maxPrice);
+
+                return query;
+            }
+            catch (Exception)
+            {
+                return query;
+            }
+        }
     }
 }

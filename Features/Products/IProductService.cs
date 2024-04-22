@@ -16,7 +16,8 @@
             string? priceFilter,
             string? alphaFilter,
             string? productsView,
-            string? search);
+            string? search,
+            string? priceRange);
 
         Task<ProductDetailsModel?> GetById(int id);
 

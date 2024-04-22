@@ -103,8 +103,10 @@
             [FromQuery] string? price = "",
             [FromQuery] string? alpha = "",
             [FromQuery] string? productsView = "all",
-            [FromQuery] string? search = "") //might add from the query filters
+            [FromQuery] string? search = "",
+            [FromQuery] string? priceRange = "") //might add from the query filters
         {
+            Console.WriteLine(priceRange);
             if (page < 1)
             {
                 return BadRequest();
@@ -118,7 +120,7 @@
             string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
             if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
             {
-                var products = await productService.All(page, categories, price, alpha, productsView, search);
+                var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
