@@ -17,6 +17,8 @@
         [Range(MinPrice, MaxPrice)]
         public decimal Price { get; set; }
 
+        public int? Quantity { get; set; }
+
         [Required]
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;

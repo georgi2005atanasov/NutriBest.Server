@@ -3,7 +3,6 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
@@ -42,7 +41,8 @@
                              Price = x.Price,
                              Categories = x.ProductsCategories
                              .Select(c => c.Category.Name)
-                             .ToList()
+                             .ToList(),
+                             Quantity = x.Quantity
                          })
                          .AsQueryable();
 
@@ -74,6 +74,7 @@
         public async Task<int> Create(string name,
             string description,
             decimal price,
+            int? quantity,
             List<int> categoriesIds,
             string imageData,
             string contentType)
@@ -91,7 +92,8 @@
                 Price = price,
                 ProductImage = productImage,
                 ProductsCategories = new List<ProductCategory>(),
-                CreatedOn = DateTime.Now
+                CreatedOn = DateTime.Now,
+                Quantity = quantity
             };
 
             foreach (var id in categoriesIds)
@@ -124,8 +126,8 @@
                              {
                                  ContentType = x.ProductImage.ContentType,
                                  ImageData = x.ProductImage.ImageData
-                             }
-
+                             },
+                             Quantity = x.Quantity,
                          })
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
@@ -139,6 +141,7 @@
             string name,
             string description,
             decimal price,
+            int? quantity,
             List<int> categoriesIds,
             string imageData,
             string contentType)
@@ -157,6 +160,7 @@
             product.Price = price;
             product.ProductImage = productImage;
             product.ProductsCategories = new List<ProductCategory>();
+            product.Quantity = quantity;
 
             var existingMappings = db.ProductsCategories.Where(pc => pc.ProductId == productId);
             db.ProductsCategories.RemoveRange(existingMappings);

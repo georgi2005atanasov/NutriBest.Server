@@ -7,6 +7,7 @@
         Task<int> Create(string name,
             string description,
             decimal price,
+            int? quantity,
             List<int> categoriesIds,
             string imageData,
             string contentType);
@@ -25,6 +26,7 @@
             string name,
             string description,
             decimal price,
+            int? quantity,
             List<int> categoriesIds,
             string imageData,
             string contentType);

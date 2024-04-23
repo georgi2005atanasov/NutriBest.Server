@@ -1,12 +1,15 @@
-﻿namespace NutriBest.Server.Features.Products
+﻿using System;
+
+namespace NutriBest.Server.Features.Products
 {
+    using System.IO;
+    using System.Net.Http.Headers;
+    using System.Net.Mime;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
@@ -79,6 +82,7 @@
                     .Create(productModel.Name,
                     productModel.Description,
                     productModel.Price,
+                    productModel.Quantity,
                     categoriesIds,
                     productImage.ImageData,
                     productImage.ContentType
@@ -98,8 +102,8 @@
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
-            [FromQuery] int page = 1, 
-            [FromQuery] string? categories = "", 
+            [FromQuery] int page = 1,
+            [FromQuery] string? categories = "",
             [FromQuery] string? price = "",
             [FromQuery] string? alpha = "",
             [FromQuery] string? productsView = "all",
@@ -148,18 +152,18 @@
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
-            if (await ProductExists(productModel.Name) && product!.Name != productModel.Name)
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (await ProductExists(productModel.Name) && product?.Name != productModel.Name)
             {
                 return BadRequest(new
                 {
                     Key = "Name",
                     Message = "Product with this name already exists!"
                 });
-            }
-
-            if (product == null)
-            {
-                return NotFound();
             }
 
             if (productModel.Price <= 0)
@@ -193,6 +197,7 @@
                     productModel.Name,
                     productModel.Description,
                     productModel.Price,
+                    productModel.Quantity,
                     categoriesIds,
                     productImage.ImageData,
                     productImage.ContentType
@@ -204,11 +209,22 @@
             }
             else
             {
-                return BadRequest(new
-                {
-                    Key = "Image",
-                    Message = "Image is required!"
-                });
+                var image = await imageService.GetImageByProductId(productModel.ProductId);
+
+                int productId = await productService
+                    .Update(productModel.ProductId,
+                    productModel.Name,
+                    productModel.Description,
+                    productModel.Price,
+                    productModel.Quantity,
+                    categoriesIds,
+                    image.ImageData,
+                    image.ContentType
+                );
+
+                memoryCache.Remove($"image_{productModel.ProductId}");
+
+                return productId;
             }
         }
 
