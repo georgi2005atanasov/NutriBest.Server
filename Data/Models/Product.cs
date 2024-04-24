@@ -3,7 +3,7 @@
     using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using static WebConstants.ProductConstants;
+    using static Validation.Product;
 
     public class Product : DeletableEntity
     {
@@ -11,7 +11,7 @@
         public int ProductId { get; set; }
 
         [Required]
-        [MaxLength(MaxNameLength)]
+        [MaxLength(NameMaxLength)]
         public string Name { get; set; } = null!;
 
         [Required]
@@ -21,7 +21,7 @@
         public int? Quantity { get; set; }
 
         [Required]
-        [StringLength(MaxNameLength, MinimumLength = 5)]
+        [StringLength(DescriptionMaxLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
         public int ProductImageId { get; set; }

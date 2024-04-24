@@ -24,10 +24,12 @@ var appSettings = applicationSettings
 
 var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 
+builder.Services.AddHttpContextAccessor();
+
 //make extension method for adding services
 builder.Services
-    .AddTransient<IIdentityService, IdentityService>()
     .AddScoped<ICurrentUserService, CurrentUserService>()
+    .AddTransient<IIdentityService, IdentityService>()
     .AddTransient<IProductService, ProductService>()
     .AddTransient<IImageService, ImageService>()
     .AddTransient<ICategoryService, CategoryService>();

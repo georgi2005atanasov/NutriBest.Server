@@ -19,13 +19,32 @@
             SeedAdministrator(services.ServiceProvider);
             SeedCategories(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
+            SeedUserRole(services.ServiceProvider);
+        }
+
+        private static void SeedUserRole(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            Task.Run(async () =>
+            {
+                if (!await roleManager.RoleExistsAsync("User"))
+                {
+                    var role = new IdentityRole
+                    {
+                        Name = "User"
+                    };
+
+                    await roleManager.CreateAsync(role);
+                }
+            })
+                .GetAwaiter()
+                .GetResult();
         }
 
         private static void SeedEmployeeRole(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var config = serviceProvider.GetService<IConfiguration>();
 
             Task.Run(async () =>
             {
@@ -34,7 +53,10 @@
                     return;
                 }
 
-                var role = new IdentityRole { Name = "Employee" };
+                var role = new IdentityRole
+                {
+                    Name = "Employee"
+                };
 
                 await roleManager.CreateAsync(role);
             })

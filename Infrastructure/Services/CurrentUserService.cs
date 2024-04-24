@@ -1,22 +1,28 @@
-﻿using NutriBest.Server.Infrastructure.Extensions;
-using System.Security.Claims;
-
+﻿
 namespace NutriBest.Server.Infrastructure.Services
 {
+    using NutriBest.Server.Infrastructure.Extensions;
+    using System.Security.Claims;
+
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly ClaimsPrincipal user;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
-            => this.user = httpContextAccessor.HttpContext?.User;
+        {
+            this.httpContextAccessor = httpContextAccessor;
+        }
 
         public string? GetUserId()
-            => user
-            .GetId();
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+            return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
 
         public string? GetUserName()
-            => user
-            .Identity?
-            .Name;
+        {
+            var user = httpContextAccessor.HttpContext?.User;
+            return user?.Identity?.Name;
+        }
     }
 }

@@ -33,7 +33,8 @@
 
             int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
-            var queryProducts = query.OrderBy(x => x.CreatedOn)
+            var queryProducts = query
+                .OrderByDescending(x => x.CreatedOn)
                          .Select(x => new ProductListingModel
                          {
                              ProductId = x.ProductId,

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424183927_AddedDetailsForTheUser")]
+    partial class AddedDetailsForTheUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,7 +171,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -225,7 +227,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("ProductImageId")
                         .IsUnique();
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductCategory", b =>
@@ -243,7 +245,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductsCategories", (string)null);
+                    b.ToTable("ProductsCategories");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductImage", b =>
@@ -285,7 +287,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("ProductImageId");
 
-                    b.ToTable("ProductsImages", (string)null);
+                    b.ToTable("ProductsImages");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.User", b =>
