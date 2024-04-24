@@ -6,6 +6,7 @@ using NutriBest.Server.Features.Images;
 using NutriBest.Server.Features.Products;
 using NutriBest.Server.Infrastructure.Extensions;
 using NutriBest.Server.Infrastructure.Filters;
+using NutriBest.Server.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 //make extension method for adding services
 builder.Services
     .AddTransient<IIdentityService, IdentityService>()
+    .AddScoped<ICurrentUserService, CurrentUserService>()
     .AddTransient<IProductService, ProductService>()
     .AddTransient<IImageService, ImageService>()
     .AddTransient<ICategoryService, CategoryService>();

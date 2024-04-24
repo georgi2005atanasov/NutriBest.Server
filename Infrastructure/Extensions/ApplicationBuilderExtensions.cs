@@ -4,6 +4,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using System;
 
     public static class ApplicationBuilderExtensions
     {
@@ -17,6 +18,28 @@
 
             SeedAdministrator(services.ServiceProvider);
             SeedCategories(dbContext);
+            SeedEmployeeRole(services.ServiceProvider);
+        }
+
+        private static void SeedEmployeeRole(IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config = serviceProvider.GetService<IConfiguration>();
+
+            Task.Run(async () =>
+            {
+                if (await roleManager.RoleExistsAsync("Employee"))
+                {
+                    return;
+                }
+
+                var role = new IdentityRole { Name = "Employee" };
+
+                await roleManager.CreateAsync(role);
+            })
+                .GetAwaiter()
+                .GetResult();
         }
 
         private static void SeedCategories(NutriBestDbContext db)

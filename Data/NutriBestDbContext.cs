@@ -4,19 +4,27 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Data.Models.Base;
+    using NutriBest.Server.Infrastructure.Services;
     using System.Threading;
     using System.Threading.Tasks;
 
     public class NutriBestDbContext : IdentityDbContext<User>
     {
+        private readonly ICurrentUserService currentUser;
+
         public DbSet<Product> Products { get; set; } = null!;
+
         public DbSet<ProductImage> ProductsImages { get; set; } = null!;
+
         public DbSet<Category> Categories { get; set; } = null!;
+
         public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 
-        public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options)
+        public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
+            ICurrentUserService currentUser)
             : base(options)
         {
+            this.currentUser = currentUser;
         }
 
         public override int SaveChanges()
@@ -47,6 +55,12 @@
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<Product>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<ProductImage>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
             builder.Entity<ProductCategory>(e =>
             {
                 e.HasKey(bc => new { bc.ProductId, bc.CategoryId });
@@ -69,13 +83,15 @@
                 .ToList()
                 .ForEach(entry =>
                 {
+                    var user = currentUser.GetUserName();
+
                     if (entry.Entity is IDeletableEntity deletableEntity)
                     {
                         if (entry.State == EntityState.Deleted)
                         {
                             deletableEntity.DeletedOn = DateTime.UtcNow;
                             deletableEntity.IsDeleted = true;
-                            // by who
+                            deletableEntity.DeletedBy = user;
 
                             entry.State = EntityState.Modified;
                             return;
@@ -87,12 +103,12 @@
                         if (entry.State == EntityState.Added)
                         {
                             entity.CreatedOn = DateTime.UtcNow;
-                            // by who
+                            entity.CreatedBy = user;
                         }
                         else if (entry.State == EntityState.Modified)
                         {
                             entity.ModifiedOn = DateTime.UtcNow;
-                            // by who
+                            entity.ModifiedBy = user;
                         }
                     }
                 });
