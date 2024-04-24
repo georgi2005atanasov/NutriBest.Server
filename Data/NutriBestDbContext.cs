@@ -22,12 +22,20 @@
         public override int SaveChanges()
         {
             ApplyAuditInformation();
+            foreach (var entry in this.ChangeTracker.Entries())
+            {
+                Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+            }
             return base.SaveChanges();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
+            foreach (var entry in this.ChangeTracker.Entries())
+            {
+                Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+            }
             return base.SaveChangesAsync(cancellationToken);
         }
 
@@ -62,12 +70,6 @@
         private void ApplyAuditInformation()
             => this.ChangeTracker
                 .Entries()
-                .Where(entry => entry.Entity is IEntity)
-                .Select(entry => new
-                {
-                    entry.Entity,
-                    entry.State
-                })
                 .ToList()
                 .ForEach(entry =>
                 {
@@ -76,17 +78,25 @@
                         if (entry.State == EntityState.Deleted)
                         {
                             deletableEntity.DeletedOn = DateTime.UtcNow;
+                            deletableEntity.IsDeleted = true;
+                            // by who
+
+                            entry.State = EntityState.Modified;
+                            return;
                         }
                     }
-                    else if (entry.Entity is IEntity entity)
+
+                    if (entry.Entity is IEntity entity)
                     {
                         if (entry.State == EntityState.Added)
                         {
                             entity.CreatedOn = DateTime.UtcNow;
+                            // by who
                         }
                         else if (entry.State == EntityState.Modified)
                         {
                             entity.ModifiedOn = DateTime.UtcNow;
+                            // by who
                         }
                     }
                 });

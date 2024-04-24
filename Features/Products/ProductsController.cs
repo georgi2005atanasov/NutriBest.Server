@@ -110,30 +110,36 @@ namespace NutriBest.Server.Features.Products
             [FromQuery] string? search = "",
             [FromQuery] string? priceRange = "") //might add from the query filters
         {
-            Console.WriteLine(priceRange);
-            if (page < 1)
+            try
+            {
+                if (page < 1)
+                {
+                    return BadRequest();
+                }
+
+                if (productsView == "table" && !User.IsInRole("Administrator"))
+                {
+                    return BadRequest();
+                }
+
+                string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
+                if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
+                {
+                    var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
+
+                    memoryCache.Set(cacheKey, products, cacheEntryOptions);
+                    return Ok(products);
+                }
+
+                return Ok(cachedProducts);
+            }
+            catch (Exception)
             {
                 return BadRequest();
             }
-
-            if (productsView == "table" && !User.IsInRole("Administrator"))
-            {
-                return BadRequest();
-            }
-
-            string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
-            if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
-            {
-                var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
-
-                memoryCache.Set(cacheKey, products, cacheEntryOptions);
-                return Ok(products);
-            }
-
-            return Ok(cachedProducts);
         }
 
         [HttpGet]

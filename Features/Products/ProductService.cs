@@ -34,6 +34,7 @@
             int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
             var queryProducts = query.OrderBy(x => x.CreatedOn)
+                         .Where(x => !x.IsDeleted)
                          .Select(x => new ProductListingModel
                          {
                              ProductId = x.ProductId,
@@ -60,7 +61,7 @@
 
             var products = await queryProducts.ToListAsync();
 
-            var productsRows = this.GetProductsRows(products, 
+            var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);
 
             return new AllProductsModel
