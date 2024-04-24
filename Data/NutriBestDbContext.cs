@@ -32,10 +32,6 @@
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
-            foreach (var entry in this.ChangeTracker.Entries())
-            {
-                Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
-            }
             return base.SaveChangesAsync(cancellationToken);
         }
 

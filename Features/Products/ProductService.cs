@@ -101,7 +101,10 @@
             {
                 if (!product.ProductsCategories.Any(x => x.CategoryId == id))
                     product.ProductsCategories
-                        .Add(new ProductCategory { CategoryId = id });
+                        .Add(new ProductCategory
+                        {
+                            CategoryId = id
+                        });
             }
 
 
@@ -114,6 +117,7 @@
         public async Task<ProductDetailsModel?> GetById(int id)
         {
             var product = await db.Products
+                         .Where(x => !x.IsDeleted)
                          .Select(x => new ProductDetailsModel
                          {
                              ProductId = x.ProductId,
@@ -163,7 +167,9 @@
             product.ProductsCategories = new List<ProductCategory>();
             product.Quantity = quantity;
 
-            var existingMappings = db.ProductsCategories.Where(pc => pc.ProductId == productId);
+            var existingMappings = db.ProductsCategories
+                .Where(pc => pc.ProductId == productId);
+
             db.ProductsCategories.RemoveRange(existingMappings);
 
             foreach (var id in categoriesIds)
@@ -172,6 +178,7 @@
                     .Add(new ProductCategory { CategoryId = id });
             }
 
+            //handle productCategories, since they are not really being deleted.
             db.Products.Update(product);
             await db.SaveChangesAsync();
 
@@ -185,15 +192,19 @@
                 var product = await db.Products
                     .FirstAsync(x => x.ProductId == productId);
 
-                var productsCategories = await db.ProductsCategories
-                    .Where(x => x.ProductId == productId)
-                    .ToListAsync();
-
                 var productImage = await db.ProductsImages
                     .FirstAsync(x => x.ProductImageId == product.ProductImageId);
 
-                db.ProductsCategories.RemoveRange(productsCategories);
                 db.Products.Remove(product);
+                await db.ProductsCategories
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync(pc =>
+                    {
+                        if (pc.ProductId == productId)
+                        {
+                            pc.IsDeleted = true;
+                        }
+                    });
                 db.ProductsImages.Remove(productImage);
 
                 await db.SaveChangesAsync();

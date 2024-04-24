@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Data.Models.Base
 {
-    public class DeletableEntity : Entity, IDeletableEntity
+    public abstract class DeletableEntity : Entity, IDeletableEntity
     {
         public DateTime? DeletedOn { get; set; }
 
