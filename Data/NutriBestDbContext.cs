@@ -3,17 +3,32 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Data.Models.Base;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public class NutriBestDbContext : IdentityDbContext<User>
     {
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductImage> ProductsImages { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<ProductCategory> ProductsCategories { get; set; }
+        public DbSet<Product> Products { get; set; } = null!;
+        public DbSet<ProductImage> ProductsImages { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options)
             : base(options)
         {
+        }
+
+        public override int SaveChanges()
+        {
+            ApplyAuditInformation();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            ApplyAuditInformation();
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -42,7 +57,38 @@
                 .HasForeignKey(bc => bc.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
-
         }
+
+        private void ApplyAuditInformation()
+            => this.ChangeTracker
+                .Entries()
+                .Where(entry => entry.Entity is IEntity)
+                .Select(entry => new
+                {
+                    entry.Entity,
+                    entry.State
+                })
+                .ToList()
+                .ForEach(entry =>
+                {
+                    if (entry.Entity is IDeletableEntity deletableEntity)
+                    {
+                        if (entry.State == EntityState.Deleted)
+                        {
+                            deletableEntity.DeletedOn = DateTime.UtcNow;
+                        }
+                    }
+                    else if (entry.Entity is IEntity entity)
+                    {
+                        if (entry.State == EntityState.Added)
+                        {
+                            entity.CreatedOn = DateTime.UtcNow;
+                        }
+                        else if (entry.State == EntityState.Modified)
+                        {
+                            entity.ModifiedOn = DateTime.UtcNow;
+                        }
+                    }
+                });
     }
 }

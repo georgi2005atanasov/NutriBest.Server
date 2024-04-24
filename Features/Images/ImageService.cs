@@ -1,6 +1,5 @@
 ﻿namespace NutriBest.Server.Features.Images
 {
-    using Microsoft.AspNetCore.Components;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
@@ -36,7 +35,7 @@
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product == null)
-                return null;
+                return null!;
 
             var image = await db.ProductsImages
                 .Where(x => x.ProductImageId == product.ProductImageId)
@@ -47,7 +46,8 @@
                     
                 })
                 .FirstOrDefaultAsync();
-            return image;
+
+            return image!;
         }
     }
 }

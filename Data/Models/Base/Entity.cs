@@ -1,10 +1,8 @@
-﻿namespace NutriBest.Server.Data.Models
-{
-    using Microsoft.AspNetCore.Identity;
-    using NutriBest.Server.Data.Models.Base;
-    using System;
+﻿using System.ComponentModel.DataAnnotations;
 
-    public class User : IdentityUser, IEntity
+namespace NutriBest.Server.Data.Models.Base
+{
+    public abstract class Entity : IEntity
     {
         public DateTime CreatedOn { get; set; }
 

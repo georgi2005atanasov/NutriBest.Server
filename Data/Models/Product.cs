@@ -1,10 +1,11 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using static WebConstants.ProductConstants;
 
-    public class Product
+    public class Product : DeletableEntity
     {
         [Required]
         public int ProductId { get; set; }
@@ -22,9 +23,6 @@
         [Required]
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
-
-        [Required]
-        public DateTime CreatedOn { get; set; }
 
         public int ProductImageId { get; set; }
 
