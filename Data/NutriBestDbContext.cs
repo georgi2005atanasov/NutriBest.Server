@@ -47,6 +47,14 @@
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<User>(e =>
+            {
+                e.HasOne(x => x.Profile)
+                .WithOne()
+                .HasForeignKey<Profile>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<Product>(e =>
             {
                 e.HasOne(x => x.ProductImage)

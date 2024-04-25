@@ -15,7 +15,7 @@
         public ProductService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<AllProductsModel> All(int page,
+        public async Task<AllProductsServiceModel> All(int page,
             string? categoriesFilter,
             string? priceFilter,
             string? alphaFilter,
@@ -35,7 +35,7 @@
 
             var queryProducts = query
                 .OrderByDescending(x => x.CreatedOn)
-                         .Select(x => new ProductListingModel
+                         .Select(x => new ProductListingServiceModel
                          {
                              ProductId = x.ProductId,
                              Name = x.Name,
@@ -64,7 +64,7 @@
             var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);
 
-            return new AllProductsModel
+            return new AllProductsServiceModel
             {
                 ProductsRows = productsRows,
                 Count = productsCount,
@@ -114,10 +114,10 @@
             return product.ProductId;
         }
 
-        public async Task<ProductDetailsModel?> GetById(int id)
+        public async Task<ProductDetailsServiceModel?> GetById(int id)
         {
             var product = await db.Products
-                         .Select(x => new ProductDetailsModel
+                         .Select(x => new ProductDetailsServiceModel
                          {
                              ProductId = x.ProductId,
                              Name = x.Name,
@@ -126,7 +126,7 @@
                              .Select(c => c.Category.Name)
                              .ToList(),
                              Description = x.Description,
-                             Image = new ImageListingModel
+                             Image = new ImageListingServiceModel
                              {
                                  ContentType = x.ProductImage.ContentType,
                                  ImageData = x.ProductImage.ImageData

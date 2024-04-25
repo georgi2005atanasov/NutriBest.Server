@@ -2,7 +2,7 @@
 {
     using Microsoft.AspNetCore.Identity;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Identity.Models;
+    using NutriBest.Server.Features.Profile.Models;
 
     public interface IIdentityService
     {
@@ -10,9 +10,9 @@
 
         Task<IdentityResult> CreateUser(string userName, string email, string password);
 
-        Task<User> FindUserByName(string userName);
+        Task<User> FindUserByUserName(string userName);
 
-        Task<UserServiceModel> FindUserById(string id);
+        Task<ProfileServiceModel> FindUserById(string id);
 
         Task<bool> CheckUserPassword(User user, string password);
     }

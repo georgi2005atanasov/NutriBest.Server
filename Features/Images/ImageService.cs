@@ -29,7 +29,7 @@
             }
         }
 
-        public async Task<ImageListingModel> GetImageByProductId(int productId)
+        public async Task<ImageListingServiceModel> GetImageByProductId(int productId)
         {
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
@@ -39,7 +39,7 @@
 
             var image = await db.ProductsImages
                 .Where(x => x.ProductImageId == product.ProductImageId)
-                .Select(x => new ImageListingModel
+                .Select(x => new ImageListingServiceModel
                 {
                     ContentType = x.ContentType,
                     ImageData = x.ImageData,

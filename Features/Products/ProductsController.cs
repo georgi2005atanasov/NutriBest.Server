@@ -108,7 +108,7 @@ namespace NutriBest.Server.Features.Products
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingModel>>>> All(
+        public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingServiceModel>>>> All(
             [FromQuery] int page = 1,
             [FromQuery] string? categories = "",
             [FromQuery] string? price = "",
@@ -131,7 +131,7 @@ namespace NutriBest.Server.Features.Products
                 }
 
                 string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
-                if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingModel>> cachedProducts))
+                if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingServiceModel>> cachedProducts))
                 {
                     var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -152,7 +152,7 @@ namespace NutriBest.Server.Features.Products
 
         [Authorize(Roles = "Administrator")]
         [HttpPut]
-        public async Task<ActionResult<int>> Update([FromForm] UpdateProductModel productModel)
+        public async Task<ActionResult<int>> Update([FromForm] UpdateProductServiceModel productModel)
         {
             try
             {
@@ -162,6 +162,15 @@ namespace NutriBest.Server.Features.Products
                 if (product == null)
                 {
                     return NotFound();
+                }
+
+                if (productModel.Quantity < 0)
+                {
+                    return BadRequest(new
+                    {
+                        Key = "Quantity",
+                        Message = "Quantity must be a positive number!"
+                    });
                 }
 
                 if (await ProductExists(productModel.Name) && product?.Name != productModel.Name)
@@ -269,7 +278,7 @@ namespace NutriBest.Server.Features.Products
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<ProductListingModel>> Details([FromRoute] int id)
+        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id)
         {
             try
             {

@@ -23,7 +23,7 @@
             try
             {
                 string cacheKey = $"image_{id}";
-                if (!memoryCache.TryGetValue(cacheKey, out ImageListingModel cachedImage))
+                if (!memoryCache.TryGetValue(cacheKey, out ImageListingServiceModel cachedImage))
                 {
                     var image = await imageService.GetImageByProductId(id);
 

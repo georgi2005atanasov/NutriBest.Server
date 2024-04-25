@@ -7,6 +7,6 @@
     {
         Task<ProductImage> CreateImage(IFormFile image, string contentType);
 
-        Task<ImageListingModel> GetImageByProductId(int productId);
+        Task<ImageListingServiceModel> GetImageByProductId(int productId);
     }
 }

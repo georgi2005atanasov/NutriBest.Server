@@ -19,6 +19,7 @@
                  options.Password.RequiredLength = 6;
                  options.Password.RequireDigit = false;
                  options.Password.RequireUppercase = false;
+                 options.User.RequireUniqueEmail = true;
              })
             .AddEntityFrameworkStores<NutriBestDbContext>();
 

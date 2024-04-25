@@ -5,7 +5,7 @@ namespace NutriBest.Server.Features.Products.Models
     using System.ComponentModel.DataAnnotations;
     using static WebConstants.ProductConstants;
 
-    public class ProductListingModel
+    public class ProductListingServiceModel
     {
         [Required]
         public int ProductId { get; set; }

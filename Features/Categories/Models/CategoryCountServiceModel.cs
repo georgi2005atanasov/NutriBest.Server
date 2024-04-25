@@ -1,8 +1,8 @@
 ﻿using NutriBest.Server.Data.Models;
 
-namespace NutriBest.Server.Features.Categories
+namespace NutriBest.Server.Features.Categories.Models
 {
-    public class CategoryCountModel
+    public class CategoryCountServiceModel
     {
         public string Category { get; set; } = null!;
         public int Count { get; set; }

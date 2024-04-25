@@ -10,7 +10,7 @@
             public const int MaxPrice = 40;
         }
 
-        public class User
+        public class Profile
         {
             public const int NameMaxLength = 40;
             public const int DescriptionMaxLength = 2000;

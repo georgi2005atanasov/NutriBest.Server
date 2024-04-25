@@ -2,7 +2,7 @@
 
 namespace NutriBest.Server.Features.Images.Models
 {
-    public class ImageListingModel
+    public class ImageListingServiceModel
     {
         [Required]
         public string ImageData { get; set; } = null!;

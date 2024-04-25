@@ -1,14 +1,16 @@
 ﻿namespace NutriBest.Server.Features.Products.Models
 {
+    using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
     using static WebConstants.ProductConstants;
 
-    public class UpdateProductModel
+    public class ProductDetailsServiceModel
     {
         [Required]
         public int ProductId { get; set; }
 
         [Required]
+        [MaxLength(MaxNameLength)]
         public string Name { get; set; } = null!;
 
         [Required]
@@ -18,13 +20,13 @@
         public int? Quantity { get; set; }
 
         [Required]
+        [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
         [Required]
-        public List<string> Categories { get; set; } = null!;
+        public List<string> Categories { get; set; } = new List<string>();
 
-        public IFormFile? Image { get; set; }
-
-        //more...
+        [Required]
+        public ImageListingServiceModel Image { get; set; } = null!;
     }
 }

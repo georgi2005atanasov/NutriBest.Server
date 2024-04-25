@@ -12,7 +12,7 @@
             string imageData,
             string contentType);
 
-        Task<AllProductsModel> All(int page,
+        Task<AllProductsServiceModel> All(int page,
             string? categories,
             string? priceFilter,
             string? alphaFilter,
@@ -20,7 +20,7 @@
             string? search,
             string? priceRange);
 
-        Task<ProductDetailsModel?> GetById(int id);
+        Task<ProductDetailsServiceModel?> GetById(int id);
 
         Task<int> Update(int id,
             string name,

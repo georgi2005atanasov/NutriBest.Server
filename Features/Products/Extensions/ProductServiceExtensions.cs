@@ -6,18 +6,18 @@ namespace NutriBest.Server.Features.Products.Extensions
 
     public static class ProductServiceExtensions
     {
-        public static List<List<ProductListingModel>> GetProductsRows(this IProductService service, List<ProductListingModel> products, int productsPerRow)
+        public static List<List<ProductListingServiceModel>> GetProductsRows(this IProductService service, List<ProductListingServiceModel> products, int productsPerRow)
         {
-            var productsRows = new List<List<ProductListingModel>>();
+            var productsRows = new List<List<ProductListingServiceModel>>();
             int i = 0;
-            var row = new List<ProductListingModel>();
+            var row = new List<ProductListingServiceModel>();
 
             for (int j = i; j < products.Count; j++)
             {
                 if (j % productsPerRow == 0 && j != 0)
                 {
                     productsRows.Add(row);
-                    row = new List<ProductListingModel>();
+                    row = new List<ProductListingServiceModel>();
                 }
 
                 row.Add(products[j]);
@@ -62,7 +62,7 @@ namespace NutriBest.Server.Features.Products.Extensions
             return query;
         }
 
-        public static IQueryable<ProductListingModel> OrderByPrice(this IProductService service, IQueryable<ProductListingModel> queryProducts, string priceFilter = "")
+        public static IQueryable<ProductListingServiceModel> OrderByPrice(this IProductService service, IQueryable<ProductListingServiceModel> queryProducts, string priceFilter = "")
         {
             if (!string.IsNullOrEmpty(priceFilter))
             {
@@ -77,7 +77,7 @@ namespace NutriBest.Server.Features.Products.Extensions
             return queryProducts;
         }
 
-        public static IQueryable<ProductListingModel> OrderByName(this IProductService service, IQueryable<ProductListingModel> queryProducts, string alphaFilter = "")
+        public static IQueryable<ProductListingServiceModel> OrderByName(this IProductService service, IQueryable<ProductListingServiceModel> queryProducts, string alphaFilter = "")
         {
             if (!string.IsNullOrEmpty(alphaFilter))
             {

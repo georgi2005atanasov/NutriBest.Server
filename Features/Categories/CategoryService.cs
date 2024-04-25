@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Features.Categories.Models;
 
     public class CategoryService : ICategoryService
     {
@@ -38,10 +39,10 @@
             return categoriesIds;
         }
 
-        public async Task<IEnumerable<CategoryCountModel>> GetProductsCountByCategory()
+        public async Task<IEnumerable<CategoryCountServiceModel>> GetProductsCountByCategory()
         {
             var categoriesCount = await db.Categories
-                .Select(x => new CategoryCountModel
+                .Select(x => new CategoryCountServiceModel
                 {
                     Category = x.Name,
                     Count = x.ProductsCategories.Where(y => y.CategoryId == x.Id).Count(),

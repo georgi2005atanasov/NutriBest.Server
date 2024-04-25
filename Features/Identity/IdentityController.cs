@@ -24,10 +24,18 @@
 
         [Route(nameof(Register))]
         [HttpPost]
-        public async Task<ActionResult> Register(RegisterRequestModel userModel)
+        public async Task<ActionResult> Register(RegisterServiceModel userModel)
         {
             try
             {
+                if (userModel.ConfirmPassword != userModel.Password)
+                {
+                    return BadRequest(new {
+                        Key = "Password",
+                        Message = "Both passwords should match!"
+                    });
+                }
+
                 var result = await identityService
                          .CreateUser(userModel.UserName,
                                      userModel.Email,
@@ -48,7 +56,7 @@
 
         [Route(nameof(Login))]
         [HttpPost]
-        public async Task<ActionResult<string>> Login(LoginRequestModel userModel)
+        public async Task<ActionResult<string>> Login(LoginServiceModel userModel)
         {
             try
             {
@@ -74,45 +82,5 @@
                 return BadRequest();
             }
         }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("{userId}")]
-        public async Task<ActionResult<UserServiceModel?>> GetById(string userId)
-        {
-            try
-            {
-                Task<UserServiceModel>? task = identityService.FindUserById(userId);
-                return await task!;
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-
-        [HttpGet]
-        [Route("mine")]
-        [Authorize(Roles = "Administrator,Employee,User")]
-        public async Task<ActionResult<UserServiceModel?>> GetCurrentUser()
-        {
-            try
-            {
-                var currentUserId = currentUserService.GetUserId();
-
-                if (currentUserId == null)
-                {
-                    return BadRequest();
-                }
-
-                Task<UserServiceModel>? task = identityService.FindUserById(currentUserId);
-                return await task!;
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-
     }
 }

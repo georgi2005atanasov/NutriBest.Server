@@ -1,8 +1,6 @@
-﻿namespace NutriBest.Server.Features.Identity.Models
+﻿namespace NutriBest.Server.Features.Profile.Models
 {
-    using System.ComponentModel.DataAnnotations;
-
-    public class UserServiceModel
+    public class ProfileServiceModel
     {
         public string? Name { get; set; }
 

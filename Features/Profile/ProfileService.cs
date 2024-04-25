@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
-    public class AdminService
+    public class ProfileService
     {
     }
 }
