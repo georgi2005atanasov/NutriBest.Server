@@ -22,8 +22,8 @@
             this.currentUserService = currentUserService;
         }
 
-        [Route(nameof(Register))]
         [HttpPost]
+        [Route(nameof(Register))]
         public async Task<ActionResult> Register(RegisterServiceModel userModel)
         {
             try
@@ -57,8 +57,8 @@
             }
         }
 
-        [Route(nameof(Login))]
         [HttpPost]
+        [Route(nameof(Login))]
         public async Task<ActionResult<string>> Login(LoginServiceModel userModel)
         {
             try

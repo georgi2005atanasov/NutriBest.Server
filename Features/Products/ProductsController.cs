@@ -35,8 +35,8 @@ namespace NutriBest.Server.Features.Products
             this.memoryCache = memoryCache;
         }
 
-        [Authorize(Roles = "Administrator")]
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
             try

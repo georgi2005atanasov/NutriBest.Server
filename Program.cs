@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NutriBest.Server;
+using NutriBest.Server.Features.Admin;
 using NutriBest.Server.Features.Categories;
 using NutriBest.Server.Features.Identity;
 using NutriBest.Server.Features.Images;
@@ -28,6 +29,7 @@ var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 builder.Services
     .AddScoped<ICurrentUserService, CurrentUserService>()
     .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<IProfileService, ProfileService>()
     .AddTransient<IProductService, ProductService>()
     .AddTransient<IImageService, ImageService>()
     .AddTransient<ICategoryService, CategoryService>();

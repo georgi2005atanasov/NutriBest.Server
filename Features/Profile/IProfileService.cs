@@ -2,6 +2,11 @@
 {
     public interface IProfileService
     {
-        Task<bool> UpdateUserProfile();
+        Task<string> UpdateProfile(string? name,
+            string? userName,
+            string? email,
+            int? age);
+
+        Task DeleteProfile();
     }
 }

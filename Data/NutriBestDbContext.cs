@@ -20,7 +20,7 @@
 
         public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 
-        public DbSet<Profile> Profiles { get; set; } = null;
+        public DbSet<Profile> Profiles { get; set; } = null!;
 
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
