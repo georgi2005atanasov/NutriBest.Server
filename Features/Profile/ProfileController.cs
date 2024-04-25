@@ -96,7 +96,10 @@
 
                 if (currentUserId == null)
                 {
-                    return BadRequest();
+                    return BadRequest(new
+                    {
+                        Message = "Invalid user!"
+                    });
                 }
 
                 var user = await db.Users.FindAsync(currentUserId);
@@ -104,7 +107,10 @@
 
                 if (user == null)
                 {
-                    return BadRequest();
+                    return BadRequest(new
+                    {
+                        Message = "User could not be found!"
+                    });
                 }
 
                 db.Profiles.Remove(profile);
