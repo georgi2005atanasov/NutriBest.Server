@@ -5,7 +5,8 @@
         Task<string> UpdateProfile(string? name,
             string? userName,
             string? email,
-            int? age);
+            int? age,
+            string? gender);
 
         Task DeleteProfile();
     }

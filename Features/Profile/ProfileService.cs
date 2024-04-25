@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Infrastructure.Services;
 
     public class ProfileService : IProfileService
@@ -18,7 +19,8 @@
         public async Task<string> UpdateProfile(string? name,
             string? userName,
             string? email,
-            int? age)
+            int? age,
+            string? gender)
         {
             var id = currentUser.GetUserId();
 
@@ -26,7 +28,11 @@
                 .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
 
-            if (user == null)
+            var profile = await db.Profiles
+                .Where(x => x.UserId == id)
+                .FirstOrDefaultAsync();
+
+            if (user == null || profile == null)
             {
                 return "User could not be found";
             }
@@ -51,12 +57,12 @@
 
             if (!string.IsNullOrEmpty(name))
             {
-                if (name == user.Profile.Name)
+                if (name == profile.Name)
                 {
                     return "Name cannot be the same!";
                 }
 
-                if (await db.Users.AnyAsync(x => x.Profile.Name == name))
+                if (await db.Users.AnyAsync(x => profile.Name == name))
                 {
                     return "User with this name already exists!";
                 }
@@ -77,33 +83,46 @@
                 }
             }
 
+            if (age != null && age == profile.Age)
+            {
+                return $"Age must be different than the previous";
+            }
+
+            Gender genderRes = Gender.Unspecified;
+
+            if (!string.IsNullOrEmpty(gender) && !Enum.TryParse<Gender>(gender, true, out genderRes))
+            {
+                return $"{gender} is invalid Gender!";
+            }
+
+            if (gender == profile.Gender.ToString())
+            {
+                return "The gender must be different from the previous!";
+            }
+
             if (!string.IsNullOrEmpty(email))
             {
                 user.Email = email;
             }
             if (!string.IsNullOrEmpty(name))
             {
-                user.Profile.Name = name;
+                profile.Name = name;
             }
             if (!string.IsNullOrEmpty(userName))
             {
                 user.UserName = userName;
             }
-
-            var profileToChange = await db.Profiles
-                .FirstAsync(x => x.UserId == id);
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                profileToChange.Name = name;
-            }
             if (age != null)
             {
-                profileToChange.Age = age;
+                profile.Age = age;
+            }
+            if (!string.IsNullOrEmpty(gender))
+            {
+                profile.Gender = genderRes;
             }
 
             db.Users.Update(user);
-            db.Profiles.Update(profileToChange);
+            db.Profiles.Update(profile);
 
             await db.SaveChangesAsync();
 

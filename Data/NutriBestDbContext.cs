@@ -2,6 +2,8 @@
 {
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+    using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Data.Models.Base;
     using NutriBest.Server.Infrastructure.Services;
@@ -48,6 +50,13 @@
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            var converter = new EnumToStringConverter<Gender>();
+
+            builder
+                .Entity<Profile>()
+                .Property(e => e.Gender)
+                .HasConversion(converter);
 
             builder.Entity<User>(e =>
             {

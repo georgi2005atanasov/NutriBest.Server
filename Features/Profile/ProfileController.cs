@@ -73,7 +73,8 @@
             var result = await profileService.UpdateProfile(profile.Name,
                 profile.UserName,
                 profile.Email,
-                profile.Age);
+                profile.Age,
+                profile.Gender);
 
             if (result != "success")
             {

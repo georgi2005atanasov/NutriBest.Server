@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Data.Enums
 {
-    public enum Category
+    public enum Categories
     {
         Proteins = 0,
         AminoAcids = 1,

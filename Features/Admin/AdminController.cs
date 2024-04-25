@@ -26,72 +26,92 @@
         [Route("grant/{id}")]
         public async Task<ActionResult> GrantUser([FromRoute] string id, [FromForm] string role)
         {
-            var user = await userManager.FindByIdAsync(id);
-            var existingRole = await roleManager.FindByNameAsync(role);
-
-            if (user == null)
+            try
             {
-                return BadRequest(new
+                var user = await userManager.FindByIdAsync(id);
+                var existingRole = await roleManager.FindByNameAsync(role);
+
+                if (user == null)
                 {
-                    Message = "User could not be found!"
+                    return BadRequest(new
+                    {
+                        Message = "User could not be found!"
+                    });
+                }
+
+                if (existingRole == null)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Invalid role!"
+                    });
+                }
+
+                if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
+                {
+                    return BadRequest(new
+                    {
+                        Message = $"'{user.UserName}' is already in the role of '{role}'!"
+                    });
+                }
+
+                await userManager.AddToRoleAsync(user, role);
+
+                return Ok(new
+                {
+                    Message = $"Successfully added role '{role}' to '{user.UserName}'!"
                 });
             }
-
-            if (existingRole == null)
+            catch (Exception)
             {
-                return BadRequest(new
-                {
-                    Message = "Invalid role!"
-                });
+                return BadRequest();
             }
-
-            if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-            {
-                return BadRequest(new
-                {
-                    Message = "The user is already in this role!"
-                });
-            }
-
-            await userManager.AddToRoleAsync(user, role);
-
-            return Ok($"Successfully added role '{role}' to '{user.UserName}'!");
         }
 
         [HttpPatch]
         [Route("disown/{id}")]
         public async Task<ActionResult> DisownUser([FromRoute] string id, [FromForm] string role)
         {
-            var user = await userManager.FindByIdAsync(id);
-            var existingRole = await roleManager.FindByNameAsync(role);
-
-            if (user == null)
+            try
             {
-                return BadRequest(new
+                var user = await userManager.FindByIdAsync(id);
+                var existingRole = await roleManager.FindByNameAsync(role);
+
+                if (user == null)
                 {
-                    Message = "User could not be found!"
+                    return BadRequest(new
+                    {
+                        Message = "User could not be found!"
+                    });
+                }
+
+                if (existingRole == null)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Invalid role!"
+                    });
+                }
+
+                if (!db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
+                {
+                    return BadRequest(new
+                    {
+                        Message = "The user does not have this role!"
+                    });
+                }
+
+                await userManager.RemoveFromRoleAsync(user, role);
+
+                return Ok(new
+                {
+                    Message = $"Successfully removed role '{role}' from '{user.UserName}'!"
                 });
             }
-
-            if (existingRole == null)
+            catch (Exception)
             {
-                return BadRequest(new
-                {
-                    Message = "Invalid role!"
-                });
+                return BadRequest();
             }
-
-            if (!db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-            {
-                return BadRequest(new
-                {
-                    Message = "The user does not have this role!"
-                });
-            }
-
-            await userManager.RemoveFromRoleAsync(user, role);
-
-            return Ok($"Successfully removed role '{role}' from '{user.UserName}'!");
         }
     }
 }
