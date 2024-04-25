@@ -48,9 +48,12 @@
 
                 return BadRequest(result.Errors);
             }
-            catch (Exception)
+            catch (Exception err)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
             }
         }
 
@@ -60,7 +63,7 @@
         {
             try
             {
-                var user = await identityService.FindUserByName(userModel.UserName);
+                var user = await identityService.FindUserByUserName(userModel.UserName);
 
                 if (user == null)
                 {

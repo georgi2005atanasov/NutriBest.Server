@@ -13,7 +13,8 @@
         public class Profile
         {
             public const int NameMaxLength = 40;
-            public const int DescriptionMaxLength = 2000;
+            public const int MaxAge = 100;
+            public const int MinAge = 12;
         }
     }
 }

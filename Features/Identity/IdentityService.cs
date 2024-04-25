@@ -38,10 +38,15 @@
             var user = new User
             {
                 UserName = userName,
-                Email = email,
+                Email = email
             };
 
             var result = await userManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                throw new Exception(String.Join(", ", result.Errors.Select(x => x.Description)));
+            }
 
             var roleResult = await userManager.AddToRoleAsync(user, "User");
 
@@ -60,8 +65,11 @@
                 {
                     Gender = x.Profile.Gender.ToString(),
                     Name = x.Profile.Name,
+                    Age = x.Profile.Age,
                     ModifiedOn = x.ModifiedOn,
-                    CreatedOn = x.CreatedOn
+                    CreatedOn = x.CreatedOn,
+                    Email = x.Email,
+                    UserName = x.UserName
                 })
                 .FirstOrDefaultAsync();
 

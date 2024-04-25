@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace NutriBest.Server.Data.Models.Base
 {
+    using System.ComponentModel.DataAnnotations;
+
     public abstract class Entity : IEntity
     {
         public DateTime CreatedOn { get; set; }

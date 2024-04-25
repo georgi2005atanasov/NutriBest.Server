@@ -4,7 +4,7 @@
     using Microsoft.AspNetCore.Identity;
     using NutriBest.Server.Data.Models.Base;
 
-    public class User : IdentityUser, IEntity
+    public class User : IdentityUser, IDeletableEntity
     {
         public Profile Profile { get; set; } = new Profile();
 
@@ -15,5 +15,11 @@
         public DateTime? ModifiedOn { get; set; }
 
         public string? ModifiedBy { get; set; }
+
+        public DateTime? DeletedOn { get; set; }
+
+        public string? DeletedBy { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }
