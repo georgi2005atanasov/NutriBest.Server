@@ -5,7 +5,7 @@ using NutriBest.Server.Features.Identity;
 using NutriBest.Server.Features.Images;
 using NutriBest.Server.Features.Products;
 using NutriBest.Server.Infrastructure.Extensions;
-using NutriBest.Server.Infrastructure.Filters;
+using NutriBest.Server.Infrastructure.Middlewares;
 using NutriBest.Server.Infrastructure.Services;
 using System.Text;
 
@@ -24,8 +24,6 @@ var appSettings = applicationSettings
 
 var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 
-builder.Services.AddHttpContextAccessor();
-
 //make extension method for adding services
 builder.Services
     .AddScoped<ICurrentUserService, CurrentUserService>()
@@ -36,6 +34,7 @@ builder.Services
 
 builder
     .Services
+    .AddHttpContextAccessor()
     .AddMemoryCache()
     .AddDatabase(connectionString)
     .AddDatabaseDeveloperPageExceptionFilter()
@@ -60,6 +59,9 @@ app.UseHttpsRedirection()
     .UseAuthentication();
 
 app.UseAuthorization();
+
+//mine
+app.UseMiddleware<RateLimitingMiddleware>();
 
 app.UseCors(x => x
             .AllowAnyOrigin()

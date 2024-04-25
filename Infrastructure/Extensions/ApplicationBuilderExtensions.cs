@@ -5,6 +5,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using System;
+    using System.Security.Claims;
 
     public static class ApplicationBuilderExtensions
     {

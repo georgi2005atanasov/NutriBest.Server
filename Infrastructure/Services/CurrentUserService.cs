@@ -6,22 +6,20 @@ namespace NutriBest.Server.Infrastructure.Services
 
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ClaimsPrincipal user;
 
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            this.user = httpContextAccessor.HttpContext?.User;
         }
 
         public string? GetUserId()
         {
-            var user = httpContextAccessor.HttpContext?.User;
-            return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            return this.user.GetId();
         }
 
         public string? GetUserName()
         {
-            var user = httpContextAccessor.HttpContext?.User;
             return user?.Identity?.Name;
         }
     }

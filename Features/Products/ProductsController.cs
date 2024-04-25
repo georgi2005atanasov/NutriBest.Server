@@ -39,64 +39,71 @@ namespace NutriBest.Server.Features.Products
         [HttpPost]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
-            var passedCategories = productModel.Categories[0]
+            try
+            {
+                var passedCategories = productModel.Categories[0]
                 .Split(",")
                 .ToList();
 
-            if (await ProductExists(productModel.Name))
-            {
-                return BadRequest(new
+                if (await ProductExists(productModel.Name))
                 {
-                    Key = "Name",
-                    Message = "Product with this name already exists!"
-                });
-            }
+                    return BadRequest(new
+                    {
+                        Key = "Name",
+                        Message = "Product with this name already exists!"
+                    });
+                }
 
-            if (productModel.Price <= 0)
-            {
-                return BadRequest(new
+                if (productModel.Price <= 0)
                 {
-                    Key = "Price",
-                    Message = "Price must be bigger than zero!"
-                });
-            }
+                    return BadRequest(new
+                    {
+                        Key = "Price",
+                        Message = "Price must be bigger than zero!"
+                    });
+                }
 
-            var categoriesIds = await categoryService
-                .GetCategoriesIds(passedCategories);
+                var categoriesIds = await categoryService
+                    .GetCategoriesIds(passedCategories);
 
-            if (categoriesIds.Count == 0)
-            {
-                return BadRequest(new
+                if (categoriesIds.Count == 0)
                 {
-                    Key = "Category",
-                    Message = "You have to choose at least 1 category!"
-                });
-            }
+                    return BadRequest(new
+                    {
+                        Key = "Category",
+                        Message = "You have to choose at least 1 category!"
+                    });
+                }
 
-            if (productModel.Image != null)
-            {
-                var productImage = await imageService
-                    .CreateImage(productModel.Image, productModel.Image.ContentType);
-
-                var productId = await productService
-                    .Create(productModel.Name,
-                    productModel.Description,
-                    productModel.Price,
-                    productModel.Quantity,
-                    categoriesIds,
-                    productImage.ImageData,
-                    productImage.ContentType
-                    );
-
-                return Created(nameof(Create), productId);
-            }
-            else
-            {
-                return BadRequest(new
+                if (productModel.Image != null)
                 {
-                    Key = "Image",
-                    Message = "Image is required!"
-                });
+                    var productImage = await imageService
+                        .CreateImage(productModel.Image, productModel.Image.ContentType);
+
+                    var productId = await productService
+                        .Create(productModel.Name,
+                        productModel.Description,
+                        productModel.Price,
+                        productModel.Quantity,
+                        categoriesIds,
+                        productImage.ImageData,
+                        productImage.ContentType
+                        );
+
+                    return Created(nameof(Create), productId);
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        Key = "Image",
+                        Message = "Image is required!"
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
             }
         }
 
@@ -117,7 +124,8 @@ namespace NutriBest.Server.Features.Products
                     return BadRequest();
                 }
 
-                if (productsView == "table" && !User.IsInRole("Administrator"))
+                if (productsView == "table" &&
+                    !User.IsInRole("Administrator") && !User.IsInRole("Employee"))
                 {
                     return BadRequest();
                 }
@@ -142,95 +150,93 @@ namespace NutriBest.Server.Features.Products
             }
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<ActionResult<ProductListingModel>> Details([FromRoute] int id)
-        {
-            var product = await productService.GetById(id);
-
-            return Ok(product);
-        }
-
         [Authorize(Roles = "Administrator")]
         [HttpPut]
         public async Task<ActionResult<int>> Update([FromForm] UpdateProductModel productModel)
         {
-            var product = await db.Products
+            try
+            {
+                var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            if (await ProductExists(productModel.Name) && product?.Name != productModel.Name)
-            {
-                return BadRequest(new
+                if (product == null)
                 {
-                    Key = "Name",
-                    Message = "Product with this name already exists!"
-                });
-            }
+                    return NotFound();
+                }
 
-            if (productModel.Price <= 0)
-            {
-                return BadRequest(new
+                if (await ProductExists(productModel.Name) && product?.Name != productModel.Name)
                 {
-                    Key = "Price",
-                    Message = "Price must be bigger than zero!"
-                });
-            }
+                    return BadRequest(new
+                    {
+                        Key = "Name",
+                        Message = "Product with this name already exists!"
+                    });
+                }
 
-            var categoriesIds = await categoryService
-                .GetCategoriesIds(productModel.Categories);
-
-            if (categoriesIds.Count == 0)
-            {
-                BadRequest(new
+                if (productModel.Price <= 0)
                 {
-                    Key = "Category",
-                    Message = "You have to choose at least 1 category!"
-                });
+                    return BadRequest(new
+                    {
+                        Key = "Price",
+                        Message = "Price must be bigger than zero!"
+                    });
+                }
+
+                var categoriesIds = await categoryService
+                    .GetCategoriesIds(productModel.Categories);
+
+                if (categoriesIds.Count == 0)
+                {
+                    BadRequest(new
+                    {
+                        Key = "Category",
+                        Message = "You have to choose at least 1 category!"
+                    });
+                }
+
+                if (productModel.Image != null)
+                {
+                    var productImage = await imageService
+                        .CreateImage(productModel.Image, productModel.Image.ContentType);
+
+                    int productId = await productService
+                        .Update(productModel.ProductId,
+                        productModel.Name,
+                        productModel.Description,
+                        productModel.Price,
+                        productModel.Quantity,
+                        categoriesIds,
+                        productImage.ImageData,
+                        productImage.ContentType
+                    );
+
+                    memoryCache.Remove($"image_{productModel.ProductId}");
+
+                    return productId;
+                }
+                else
+                {
+                    var image = await imageService.GetImageByProductId(productModel.ProductId);
+
+                    int productId = await productService
+                        .Update(productModel.ProductId,
+                        productModel.Name,
+                        productModel.Description,
+                        productModel.Price,
+                        productModel.Quantity,
+                        categoriesIds,
+                        image.ImageData,
+                        image.ContentType
+                    );
+
+                    memoryCache.Remove($"image_{productModel.ProductId}");
+
+                    return productId;
+                }
             }
-
-            if (productModel.Image != null)
+            catch (Exception)
             {
-                var productImage = await imageService
-                    .CreateImage(productModel.Image, productModel.Image.ContentType);
-
-                int productId = await productService
-                    .Update(productModel.ProductId,
-                    productModel.Name,
-                    productModel.Description,
-                    productModel.Price,
-                    productModel.Quantity,
-                    categoriesIds,
-                    productImage.ImageData,
-                    productImage.ContentType
-                );
-
-                memoryCache.Remove($"image_{productModel.ProductId}");
-
-                return productId;
-            }
-            else
-            {
-                var image = await imageService.GetImageByProductId(productModel.ProductId);
-
-                int productId = await productService
-                    .Update(productModel.ProductId,
-                    productModel.Name,
-                    productModel.Description,
-                    productModel.Price,
-                    productModel.Quantity,
-                    categoriesIds,
-                    image.ImageData,
-                    image.ContentType
-                );
-
-                memoryCache.Remove($"image_{productModel.ProductId}");
-
-                return productId;
+                return BadRequest();
             }
         }
 
@@ -239,19 +245,42 @@ namespace NutriBest.Server.Features.Products
         [Route("{id}")]
         public async Task<ActionResult<bool>> Delete([FromRoute] int id)
         {
-            var product = await db.Products
+            try
+            {
+                var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
-            if (product == null)
-            {
-                return NotFound();
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                var result = await productService.Delete(id);
+
+                memoryCache.Remove($"image_{id}");
+
+                return result;
             }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
 
-            var result = await productService.Delete(id);
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<ProductListingModel>> Details([FromRoute] int id)
+        {
+            try
+            {
+                var product = await productService.GetById(id);
 
-            memoryCache.Remove($"image_{id}");
-
-            return result;
+                return Ok(product);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
@@ -263,7 +292,6 @@ namespace NutriBest.Server.Features.Products
             return Ok(products);
         }
 
-        //[Authorize("Administrator")]
         [HttpGet]
         [Route("identifiers")]
         public async Task<ActionResult<IEnumerable<int>>> GetProductsIds()
