@@ -150,7 +150,7 @@ namespace NutriBest.Server.Features.Products
             }
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpPut]
         public async Task<ActionResult<int>> Update([FromForm] UpdateProductServiceModel productModel)
         {
@@ -249,7 +249,7 @@ namespace NutriBest.Server.Features.Products
             }
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpDelete]
         [Route("{id}")]
         public async Task<ActionResult<bool>> Delete([FromRoute] int id)

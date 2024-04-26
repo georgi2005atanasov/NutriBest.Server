@@ -68,7 +68,7 @@
 
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee,User")]
-        public async Task<ActionResult<bool>> UpdateProfile(UpdateProfileServiceModel profile)
+        public async Task<ActionResult<bool>> UpdateProfile([FromForm] UpdateProfileServiceModel profile)
         {
             var result = await profileService.UpdateProfile(profile.Name,
                 profile.UserName,
@@ -114,7 +114,7 @@
                     });
                 }
 
-                db.Profiles.Remove(profile);
+                db.Profiles.Remove(profile!);
                 db.Users.Remove(user);
 
                 await db.SaveChangesAsync();
