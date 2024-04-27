@@ -155,6 +155,46 @@ namespace NutriBest.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PostalCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StreetNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique()
+                        .HasFilter("[ProfileId] IS NOT NULL");
+
+                    b.HasIndex("ProfileUserId");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Cart", b =>
                 {
                     b.Property<int>("Id")
@@ -238,20 +278,11 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsShipped")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
 
                     b.Property<string>("ProfileId")
                         .IsRequired()
@@ -265,6 +296,30 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsShipped")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("OrdersDetails");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -672,6 +727,20 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", null)
+                        .WithOne("Address")
+                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileUserId");
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.CartProduct", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Cart", "Cart")
@@ -700,6 +769,25 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Order", "Order")
+                        .WithOne("OrderDetails")
+                        .HasForeignKey("NutriBest.Server.Data.Models.OrderDetails", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -807,6 +895,11 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("ProductsCategories");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
                 {
                     b.Navigation("ProductDetails");
@@ -826,6 +919,8 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
+                    b.Navigation("Address");
+
                     b.Navigation("Orders");
                 });
 

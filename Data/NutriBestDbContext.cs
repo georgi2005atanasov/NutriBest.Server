@@ -38,6 +38,10 @@
 
         public DbSet<Order> Orders { get; set; } = null!;
 
+        public DbSet<OrderDetails> OrdersDetails { get; set; } = null!;
+
+        public DbSet<Address> Addresses { get; set; } = null!;
+
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
             : base(options)
@@ -84,10 +88,22 @@
                 .Property(e => e.Gender)
                 .HasConversion(genderConverter);
 
+            builder.Entity<Profile>()
+                .HasOne(x => x.Address)
+                .WithOne()
+                .HasForeignKey<Address>(x => x.ProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Order>()
                 .HasOne(x => x.Cart)
                 .WithOne()
                 .HasForeignKey<Order>(x => x.CartId);
+
+            builder.Entity<Order>()
+                .HasOne(x => x.OrderDetails)
+                .WithOne(x => x.Order)
+                .HasForeignKey<OrderDetails>(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<CartProduct>()
                 .HasOne(x => x.Cart)

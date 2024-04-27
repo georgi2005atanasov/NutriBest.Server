@@ -15,13 +15,7 @@ namespace NutriBest.Server.Data.Models
 
         public Profile? Profile { get; set; }
 
-        [Required]
-        public PaymentMethod PaymentMethod { get; set; }
-
-        [Required]
-        public bool IsPaid { get; set; }
-
-        public bool IsShipped { get; set; }
+        public OrderDetails? OrderDetails { get; set; }
 
         [Required]
         public int CartId { get; set; }

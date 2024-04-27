@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240427113604_AddedIsDeletedOnProductsDetailsAndIsShippedOnOrder")]
-    partial class AddedIsDeletedOnProductsDetailsAndIsShippedOnOrder
+    [Migration("20240427220419_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -157,6 +157,46 @@ namespace NutriBest.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PostalCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StreetNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique()
+                        .HasFilter("[ProfileId] IS NOT NULL");
+
+                    b.HasIndex("ProfileUserId");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Cart", b =>
                 {
                     b.Property<int>("Id")
@@ -240,20 +280,11 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsShipped")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
 
                     b.Property<string>("ProfileId")
                         .IsRequired()
@@ -267,6 +298,30 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("ProfileId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsShipped")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("OrdersDetails");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -407,6 +462,57 @@ namespace NutriBest.Server.Data.Migrations
                     b.ToTable("ProductsImages");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPromotion", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PromotionId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("SpecialPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ProductId", "PromotionId");
+
+                    b.HasIndex("PromotionId");
+
+                    b.ToTable("ProductsPromotions");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductReview", b =>
+                {
+                    b.Property<int>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"), 1L, 1);
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProfileId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("ProductsReviews");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
                     b.Property<string>("UserId")
@@ -453,6 +559,37 @@ namespace NutriBest.Server.Data.Migrations
                         .HasFilter("[CartId] IS NOT NULL");
 
                     b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
+                {
+                    b.Property<int>("PromotionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromotionId"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("DiscountPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PromotionId");
+
+                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.User", b =>
@@ -592,6 +729,20 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", null)
+                        .WithOne("Address")
+                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileUserId");
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.CartProduct", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Cart", "Cart")
@@ -620,6 +771,25 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Order", "Order")
+                        .WithOne("OrderDetails")
+                        .HasForeignKey("NutriBest.Server.Data.Models.OrderDetails", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -661,6 +831,44 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPromotion", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
+                        .WithMany("ProductPromotions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Promotion", "Promotion")
+                        .WithMany("ProductPromotions")
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Promotion");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductReview", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
+                        .WithMany("ProductReviews")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Cart", "Cart")
@@ -689,9 +897,18 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("ProductsCategories");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
                 {
                     b.Navigation("ProductDetails");
+
+                    b.Navigation("ProductPromotions");
+
+                    b.Navigation("ProductReviews");
 
                     b.Navigation("ProductsCategories");
                 });
@@ -704,7 +921,14 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
+                    b.Navigation("Address");
+
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
+                {
+                    b.Navigation("ProductPromotions");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.User", b =>

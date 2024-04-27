@@ -9,16 +9,11 @@ namespace NutriBest.Server.Features.Carts
 
     public class CartsController : ApiController
     {
-        private readonly NutriBestDbContext db;
         private readonly ICartService cartService;
-        private readonly ICurrentUserService currentUser;
 
-        public CartsController(NutriBestDbContext db,
-            ICartService cartService, ICurrentUserService currentUser)
+        public CartsController(ICartService cartService)
         {
-            this.db = db;
             this.cartService = cartService;
-            this.currentUser = currentUser;
         }
 
         [HttpPost]
