@@ -29,7 +29,13 @@
         [NotMapped]
         public ProductImage ProductImage { get; set; } = null!;
 
+        public ProductDetails? ProductDetails { get; set; }
+
+        public List<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
+
         [Required]
         public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
+
+        public List<ProductPromotion> ProductPromotions { get; set; } = new List<ProductPromotion>();
     }
 }

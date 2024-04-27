@@ -14,18 +14,18 @@
 
     public class IdentityService : IIdentityService
     {
+        private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
         private readonly ApplicationSettings appSettings;
-        private readonly NutriBestDbContext db;
 
         public IdentityService(UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
             NutriBestDbContext db,
             ICurrentUserService currentUser)
         {
+            this.db = db;
             this.userManager = userManager;
             this.appSettings = appSettings.Value;
-            this.db = db;
         }
 
         public async Task<bool> CheckUserPassword(User user, string password)

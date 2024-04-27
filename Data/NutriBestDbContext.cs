@@ -16,6 +16,14 @@
 
         public DbSet<Product> Products { get; set; } = null!;
 
+        public DbSet<ProductDetails> ProductsDetails { get; set; } = null!;
+
+        public DbSet<ProductReview> ProductsReviews { get; set; }
+
+        public DbSet<Promotion> Promotions { get; set; }
+
+        public DbSet<ProductPromotion> ProductsPromotions { get; set; }
+
         public DbSet<ProductImage> ProductsImages { get; set; } = null!;
 
         public DbSet<Category> Categories { get; set; } = null!;
@@ -24,6 +32,12 @@
 
         public DbSet<Profile> Profiles { get; set; } = null!;
 
+        public DbSet<Cart> Carts { get; set; } = null!;
+
+        public DbSet<CartProduct> CartProducts { get; set; } = null!;
+
+        public DbSet<Order> Orders { get; set; } = null!;
+
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
             : base(options)
@@ -31,16 +45,14 @@
             this.currentUser = currentUser;
         }
 
+        //be aware
         public override int SaveChanges()
         {
             ApplyAuditInformation();
-            foreach (var entry in this.ChangeTracker.Entries())
-            {
-                Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
-            }
             return base.SaveChanges();
         }
 
+        //be aware
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
@@ -51,12 +63,37 @@
         {
             base.OnModelCreating(builder);
 
-            var converter = new EnumToStringConverter<Gender>();
+            var genderConverter = new EnumToStringConverter<Gender>();
+            var paymentMethodConverter = new EnumToStringConverter<PaymentMethod>();
+
+            builder.Entity<Profile>()
+               .HasOne(x => x.Cart)
+               .WithOne(x => x.Profile)
+               .HasForeignKey<Profile>(x => x.CartId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .Entity<Profile>()
+                .HasMany(x => x.Orders)
+                .WithOne(x => x.Profile)
+                .HasForeignKey(x => x.ProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .Entity<Profile>()
                 .Property(e => e.Gender)
-                .HasConversion(converter);
+                .HasConversion(genderConverter);
+
+            builder.Entity<Order>()
+                .HasOne(x => x.Cart)
+                .WithOne()
+                .HasForeignKey<Order>(x => x.CartId);
+
+            builder.Entity<CartProduct>()
+                .HasOne(x => x.Cart)
+                .WithMany(x => x.CartProducts)
+                .HasForeignKey(x => x.CartId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<User>(e =>
             {
@@ -73,6 +110,18 @@
                 .HasForeignKey<Product>(x => x.ProductImageId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
+            builder.Entity<Product>()
+                .HasOne(x => x.ProductDetails)
+                .WithOne()
+                .HasForeignKey<ProductDetails>(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Product>()
+                .HasMany(x => x.ProductReviews)
+                .WithOne(x => x.Product)
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
                 .HasQueryFilter(x => !x.IsDeleted);
@@ -97,6 +146,21 @@
 
             builder.Entity<ProductCategory>()
                 .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<Product>()
+                .HasMany(x => x.ProductPromotions)
+                .WithOne(x => x.Product)
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Promotion>()
+                .HasMany(x => x.ProductPromotions)
+                .WithOne(x => x.Promotion)
+                .HasForeignKey(x => x.PromotionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ProductPromotion>()
+                .HasKey(x => new { x.ProductId, x.PromotionId });
         }
 
         private void ApplyAuditInformation()
