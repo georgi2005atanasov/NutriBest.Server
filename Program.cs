@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NutriBest.Server;
 using NutriBest.Server.Features.Admin;
+using NutriBest.Server.Features.Carts;
 using NutriBest.Server.Features.Categories;
 using NutriBest.Server.Features.Identity;
 using NutriBest.Server.Features.Images;
@@ -32,6 +33,7 @@ builder.Services
     .AddTransient<IIdentityService, IdentityService>()
     .AddTransient<IProfileService, ProfileService>()
     .AddTransient<IProductService, ProductService>()
+    .AddTransient<ICartService,CartService>()
     .AddTransient<IImageService, ImageService>()
     .AddTransient<ICategoryService, CategoryService>();
 
