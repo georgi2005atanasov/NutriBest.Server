@@ -94,6 +94,9 @@
                 .HasForeignKey(bc => bc.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
+            builder.Entity<ProductCategory>()
+                .HasQueryFilter(x => !x.IsDeleted);
         }
 
         private void ApplyAuditInformation()

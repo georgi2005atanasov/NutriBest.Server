@@ -70,6 +70,11 @@
                     return Unauthorized();
                 }
 
+                if (user.IsDeleted)
+                {
+                    return Unauthorized();
+                }
+
                 var passwordValid = await identityService.CheckUserPassword(user, userModel.Password);
 
                 if (!passwordValid)

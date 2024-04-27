@@ -12,7 +12,7 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240425195711_InitDb")]
+    [Migration("20240426200320_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

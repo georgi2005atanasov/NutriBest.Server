@@ -36,7 +36,7 @@ namespace NutriBest.Server.Features.Products
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
             try

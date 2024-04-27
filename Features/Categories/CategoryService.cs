@@ -45,7 +45,8 @@
                 .Select(x => new CategoryCountServiceModel
                 {
                     Category = x.Name,
-                    Count = x.ProductsCategories.Where(y => y.CategoryId == x.Id).Count(),
+                    Count = x.ProductsCategories
+                    .Where(y => y.CategoryId == x.Id).Count(),
                 })
                 .ToListAsync();
 

@@ -28,6 +28,7 @@ var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 //make extension method for adding services
 builder.Services
     .AddScoped<ICurrentUserService, CurrentUserService>()
+    .AddTransient<IAdminService, AdminService>()
     .AddTransient<IIdentityService, IdentityService>()
     .AddTransient<IProfileService, ProfileService>()
     .AddTransient<IProductService, ProductService>()
@@ -63,7 +64,7 @@ app.UseHttpsRedirection()
 app.UseAuthorization();
 
 //mine
-app.UseMiddleware<RateLimitingMiddleware>();
+//app.UseMiddleware<RateLimitingMiddleware>();
 
 app.UseCors(x => x
             .AllowAnyOrigin()

@@ -5,21 +5,35 @@
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Admin.Models;
 
     [Authorize(Roles = "Administrator")]
     public class AdminController : ApiController
     {
         private readonly NutriBestDbContext db;
+        private readonly IAdminService adminService;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
         public AdminController(NutriBestDbContext db,
+            IAdminService adminService,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             this.db = db;
+            this.adminService = adminService;
             this.userManager = userManager;
             this.roleManager = roleManager;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        [Route("all-users")]
+        public async Task<ActionResult<IEnumerable<UserServiceModel>>> GetUsers()
+        {
+            var users = await adminService.GetAllUsers();
+
+            return Ok(users);
         }
 
         [HttpPatch]

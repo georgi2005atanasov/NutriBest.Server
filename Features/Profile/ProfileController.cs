@@ -88,7 +88,7 @@
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Administrator,Employee,User")]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<bool>> DeleteProfile()
         {
             try
