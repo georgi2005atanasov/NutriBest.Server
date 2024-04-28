@@ -185,7 +185,7 @@
             }
         }
 
-        [HttpPost]
+        [HttpDelete]
         [AllowAnonymous]
         [Route("/cart/guest/remove")]
         public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)

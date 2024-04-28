@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using NutriBest.Server;
 using NutriBest.Server.Features.Admin;
 using NutriBest.Server.Features.Carts;
@@ -7,7 +8,6 @@ using NutriBest.Server.Features.Identity;
 using NutriBest.Server.Features.Images;
 using NutriBest.Server.Features.Products;
 using NutriBest.Server.Infrastructure.Extensions;
-using NutriBest.Server.Infrastructure.Middlewares;
 using NutriBest.Server.Infrastructure.Services;
 using System.Text;
 
@@ -49,7 +49,10 @@ builder
     .Configure<ApplicationSettings>(applicationSettings)
     .AddApiControllers();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecureSwagger", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -75,10 +78,11 @@ app.UseCors(x => x
     .UseEndpoints(endpoints => endpoints.MapControllers())
     .ApplyMigrations();
 
+app.UseSwaggerAuthorized(app.Services);
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecureSwagger v1");
     c.RoutePrefix = string.Empty;
 });
 

@@ -4,6 +4,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Infrastructure.Middlewares;
     using System;
     using System.Security.Claims;
 
@@ -21,6 +22,16 @@
             SeedCategories(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
+        }
+
+        public static IApplicationBuilder UseSwaggerAuthorized(this IApplicationBuilder builder, IServiceProvider serviceProvider)
+        {
+            var config = serviceProvider.GetService<IConfiguration>();
+
+            string adminEmail = config.GetValue<string>("Admin:UserName");
+            string adminPassword = config.GetValue<string>("Admin:Password");
+
+            return builder.UseMiddleware<SwaggerBasicAuthMiddleware>(adminEmail, adminPassword);
         }
 
         private static void SeedUserRole(IServiceProvider serviceProvider)
@@ -115,7 +126,7 @@
                 await roleManager.CreateAsync(role);
 
                 string adminEmail = config.GetValue<string>("Admin:UserName");
-                string adminPassword = config.GetValue<string>("Admin:Password"); ;
+                string adminPassword = config.GetValue<string>("Admin:Password");
 
                 var user = new User
                 {
