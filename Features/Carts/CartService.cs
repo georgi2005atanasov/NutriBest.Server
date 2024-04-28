@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Infrastructure.Services;
 
     public class CartService : ICartService
@@ -17,7 +18,28 @@
             this.currentUser = currentUser;
         }
 
-        public async Task<int?> Add(int productId)
+        public async Task<CartServiceModel> Get()
+        {
+            var (userId, profile, cart, cartProducts) = await GetDataForChangingCart();
+
+            var products = await cartProducts
+                .Select(x => new CartProductServiceModel
+                {
+                    ProductId = x.ProductId,
+                    Count = x.Count
+                })
+                .ToListAsync();
+
+            var cartModel = new CartServiceModel
+            {
+                CartProducts = products,
+                TotalPrice = cart.TotalPrice
+            };
+
+            return cartModel;
+        }
+
+        public async Task<int?> Add(int productId, int count)
         {
             var (userId, profile, cart, cartProducts) = await GetDataForChangingCart();
 
@@ -28,7 +50,7 @@
                 cartProduct = await db.CartProducts
                     .FirstAsync(x => x.ProductId == productId);
 
-                cartProduct.Count++;
+                cartProduct.Count += count;
 
                 db.CartProducts.Update(cartProduct);
             }
@@ -38,7 +60,7 @@
                 {
                     CartId = (int)profile!.CartId!,
                     ProductId = productId,
-                    Count = 1
+                    Count = count
                 };
 
                 db.CartProducts.Add(cartProduct);
@@ -52,14 +74,14 @@
                 throw new InvalidOperationException($"Sorry, we have {product.Quantity} units of this product available.");
             }
 
-            cart.TotalPrice += product.Price + 0.99m;
+            cart.TotalPrice += (product.Price + 0.99m) * count;
 
             await db.SaveChangesAsync();
 
             return cartProduct.Id;
         }
 
-        public async Task<bool> Remove(int productId)
+        public async Task<bool> Remove(int productId, int count)
         {
             var (userId, profile, cart, cartProducts) = await GetDataForChangingCart();
 
@@ -70,13 +92,13 @@
                 cartProduct = await db.CartProducts
                     .FirstAsync(x => x.ProductId == productId);
 
-                if (cartProduct.Count - 1 == 0)
+                if (cartProduct.Count - count == 0)
                 {
                     db.CartProducts.Remove(cartProduct);
                 }
                 else
                 {
-                    cartProduct.Count--;
+                    cartProduct.Count -= count;
 
                     db.CartProducts.Update(cartProduct);
                 }
@@ -89,7 +111,9 @@
             var product = await db.Products
                     .FirstAsync(x => x.ProductId == productId);
 
-            cart.TotalPrice -= product.Price + 0.99m;
+            cart.TotalPrice -= (product.Price + 0.99m) * count;
+
+            db.Carts.Update(cart);
 
             await db.SaveChangesAsync();
 
@@ -100,12 +124,15 @@
         {
             var (userId, profile, cart, cartProducts) = await GetDataForChangingCart();
 
-            if (cartProducts.Count() == 0)
+            if (cartProducts.Count() == 0 && cart.TotalPrice == 0)
             {
                 return false;
             }
 
             db.CartProducts.RemoveRange(cartProducts);
+
+            cart.TotalPrice = 0;
+            db.Carts.Update(cart);
 
             await db.SaveChangesAsync();
 

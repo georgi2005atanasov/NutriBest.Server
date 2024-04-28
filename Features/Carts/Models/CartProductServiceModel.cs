@@ -3,5 +3,7 @@
     public class CartProductServiceModel
     {
         public int ProductId { get; set; }
+
+        public int Count { get; set; }
     }
 }
