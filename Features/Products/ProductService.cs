@@ -47,7 +47,6 @@
                          })
                          .AsQueryable();
 
-
             queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
 
             var productsCount = queryProducts.Count();
@@ -93,6 +92,9 @@
                 Price = price,
                 ProductImage = productImage,
                 ProductsCategories = new List<ProductCategory>(),
+                ProductDetails = new ProductDetails(),
+                //ProductPromotions = new List<ProductPromotion>(),
+                //ProductReviews = new List<ProductReview>(),
                 CreatedOn = DateTime.Now,
                 Quantity = quantity
             };
@@ -107,16 +109,16 @@
                         });
             }
 
-
             db.Products.Add(product);
             await db.SaveChangesAsync();
 
             return product.ProductId;
         }
 
-        public async Task<ProductDetailsServiceModel?> GetById(int id)
+        public async Task<ProductDetailsServiceModel> GetById(int id, string name)
         {
             var product = await db.Products
+                         .Include(x => x.ProductDetails)
                          .Select(x => new ProductDetailsServiceModel
                          {
                              ProductId = x.ProductId,
@@ -132,11 +134,14 @@
                                  ImageData = x.ProductImage.ImageData
                              },
                              Quantity = x.Quantity,
+                             HowToUse = x.ProductDetails.HowToUse,
+                             ServingSize = x.ProductDetails.ServingSize,
+                             ServingsPerContainer = x.ProductDetails.ServingsPerContainer
                          })
-                         .FirstOrDefaultAsync(x => x.ProductId == id);
+                         .FirstAsync(x => x.ProductId == id);
 
-            if (product == null)
-                return null;
+            if (product == null || product.Name != name)
+                throw new InvalidOperationException("Invalid product!");
 
             return product;
         }
@@ -178,7 +183,7 @@
             }
 
             //handle productCategories, since they are not really being deleted.
-            db.Products.Update(product);
+
             await db.SaveChangesAsync();
 
             return productId;
@@ -214,6 +219,27 @@
             {
                 return false;
             }
+        }
+
+        public async Task AddDetails(int productId, string? howToUse, string? servingSize, string? servingsPerContainer)
+        {
+            var details = await db.ProductsDetails
+                .FirstAsync(x => x.ProductId == productId);
+
+            if (!string.IsNullOrEmpty(howToUse))
+            {
+                details.HowToUse = howToUse;
+            }
+            if (!string.IsNullOrEmpty(servingSize))
+            {
+                details.ServingSize = servingSize;
+            }
+            if (!string.IsNullOrEmpty(servingsPerContainer))
+            {
+                details.ServingsPerContainer = servingsPerContainer;
+            }
+
+            await db.SaveChangesAsync();
         }
     }
 }

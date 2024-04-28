@@ -18,11 +18,11 @@
 
         public DbSet<ProductDetails> ProductsDetails { get; set; } = null!;
 
-        public DbSet<ProductReview> ProductsReviews { get; set; }
+        public DbSet<ProductReview> ProductsReviews { get; set; } = null!;
 
-        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<Promotion> Promotions { get; set; } = null!;
 
-        public DbSet<ProductPromotion> ProductsPromotions { get; set; }
+        public DbSet<ProductPromotion> ProductsPromotions { get; set; } = null!;
 
         public DbSet<ProductImage> ProductsImages { get; set; } = null!;
 

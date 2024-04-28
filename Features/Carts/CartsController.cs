@@ -27,6 +27,7 @@
             try
             {
                 var cart = await cartService.Get();
+
                 return Ok(cart);
             }
             catch (Exception)
@@ -224,6 +225,22 @@
             });
         }
 
+        [HttpDelete]
+        [Route("/cart/guest/clean")]
+        public async Task<ActionResult> CleanSessionCart()
+        {
+            try
+            {
+                await SetSessionCart(new CartServiceModel());
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         private async Task<CartServiceModel?> GetSessionCart()
         {
             return await Task.Run(() =>
@@ -258,6 +275,5 @@
 
         private bool CanRemoveProduct(int? quantity, int count)
             => quantity >= count;
-        
     }
 }

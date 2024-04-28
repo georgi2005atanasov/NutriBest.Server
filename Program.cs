@@ -68,9 +68,6 @@ app.UseHttpsRedirection()
 
 app.UseAuthorization();
 
-//mine
-//app.UseMiddleware<RateLimitingMiddleware>();
-
 app.UseCors(x => x
             .AllowAnyOrigin()
             .AllowAnyMethod()
@@ -78,7 +75,7 @@ app.UseCors(x => x
     .UseEndpoints(endpoints => endpoints.MapControllers())
     .ApplyMigrations();
 
-app.UseSwaggerAuthorized(app.Services);
+//app.UseSwaggerAuthorized(app.Services); gotta uncomment this in the future
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {

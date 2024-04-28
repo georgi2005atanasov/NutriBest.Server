@@ -1,10 +1,5 @@
-﻿using System;
-
-namespace NutriBest.Server.Features.Products
+﻿namespace NutriBest.Server.Features.Products
 {
-    using System.IO;
-    using System.Net.Http.Headers;
-    using System.Net.Mime;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -278,17 +273,54 @@ namespace NutriBest.Server.Features.Products
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id)
+        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id,
+            [FromQuery] string name)
         {
             try
             {
-                var product = await productService.GetById(id);
+                var product = await productService.GetById(id, name);
 
                 return Ok(product);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
             }
             catch (Exception)
             {
                 return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route("{id}")]
+        public async Task<ActionResult<ProductListingServiceModel>> AddDetails([FromRoute] int id,
+            [FromQuery] string name, [FromBody] CreateProductDetailsServiceModel details)
+        {
+            try
+            {
+                var product = await productService.GetById(id, name);
+
+                await productService.AddDetails(id,
+                    details.HowToUse,
+                    details.ServingSize,
+                    details.ServingsPerContainer);
+
+                return Ok(true);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(false);
             }
         }
 

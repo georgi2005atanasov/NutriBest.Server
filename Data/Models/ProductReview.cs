@@ -24,11 +24,7 @@
         public string? Comment { get; set; }
 
         public DateTime ReviewDate { get; set; }
-        //        ReviewId(Primary Key, INT, Auto-increment)
-        //ProductId(INT, Foreign Key)
-        //UserId(INT, Foreign Key)
-        //Rating(INT)
-        //Comment(TEXT)
-        //ReviewDate(DATETIME)
+
+        public bool IsDeleted { get; set; }
     }
 }

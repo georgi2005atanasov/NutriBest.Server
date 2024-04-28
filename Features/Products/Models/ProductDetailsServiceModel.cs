@@ -28,5 +28,13 @@
 
         [Required]
         public ImageListingServiceModel Image { get; set; } = null!;
+
+        public string? HowToUse { get; set; }
+
+        public string? ServingSize { get; set; }
+
+        public string? ServingsPerContainer { get; set; }
+
+        //public string? NutritionFacts { get; set; } gotta make model
     }
 }

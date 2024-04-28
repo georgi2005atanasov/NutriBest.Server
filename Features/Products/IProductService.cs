@@ -20,7 +20,7 @@
             string? search,
             string? priceRange);
 
-        Task<ProductDetailsServiceModel?> GetById(int id);
+        Task<ProductDetailsServiceModel> GetById(int id, string name);
 
         Task<int> Update(int id,
             string name,
@@ -32,5 +32,11 @@
             string contentType);
 
         Task<bool> Delete(int productId);
+
+        Task AddDetails(
+            int productId,
+            string? howToUse, 
+            string? servingSize, 
+            string? servingsPerContainer);
     }
 }

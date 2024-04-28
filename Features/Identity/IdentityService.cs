@@ -58,7 +58,7 @@
             return result;
         }
 
-        public async Task<ProfileServiceModel> FindUserById(string id)
+        public async Task<ProfileServiceModel?> FindUserById(string id)
             => await db.Users
                 .Where(x => x.Id == id)
                 .Select(x => new ProfileServiceModel

@@ -17,5 +17,7 @@ namespace NutriBest.Server.Data.Models
         public Promotion? Promotion { get; set; }
 
         public decimal? SpecialPrice { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

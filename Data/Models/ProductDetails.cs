@@ -16,7 +16,9 @@ namespace NutriBest.Server.Data.Models
 
         public string? ServingSize { get; set; }
 
-        public string? NutritionFacts { get; set; }
+        public string? ServingsPerContainer { get; set; }
+
+        //public string? NutritionFacts { get; set; }
 
         public bool IsDeleted { get; set; }
     }
