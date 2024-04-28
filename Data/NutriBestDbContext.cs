@@ -42,6 +42,8 @@
 
         public DbSet<Address> Addresses { get; set; } = null!;
 
+        public DbSet<NutritionFacts> NutritionFacts { get; set; } = null!;
+
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
             : base(options)
@@ -134,7 +136,19 @@
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
+                .HasOne(x => x.NutritionFacts)
+                .WithOne(x => x.Product)
+                .HasForeignKey<NutritionFacts>(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Product>()
                 .HasMany(x => x.ProductReviews)
+                .WithOne(x => x.Product)
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Product>()
+                .HasMany(x => x.ProductPromotions)
                 .WithOne(x => x.Product)
                 .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -162,12 +176,6 @@
 
             builder.Entity<ProductCategory>()
                 .HasQueryFilter(x => !x.IsDeleted);
-
-            builder.Entity<Product>()
-                .HasMany(x => x.ProductPromotions)
-                .WithOne(x => x.Product)
-                .HasForeignKey(x => x.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Promotion>()
                 .HasMany(x => x.ProductPromotions)

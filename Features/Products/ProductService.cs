@@ -93,6 +93,7 @@
                 ProductImage = productImage,
                 ProductsCategories = new List<ProductCategory>(),
                 ProductDetails = new ProductDetails(),
+                NutritionFacts = new NutritionFacts(),
                 //ProductPromotions = new List<ProductPromotion>(),
                 //ProductReviews = new List<ProductReview>(),
                 CreatedOn = DateTime.Now,
@@ -140,7 +141,7 @@
                          })
                          .FirstAsync(x => x.ProductId == id);
 
-            if (product == null || product.Name != name)
+            if (product.Name != name)
                 throw new InvalidOperationException("Invalid product!");
 
             return product;
@@ -200,6 +201,7 @@
                     .FirstAsync(x => x.ProductImageId == product.ProductImageId);
 
                 db.Products.Remove(product);
+
                 await db.ProductsCategories
                     .Where(x => x.ProductId == productId)
                     .ForEachAsync(pc =>
@@ -209,6 +211,17 @@
                             pc.IsDeleted = true;
                         }
                     });
+
+                await db.ProductsDetails
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync(pc =>
+                    {
+                        if (pc.ProductId == productId)
+                        {
+                            pc.IsDeleted = true;
+                        }
+                    });
+
                 db.ProductsImages.Remove(productImage);
 
                 await db.SaveChangesAsync();
@@ -219,27 +232,6 @@
             {
                 return false;
             }
-        }
-
-        public async Task AddDetails(int productId, string? howToUse, string? servingSize, string? servingsPerContainer)
-        {
-            var details = await db.ProductsDetails
-                .FirstAsync(x => x.ProductId == productId);
-
-            if (!string.IsNullOrEmpty(howToUse))
-            {
-                details.HowToUse = howToUse;
-            }
-            if (!string.IsNullOrEmpty(servingSize))
-            {
-                details.ServingSize = servingSize;
-            }
-            if (!string.IsNullOrEmpty(servingsPerContainer))
-            {
-                details.ServingsPerContainer = servingsPerContainer;
-            }
-
-            await db.SaveChangesAsync();
         }
     }
 }

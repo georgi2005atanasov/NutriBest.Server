@@ -32,11 +32,5 @@
             string contentType);
 
         Task<bool> Delete(int productId);
-
-        Task AddDetails(
-            int productId,
-            string? howToUse, 
-            string? servingSize, 
-            string? servingsPerContainer);
     }
 }

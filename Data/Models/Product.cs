@@ -31,6 +31,8 @@
 
         public ProductDetails? ProductDetails { get; set; }
 
+        public NutritionFacts? NutritionFacts { get; set; }
+
         public List<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 
         [Required]

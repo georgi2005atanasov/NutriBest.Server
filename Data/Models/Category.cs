@@ -1,5 +1,4 @@
-﻿
-namespace NutriBest.Server.Data.Models
+﻿namespace NutriBest.Server.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
 
