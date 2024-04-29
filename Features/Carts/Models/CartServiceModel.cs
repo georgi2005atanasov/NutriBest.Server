@@ -2,7 +2,7 @@
 {
     public class CartServiceModel
     {
-        public List<CartProductServiceModel>? CartProducts { get; set; }
+        public List<CartProductServiceModel> CartProducts { get; set; } = new List<CartProductServiceModel>();
 
         public decimal TotalPrice { get; set; }
     }

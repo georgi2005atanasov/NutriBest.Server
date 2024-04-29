@@ -1,15 +1,12 @@
-﻿namespace NutriBest.Server.Data.Models
+﻿using NutriBest.Server.Data;
+using System.ComponentModel.DataAnnotations;
+
+namespace NutriBest.Server.Features.NutritionsFacts.Models
 {
-    using System.ComponentModel.DataAnnotations;
     using static Validation.NutritionFacts;
-
-    public class NutritionFacts
+    public class NutritionFactsServiceModel
     {
-        [Key]
-        [Required]
         public int ProductId { get; set; }
-
-        public Product? Product { get; set; }
 
         [Range(MinAmount, 50000)]
         public double? EnergyValue { get; set; }
@@ -31,7 +28,5 @@
 
         [Range(MinAmount, 50000)]
         public double? Salt { get; set; }
-
-        public bool IsDeleted { get; set; }
     }
 }

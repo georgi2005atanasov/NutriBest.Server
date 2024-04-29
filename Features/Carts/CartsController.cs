@@ -231,6 +231,16 @@
         {
             try
             {
+                var cart = await GetSessionCart() ?? new CartServiceModel();
+
+                if (cart.TotalPrice == 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "The cart is already empty!"
+                    });
+                }
+
                 await SetSessionCart(new CartServiceModel());
 
                 return Ok();

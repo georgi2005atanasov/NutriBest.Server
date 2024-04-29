@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using NutriBest.Server.Features.Products;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.ProductsDetails
+﻿namespace NutriBest.Server.Features.ProductsDetails
 {
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Features.Products;
+    using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.ProductsDetails.Models;
+
     public class ProductDetailsController : ApiController
     {
         private readonly IProductService productService;
@@ -40,10 +41,10 @@ namespace NutriBest.Server.Features.ProductsDetails
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/details/{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> AddDetails([FromRoute] int id,
+        public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
             [FromQuery] string name, [FromBody] CreateProductDetailsServiceModel details)
         {
             try
@@ -88,7 +89,7 @@ namespace NutriBest.Server.Features.ProductsDetails
             {
                 return BadRequest(new
                 {
-                    Message = err.Message
+                    err.Message
                 });
             }
             catch (Exception)

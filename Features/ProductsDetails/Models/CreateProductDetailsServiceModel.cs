@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.Products.Models
+﻿namespace NutriBest.Server.Features.ProductsDetails.Models
 {
     public class CreateProductDetailsServiceModel
     {

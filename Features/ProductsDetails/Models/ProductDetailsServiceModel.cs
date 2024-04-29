@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.Products.Models
+﻿namespace NutriBest.Server.Features.ProductsDetails.Models
 {
     using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
@@ -34,7 +34,5 @@
         public string? ServingSize { get; set; }
 
         public string? ServingsPerContainer { get; set; }
-
-        //public string? NutritionFacts { get; set; } gotta make model
     }
 }

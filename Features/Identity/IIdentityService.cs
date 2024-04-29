@@ -12,7 +12,7 @@
 
         Task<User> FindUserByUserName(string userName);
 
-        Task<ProfileServiceModel?> FindUserById(string id);
+        Task<ProfileServiceModel> FindUserById(string id);
 
         Task<bool> CheckUserPassword(User user, string password);
     }

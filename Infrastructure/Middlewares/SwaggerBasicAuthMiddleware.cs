@@ -24,7 +24,7 @@
                 if (authHeader != null && authHeader.StartsWith("Basic "))
                 {
                     var header = AuthenticationHeaderValue.Parse(authHeader);
-                    var inBytes = Convert.FromBase64String(header.Parameter);
+                    var inBytes = Convert.FromBase64String(header.Parameter ?? ""); // be aware
                     var credentials = Encoding.UTF8.GetString(inBytes).Split(':');
 
                     var username = credentials[0];

@@ -34,12 +34,15 @@
         {
             try
             {
-                Task<ProfileServiceModel>? task = identityService.FindUserById(userId);
+                Task<ProfileServiceModel> task = identityService.FindUserById(userId);
                 return await task!;
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    Message = "User could not be found!"
+                });
             }
         }
 
@@ -57,7 +60,7 @@
                     return BadRequest();
                 }
 
-                Task<ProfileServiceModel>? task = identityService.FindUserById(currentUserId);
+                Task<ProfileServiceModel> task = identityService.FindUserById(currentUserId);
                 return await task!;
             }
             catch (Exception)

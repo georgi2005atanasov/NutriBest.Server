@@ -16,5 +16,10 @@
             public const int MaxAge = 100;
             public const int MinAge = 12;
         }
+
+        public class NutritionFacts
+        {
+            public const int MinAmount = 0;
+        }
     }
 }

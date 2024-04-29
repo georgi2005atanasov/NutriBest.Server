@@ -29,9 +29,9 @@
         [NotMapped]
         public ProductImage ProductImage { get; set; } = null!;
 
-        public ProductDetails? ProductDetails { get; set; }
+        public ProductDetails ProductDetails { get; set; } = new ProductDetails();
 
-        public NutritionFacts? NutritionFacts { get; set; }
+        public NutritionFacts NutritionFacts { get; set; } = new NutritionFacts();
 
         public List<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
 

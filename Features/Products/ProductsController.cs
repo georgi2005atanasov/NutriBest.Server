@@ -145,8 +145,8 @@
             }
         }
 
-        [Authorize(Roles = "Administrator,Employee")]
         [HttpPut]
+        [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<int>> Update([FromForm] UpdateProductServiceModel productModel)
         {
             try

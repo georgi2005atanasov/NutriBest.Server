@@ -1,6 +1,5 @@
 ﻿namespace NutriBest.Server.Features.Identity
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Data.Models;
@@ -43,7 +42,10 @@
 
                 if (result.Succeeded)
                 {
-                    return Ok("Successfully added new user!");
+                    return Ok(new
+                    {
+                        Message = "Successfully added new user!"
+                    });
                 }
 
                 return BadRequest(result.Errors);
