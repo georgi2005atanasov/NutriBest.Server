@@ -15,13 +15,6 @@
             double? energyValue,
             double? salt);
 
-        Task Remove(int productId, string name,
-            double? proteins,
-            double? sugar,
-            double? carbohydrates,
-            double? fats,
-            double? saturatedFats,
-            double? energyValue,
-            double? salt);
+        Task Remove(int productId, string name);
     }
 }

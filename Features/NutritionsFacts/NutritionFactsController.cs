@@ -41,9 +41,9 @@
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/details/{id}")]
+        [Route("/products/nutri-facts/{id}")]
         public async Task<ActionResult> SetFacts([FromRoute] int id,
             [FromQuery] string name, [FromBody] NutritionFactsServiceModel details)
         {
@@ -60,7 +60,7 @@
                     details.EnergyValue,
                     details.Salt);
 
-                return Ok();
+                return Ok(true);
             }
             catch (InvalidOperationException err)
             {
@@ -75,31 +75,31 @@
             }
         }
 
-        //[HttpDelete]
-        //[Authorize(Roles = "Administrator,Employee")]
-        //[Route("/products/details/{id}")]
-        //public async Task<ActionResult<ProductListingServiceModel>> RemoveDetails([FromRoute] int id,
-        //    [FromQuery] string name)
-        //{
-        //    try
-        //    {
-        //        var product = await productService.GetById(id, name);
+        [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("/products/nutri-facts/{id}")]
+        public async Task<ActionResult<bool>> RemoveDetails([FromRoute] int id,
+            [FromQuery] string name)
+        {
+            try
+            {
+                var product = await productService.GetById(id, name);
 
-        //        await productDetailsService.RemoveDetails(id, name);
+                await nutritionFactsService.Remove(id, name);
 
-        //        return Ok(true);
-        //    }
-        //    catch (InvalidOperationException err)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            err.Message
-        //        });
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest(false);
-        //    }
-        //}
+                return Ok(true);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(false);
+            }
+        }
     }
 }

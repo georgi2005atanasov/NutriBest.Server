@@ -24,46 +24,35 @@
         {
             var details = await db.Products
                 .Include(x => x.NutritionFacts)
-                .Select(product => new NutritionFactsServiceModel
-                {
-                    ProductId = product.ProductId,
-                    Carbohydrates = product.NutritionFacts.Carbohydrates,
-                    SaturatedFats = product.NutritionFacts.SaturatedFats,
-                    Fats = product.NutritionFacts.Fats,
-                    Sugars = product.NutritionFacts.Sugars,
-                    Proteins = product.NutritionFacts.Proteins,
-                    EnergyValue = product.NutritionFacts.EnergyValue,
-                    Salt = product.NutritionFacts.Salt,
-                })
                 .FirstAsync(x => x.ProductId == productId);
 
             if (carbohydrates != null)
             {
-                details.Carbohydrates = carbohydrates;
+                details.NutritionFacts.Carbohydrates = carbohydrates;
             }
             if (fats != null)
             {
-                details.Fats = fats;
+                details.NutritionFacts.Fats = fats;
             }
             if (saturatedFats != null)
             {
-                details.SaturatedFats = saturatedFats;
+                details.NutritionFacts.SaturatedFats = saturatedFats;
             }
             if (sugars != null)
             {
-                details.Sugars = sugars;
+                details.NutritionFacts.Sugars = sugars;
             }
             if (proteins != null)
             {
-                details.Proteins = proteins;
+                details.NutritionFacts.Proteins = proteins;
             }
             if (energyValue != null)
             {
-                details.EnergyValue = energyValue;
+                details.NutritionFacts.EnergyValue = energyValue;
             }
             if (salt != null)
             {
-                details.Salt = salt;
+                details.NutritionFacts.Salt = salt;
             }
 
             await db.SaveChangesAsync();
@@ -80,6 +69,7 @@
 
             var facts = new NutritionFactsServiceModel
             {
+                ProductId = productId,
                 Carbohydrates = product.NutritionFacts.Carbohydrates,
                 SaturatedFats = product.NutritionFacts.SaturatedFats,
                 Fats = product.NutritionFacts.Fats,
@@ -92,14 +82,7 @@
             return facts;
         }
 
-        public async Task Remove(int productId, string name,
-            double? proteins,
-            double? sugar,
-            double? carbohydrates,
-            double? fats,
-            double? saturatedFats,
-            double? energyValue,
-            double? salt)
+        public async Task Remove(int productId, string name)
         {
             var product = await db.Products
                 .FirstAsync(x => x.ProductId == productId);
