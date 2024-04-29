@@ -1,9 +1,9 @@
-﻿namespace NutriBest.Server.Features.Promotions
+﻿namespace NutriBest.Server.Features.ProductsPromotions
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Features.ProductsPromotions.Models;
 
     public class ProductPromotionService : IProductPromotionService
     {

@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.Promotions.Models
+﻿namespace NutriBest.Server.Features.ProductsPromotions.Models
 {
     public class CreatePromotionServiceModel
     {

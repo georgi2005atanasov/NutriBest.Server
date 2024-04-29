@@ -1,6 +1,6 @@
-﻿namespace NutriBest.Server.Features.Promotions
+﻿namespace NutriBest.Server.Features.ProductsPromotions
 {
-    using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Features.ProductsPromotions.Models;
 
     public interface IProductPromotionService
     {

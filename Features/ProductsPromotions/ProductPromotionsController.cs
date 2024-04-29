@@ -1,8 +1,8 @@
-﻿namespace NutriBest.Server.Features.Promotions
+﻿namespace NutriBest.Server.Features.ProductsPromotions
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Features.ProductsPromotions.Models;
 
     public class ProductPromotionsController : ApiController
     {

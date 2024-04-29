@@ -6,7 +6,7 @@
     using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Features.ProductsPromotions;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
