@@ -16,12 +16,21 @@
         }
 
         [HttpGet]
-        [Route("/products/details/{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id)
+        [Route("/products/details/{id}/{name}")]
+        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id,
+            [FromRoute] string name)
         {
             try
             {
                 var product = await productDetailsService.GetById(id);
+
+                if (product.Name != name)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Invalid product!"
+                    });
+                }
 
                 return Ok(product);
             }
@@ -40,7 +49,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/details/{id}")]
+        [Route("/products/details/{id}/{name}")]
         public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
             [FromBody] CreateProductDetailsServiceModel details)
         {

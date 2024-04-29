@@ -32,6 +32,7 @@
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route("{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> GetById([FromRoute] int id)
         {
