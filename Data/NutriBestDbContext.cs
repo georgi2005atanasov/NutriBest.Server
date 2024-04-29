@@ -185,6 +185,15 @@
 
             builder.Entity<ProductPromotion>()
                 .HasKey(x => new { x.ProductId, x.PromotionId });
+
+            builder.Entity<ProductPromotion>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<ProductDetails>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<NutritionFacts>()
+                .HasQueryFilter(x => !x.IsDeleted);
         }
 
         private void ApplyAuditInformation()

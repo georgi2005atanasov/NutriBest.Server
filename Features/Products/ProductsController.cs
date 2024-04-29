@@ -65,7 +65,7 @@
                 .Split(",")
                 .ToList();
 
-                if (await ProductExists(productModel.Name))
+                if (ProductExists(productModel.Name))
                 {
                     return BadRequest(new
                     {
@@ -215,7 +215,7 @@
                     });
                 }
 
-                if (await ProductExists(productModel.Name) && product?.Name != productModel.Name)
+                if (ProductExists(productModel.Name) && product?.Name != productModel.Name)
                 {
                     return BadRequest(new
                     {
@@ -335,11 +335,11 @@
             .OrderBy(x => x)
             .ToListAsync());
 
-        private async Task<bool> ProductExists(string productName)
+        private bool ProductExists(string productName)
         {
-            var products = await db.Products
+            var products = db.Products
                 .Select(x => x.Name)
-                .ToListAsync();
+                .ToList();
 
             if (products.Any(name => name == productName))
             {

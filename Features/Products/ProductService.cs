@@ -6,14 +6,20 @@
     using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Promotions;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
+        private readonly IProductPromotionService productPromotionService;
 
-        public ProductService(NutriBestDbContext db)
-            => this.db = db;
+        public ProductService(NutriBestDbContext db, 
+            IProductPromotionService productPromotionService)
+        {
+            this.db = db;
+            this.productPromotionService = productPromotionService;
+        }
 
         public async Task<AllProductsServiceModel> All(int page,
             string? categoriesFilter,
@@ -203,21 +209,33 @@
 
                 await db.ProductsDetails
                     .Where(x => x.ProductId == productId)
-                    .ForEachAsync(pc =>
+                    .ForEachAsync(pd =>
                     {
-                        if (pc.ProductId == productId)
+                        if (pd.ProductId == productId)
                         {
-                            pc.IsDeleted = true;
+                            pd.IsDeleted = true;
                         }
                     });
 
                 await db.NutritionFacts
                     .Where(x => x.ProductId == productId)
-                    .ForEachAsync(pc =>
+                    .ForEachAsync(nf =>
                     {
-                        if (pc.ProductId == productId)
+                        if (nf.ProductId == productId)
                         {
-                            pc.IsDeleted = true;
+                            nf.IsDeleted = true;
+                        }
+                    });
+
+                await db.ProductsPromotions
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync((pp) =>
+                    {
+                        if (pp.ProductId == productId)
+                        {
+                            pp.IsDeleted = true;
+
+                            productPromotionService.Remove(pp.PromotionId);
                         }
                     });
 

@@ -58,8 +58,8 @@
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/nutri-facts/{id}")]
-        public async Task<ActionResult> SetFacts([FromRoute] int id,
-            [FromQuery] string name, [FromBody] NutritionFactsServiceModel details)
+        public async Task<ActionResult> SetFacts([FromRoute] int id, 
+            [FromBody] NutritionFactsServiceModel details)
         {
             try
             {

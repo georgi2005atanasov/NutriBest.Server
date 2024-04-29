@@ -4,7 +4,7 @@
 
     public interface IProductPromotionService
     {
-        Task<PromotionServiceModel> Get();
+        Task<PromotionServiceModel> Get(int promotionId);
 
         Task<int> Create(int productId, 
             string? description,
@@ -14,6 +14,6 @@
             DateTime endDate,
             decimal? specialPrice);
 
-        Task<bool> Remove();
+        Task<bool> Remove(int promotionId);
     }
 }
