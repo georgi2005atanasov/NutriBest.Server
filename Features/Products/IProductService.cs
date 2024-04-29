@@ -21,7 +21,7 @@
             string? search,
             string? priceRange);
 
-        Task<ProductDetailsServiceModel> GetById(int id, string name);
+        Task<ProductEditServiceModel> GetById(int id);
 
         Task<int> Update(int id,
             string name,

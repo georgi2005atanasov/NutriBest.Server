@@ -8,23 +8,20 @@
 
     public class ProductDetailsController : ApiController
     {
-        private readonly IProductService productService;
         private readonly IProductDetailsService productDetailsService;
 
         public ProductDetailsController(IProductService productService, IProductDetailsService productDetailsService)
         {
-            this.productService = productService;
             this.productDetailsService = productDetailsService;
         }
 
         [HttpGet]
         [Route("/products/details/{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id,
-            [FromQuery] string name)
+        public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id)
         {
             try
             {
-                var product = await productService.GetById(id, name);
+                var product = await productDetailsService.GetById(id);
 
                 return Ok(product);
             }
@@ -45,11 +42,11 @@
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/details/{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
-            [FromQuery] string name, [FromBody] CreateProductDetailsServiceModel details)
+            [FromBody] CreateProductDetailsServiceModel details)
         {
             try
             {
-                var product = await productService.GetById(id, name);
+                var product = await productDetailsService.GetById(id);
 
                 await productDetailsService.AddDetails(id,
                     details.HowToUse,
@@ -74,14 +71,13 @@
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/details/{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> RemoveDetails([FromRoute] int id,
-            [FromQuery] string name)
+        public async Task<ActionResult<ProductListingServiceModel>> RemoveDetails([FromRoute] int id)
         {
             try
             {
-                var product = await productService.GetById(id, name);
+                var product = await productDetailsService.GetById(id);
 
-                await productDetailsService.RemoveDetails(id, name);
+                await productDetailsService.RemoveDetails(id);
 
                 return Ok(true);
             }

@@ -58,14 +58,11 @@
             await db.SaveChangesAsync();
         }
 
-        public async Task<NutritionFactsServiceModel> Get(int productId, string name)
+        public async Task<NutritionFactsServiceModel> Get(int productId)
         {
             var product = await db.Products
                 .Include(x => x.NutritionFacts)
                 .FirstAsync(x => x.ProductId == productId);
-
-            if (product.Name != name)
-                throw new InvalidOperationException("Invalid product!");
 
             var facts = new NutritionFactsServiceModel
             {
@@ -82,13 +79,10 @@
             return facts;
         }
 
-        public async Task Remove(int productId, string name)
+        public async Task Remove(int productId)
         {
             var product = await db.Products
                 .FirstAsync(x => x.ProductId == productId);
-
-            if (product.Name != name)
-                throw new InvalidOperationException("Invalid product!");
 
             var details = await db.NutritionFacts
                 .FirstAsync(x => x.ProductId == productId);

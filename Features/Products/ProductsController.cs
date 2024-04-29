@@ -8,6 +8,7 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
+    using System.Globalization;
 
     public class ProductsController : ApiController
     {
@@ -30,6 +31,29 @@
             this.memoryCache = memoryCache;
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<ProductListingServiceModel>> GetById([FromRoute] int id)
+        {
+            try
+            {
+                var product = await productService.GetById(id);
+
+                return Ok(product);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
@@ -49,7 +73,18 @@
                     });
                 }
 
-                if (productModel.Price <= 0)
+                decimal price;
+
+                if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
+                {
+                    return BadRequest(new
+                    {
+                        Key = "Price",
+                        Message = "Product price must be a number!"
+                    });
+                }
+
+                if (price <= 0)
                 {
                     return BadRequest(new
                     {
@@ -78,7 +113,7 @@
                     var productId = await productService
                         .Create(productModel.Name,
                         productModel.Description,
-                        productModel.Price,
+                        price,
                         productModel.Quantity,
                         categoriesIds,
                         productImage.ImageData,
@@ -151,6 +186,17 @@
         {
             try
             {
+                decimal price;
+
+                if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
+                {
+                    return BadRequest(new
+                    {
+                        Key = "Price",
+                        Message = "Product price must be a number!"
+                    });
+                }
+
                 var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
@@ -177,7 +223,7 @@
                     });
                 }
 
-                if (productModel.Price <= 0)
+                if (price <= 0)
                 {
                     return BadRequest(new
                     {
@@ -207,7 +253,7 @@
                         .Update(productModel.ProductId,
                         productModel.Name,
                         productModel.Description,
-                        productModel.Price,
+                        price,
                         productModel.Quantity,
                         categoriesIds,
                         productImage.ImageData,
@@ -226,7 +272,7 @@
                         .Update(productModel.ProductId,
                         productModel.Name,
                         productModel.Description,
-                        productModel.Price,
+                        price,
                         productModel.Quantity,
                         categoriesIds,
                         image.ImageData,
@@ -244,8 +290,8 @@
             }
         }
 
-        [Authorize(Roles = "Administrator,Employee")]
         [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route("{id}")]
         public async Task<ActionResult<bool>> Delete([FromRoute] int id)
         {

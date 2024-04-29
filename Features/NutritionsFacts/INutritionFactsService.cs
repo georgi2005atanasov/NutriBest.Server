@@ -4,7 +4,7 @@
 
     public interface INutritionFactsService
     {
-        Task<NutritionFactsServiceModel> Get(int productId, string name);
+        Task<NutritionFactsServiceModel> Get(int productId);
 
         Task Add(int productId,
             double? proteins,
@@ -15,6 +15,6 @@
             double? energyValue,
             double? salt);
 
-        Task Remove(int productId, string name);
+        Task Remove(int productId);
     }
 }

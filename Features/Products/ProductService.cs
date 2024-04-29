@@ -92,11 +92,6 @@
                 Description = description,
                 Price = price,
                 ProductImage = productImage,
-                ProductsCategories = new List<ProductCategory>(),
-                ProductDetails = new ProductDetails(),
-                NutritionFacts = new NutritionFacts(),
-                //ProductPromotions = new List<ProductPromotion>(),
-                //ProductReviews = new List<ProductReview>(),
                 CreatedOn = DateTime.Now,
                 Quantity = quantity
             };
@@ -117,11 +112,11 @@
             return product.ProductId;
         }
 
-        public async Task<ProductDetailsServiceModel> GetById(int id, string name)
+        public async Task<ProductEditServiceModel> GetById(int id)
         {
             var product = await db.Products
                          .Include(x => x.ProductDetails)
-                         .Select(x => new ProductDetailsServiceModel
+                         .Select(x => new ProductEditServiceModel
                          {
                              ProductId = x.ProductId,
                              Name = x.Name,
@@ -136,14 +131,8 @@
                                  ImageData = x.ProductImage.ImageData
                              },
                              Quantity = x.Quantity,
-                             HowToUse = x.ProductDetails.HowToUse,
-                             ServingSize = x.ProductDetails.ServingSize,
-                             ServingsPerContainer = x.ProductDetails.ServingsPerContainer
                          })
                          .FirstAsync(x => x.ProductId == id);
-
-            if (product.Name != name)
-                throw new InvalidOperationException("Invalid product!");
 
             return product;
         }
@@ -214,6 +203,16 @@
                     });
 
                 await db.ProductsDetails
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync(pc =>
+                    {
+                        if (pc.ProductId == productId)
+                        {
+                            pc.IsDeleted = true;
+                        }
+                    });
+
+                await db.NutritionFacts
                     .Where(x => x.ProductId == productId)
                     .ForEachAsync(pc =>
                     {

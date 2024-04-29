@@ -19,12 +19,11 @@
 
         [HttpGet]
         [Route("/products/nutri-facts/{id}")]
-        public async Task<ActionResult<NutritionFactsServiceModel>> Facts([FromRoute] int id,
-            [FromQuery] string name)
+        public async Task<ActionResult<NutritionFactsServiceModel>> Facts([FromRoute] int id)
         {
             try
             {
-                var facts = await nutritionFactsService.Get(id, name);
+                var facts = await nutritionFactsService.Get(id);
 
                 return Ok(facts);
             }
@@ -49,7 +48,7 @@
         {
             try
             {
-                var product = await productService.GetById(id, name);
+                var product = await productService.GetById(id);
 
                 await nutritionFactsService.Add(id,
                     details.Proteins,
@@ -78,14 +77,13 @@
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/nutri-facts/{id}")]
-        public async Task<ActionResult<bool>> RemoveDetails([FromRoute] int id,
-            [FromQuery] string name)
+        public async Task<ActionResult<bool>> RemoveDetails([FromRoute] int id)
         {
             try
             {
-                var product = await productService.GetById(id, name);
+                var product = await productService.GetById(id);
 
-                await nutritionFactsService.Remove(id, name);
+                await nutritionFactsService.Remove(id);
 
                 return Ok(true);
             }

@@ -1,5 +1,7 @@
 ﻿namespace NutriBest.Server.Features.ProductsDetails
 {
+    using NutriBest.Server.Features.ProductsDetails.Models;
+
     public interface IProductDetailsService
     {
         Task AddDetails(
@@ -8,6 +10,8 @@
             string? servingSize,
             string? servingsPerContainer);
 
-        Task RemoveDetails(int productId, string name);
+        Task RemoveDetails(int productId);
+
+        Task<ProductDetailsServiceModel> GetById(int id);
     }
 }

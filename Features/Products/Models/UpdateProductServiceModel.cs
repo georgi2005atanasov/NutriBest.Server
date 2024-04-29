@@ -13,7 +13,7 @@
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public decimal Price { get; set; }
+        public string Price { get; set; } = null!;
 
         public int? Quantity { get; set; }
 
