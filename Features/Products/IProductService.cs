@@ -20,7 +20,9 @@
             string? search,
             string? priceRange);
 
-        Task<ProductServiceModel> GetById(int id);
+        Task<ProductServiceModel> Get(int id);
+
+        Task<ProductWithPromotionListingServiceModel> GetWithPromotion(int productId, int promotionId);
 
         Task<int> Update(int id,
             string name,

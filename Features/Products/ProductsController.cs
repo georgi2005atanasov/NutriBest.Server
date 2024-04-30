@@ -34,11 +34,11 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> GetById([FromRoute] int id)
+        public async Task<ActionResult<ProductListingServiceModel>> Get([FromRoute] int id)
         {
             try
             {
-                var product = await productService.GetById(id);
+                var product = await productService.Get(id);
 
                 return Ok(product);
             }
@@ -219,11 +219,11 @@
                         Message = "Product with this name already exists!"
                     });
 
-                if (price <= 0)
+                if (price <= 0 || price > 4000)
                     return BadRequest(new
                     {
                         Key = "Price",
-                        Message = "Price must be bigger than zero!"
+                        Message = "Price must be bigger than zero and less than 4000!"
                     });
 
                 var categoriesIds = await categoryService
@@ -323,6 +323,37 @@
             .Select(x => x.ProductId)
             .OrderBy(x => x)
             .ToListAsync());
+
+        [HttpGet]
+        [Route("promotion/{promotionId}/{productId}")]
+        public async Task<ActionResult<ProductWithPromotionListingServiceModel>> GetWithPromotion([FromRoute] int promotionId,
+            [FromRoute] int productId)
+        {
+            try
+            {
+                var product = await productService.GetWithPromotion(productId, promotionId);
+
+                return Ok(product);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
 
         private bool ProductExists(string productName)
         {

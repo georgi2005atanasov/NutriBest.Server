@@ -12,9 +12,11 @@
         [Required]
         public string? Price { get; set; } = null;
 
+        [Range(MinQuantity, MaxQuantity)]
         public int? Quantity { get; set; }
 
         [Required]
+        [StringLength(MaxDescriptionLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
         [Required]

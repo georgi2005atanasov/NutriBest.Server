@@ -12,13 +12,13 @@
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
-        private readonly IPromotionService productPromotionService;
+        private readonly IPromotionService promotionService;
 
-        public ProductService(NutriBestDbContext db, 
-            IPromotionService productPromotionService)
+        public ProductService(NutriBestDbContext db,
+            IPromotionService promotionService)
         {
             this.db = db;
-            this.productPromotionService = productPromotionService;
+            this.promotionService = promotionService;
         }
 
         public async Task<AllProductsServiceModel> All(int page,
@@ -49,7 +49,8 @@
                              Categories = x.ProductsCategories
                              .Select(c => c.Category.Name)
                              .ToList(),
-                             Quantity = x.Quantity
+                             Quantity = x.Quantity,
+                             PromotionId = x.PromotionId
                          })
                          .AsQueryable();
 
@@ -117,7 +118,7 @@
             return product.ProductId;
         }
 
-        public async Task<ProductServiceModel> GetById(int id)
+        public async Task<ProductServiceModel> Get(int id)
         {
             var product = await db.Products
                          .Include(x => x.ProductDetails)
@@ -236,6 +237,48 @@
             {
                 return false;
             }
+        }
+
+        public async Task<ProductWithPromotionListingServiceModel> GetWithPromotion(int productId, int promotionId)
+        {
+            var promotion = await db.Promotions
+                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (promotion == null || product == null)
+                throw new ArgumentNullException("Invalid product!");
+
+            if (product.PromotionId != promotionId)
+                throw new InvalidOperationException("The product does not have this promotion!");
+
+            decimal newPrice = 0;
+
+            if (promotion.DiscountPercentage != null)
+                newPrice = product.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100);
+
+            if (promotion.DiscountAmount != null)
+                newPrice = product.Price - (decimal)promotion.DiscountAmount;
+
+            var productListingModel = await Get(productId);
+
+            var productWithPromotion = new ProductWithPromotionListingServiceModel
+            {
+                Categories = productListingModel.Categories,
+                Image = productListingModel.Image,
+                Description = product.Description,
+                Name = product.Name,
+                Price = product.Price,
+                PromotionId = product.PromotionId,
+                ProductId = product.ProductId,
+                Quantity = product.Quantity,
+                DiscountAmount = promotion.DiscountAmount,
+                DiscountPercentage = promotion.DiscountPercentage,
+                NewPrice = newPrice
+            };
+
+            return productWithPromotion;
         }
     }
 }

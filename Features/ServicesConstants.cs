@@ -14,9 +14,13 @@
         public class Product
         {
             public const int MaxNameLength = 60;
+            public const int MinNameLength = 1;
             public const int MaxDescriptionLength = 2000;
+            public const int MinDescriptionLength = 5;
             public const double MinPrice = 0.1;
             public const double MaxPrice = 4000;
+            public const double MinQuantity = 0;
+            public const double MaxQuantity = 1000;
         }
 
         public class NutritionFacts

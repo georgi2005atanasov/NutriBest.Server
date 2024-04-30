@@ -26,6 +26,11 @@
 
             if (product.PromotionId != null)
             {
+                if (product.PromotionId == promotionId)
+                {
+                    throw new InvalidOperationException("The promotion cannot be the same!");
+                }
+
                 product.PromotionId = null;
             }
 

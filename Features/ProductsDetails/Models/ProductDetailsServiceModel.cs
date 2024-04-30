@@ -19,6 +19,8 @@
 
         public int? Quantity { get; set; }
 
+        public int? PromotionId { get; set; }
+
         [Required]
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;

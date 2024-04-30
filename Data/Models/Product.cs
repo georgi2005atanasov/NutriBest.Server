@@ -10,18 +10,19 @@
         [Required]
         public int ProductId { get; set; }
 
-        [Required]
-        [MaxLength(NameMaxLength)]
+        [Required] 
+        [StringLength(MaxNameLength, MinimumLength = MinNameLength)]
         public string Name { get; set; } = null!;
 
         [Required]
         [Range(MinPrice, MaxPrice)]
         public decimal Price { get; set; }
 
+        [Range(MinQuantity, MaxQuantity)]
         public int? Quantity { get; set; }
 
         [Required]
-        [StringLength(DescriptionMaxLength, MinimumLength = 5)]
+        [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string Description { get; set; } = null!;
 
         public int ProductImageId { get; set; }

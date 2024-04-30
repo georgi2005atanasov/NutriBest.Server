@@ -33,6 +33,7 @@
                                  ImageData = x.ProductImage.ImageData
                              },
                              Quantity = x.Quantity,
+                             PromotionId = x.PromotionId,
                              HowToUse = x.ProductDetails.HowToUse,
                              ServingSize = x.ProductDetails.ServingSize,
                              ServingsPerContainer = x.ProductDetails.ServingsPerContainer

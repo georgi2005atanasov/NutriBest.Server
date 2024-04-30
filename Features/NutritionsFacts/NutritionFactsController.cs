@@ -63,7 +63,7 @@
         {
             try
             {
-                var product = await productService.GetById(id);
+                var product = await productService.Get(id);
 
                 await nutritionFactsService.Add(id,
                     details.Proteins,
@@ -96,7 +96,7 @@
         {
             try
             {
-                var product = await productService.GetById(id);
+                var product = await productService.Get(id);
 
                 await nutritionFactsService.Remove(id);
 
