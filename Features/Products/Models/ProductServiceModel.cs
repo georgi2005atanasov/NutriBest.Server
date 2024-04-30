@@ -1,12 +1,9 @@
-﻿using NutriBest.Server.Data;
-
-namespace NutriBest.Server.Features.Products.Models
+﻿namespace NutriBest.Server.Features.Products.Models
 {
     using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
-    using static Validation.Product;
 
-    public class ProductEditServiceModel
+    public class ProductServiceModel
     {
         public int ProductId { get; set; }
 
@@ -14,7 +11,6 @@ namespace NutriBest.Server.Features.Products.Models
         public string Name { get; set; } = null!;
 
         [Required]
-        [Range(MinPrice, MaxPrice)]
         public decimal Price { get; set; }
 
         public int? Quantity { get; set; }

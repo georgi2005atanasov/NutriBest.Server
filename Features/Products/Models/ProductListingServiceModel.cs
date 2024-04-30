@@ -1,7 +1,5 @@
-﻿
-namespace NutriBest.Server.Features.Products.Models
+﻿namespace NutriBest.Server.Features.Products.Models
 {
-    using NutriBest.Server.Data.Models;
     using System.ComponentModel.DataAnnotations;
     using static WebConstants.ProductConstants;
 

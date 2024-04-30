@@ -1,13 +1,13 @@
 ﻿namespace NutriBest.Server
 {
-    public static class WebConstants
+    public class WebConstants
     {
-        public static class ProductConstants
+        public class ProductConstants
         {
-            public const int MaxNameLength = 2000;
+            public const int MaxNameLength = 60;
             public const int MaxDescriptionLength = 2000;
             public const double MinPrice = 0.1;
-            public const double MaxPrice = 3000;
+            public const double MaxPrice = 4000;
         }
     }
 }

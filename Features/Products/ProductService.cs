@@ -6,16 +6,16 @@
     using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Features.ProductsPromotions;
+    using NutriBest.Server.Features.Promotions;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
-        private readonly IProductPromotionService productPromotionService;
+        private readonly IPromotionService productPromotionService;
 
         public ProductService(NutriBestDbContext db, 
-            IProductPromotionService productPromotionService)
+            IPromotionService productPromotionService)
         {
             this.db = db;
             this.productPromotionService = productPromotionService;
@@ -117,11 +117,11 @@
             return product.ProductId;
         }
 
-        public async Task<ProductEditServiceModel> GetById(int id)
+        public async Task<ProductServiceModel> GetById(int id)
         {
             var product = await db.Products
                          .Include(x => x.ProductDetails)
-                         .Select(x => new ProductEditServiceModel
+                         .Select(x => new ProductServiceModel
                          {
                              ProductId = x.ProductId,
                              Name = x.Name,

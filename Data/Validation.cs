@@ -4,10 +4,10 @@
     {
         public class Product
         {
-            public const int NameMaxLength = 40;
+            public const int NameMaxLength = 60;
             public const int DescriptionMaxLength = 2000;
-            public const int MinPrice = 40;
-            public const int MaxPrice = 40;
+            public const double MinPrice = 0.1;
+            public const int MaxPrice = 4000;
         }
 
         public class Profile
@@ -20,6 +20,7 @@
         public class NutritionFacts
         {
             public const int MinAmount = 0;
+            public const int MaxAmount = 50000;
         }
     }
 }

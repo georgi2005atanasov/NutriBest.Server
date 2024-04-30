@@ -1,14 +1,14 @@
-﻿namespace NutriBest.Server.Features.ProductsPromotions
+﻿namespace NutriBest.Server.Features.Promotions
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.ProductsPromotions.Models;
+    using NutriBest.Server.Features.Promotions.Models;
 
-    public class ProductPromotionsController : ApiController
+    public class PromotionsController : ApiController
     {
-        private readonly IProductPromotionService promotionService;
+        private readonly IPromotionService promotionService;
 
-        public ProductPromotionsController(IProductPromotionService promotionService)
+        public PromotionsController(IPromotionService promotionService)
         {
             this.promotionService = promotionService;
         }
@@ -38,9 +38,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/{productId}")]
-        public async Task<ActionResult> Create([FromRoute] int productId,
-            CreatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult> Create(CreatePromotionServiceModel promotion) // may receive it from a form
         {
             if (promotion.StartDate > promotion.EndDate)
             {
@@ -64,13 +62,51 @@
 
             try
             {
-                var result = await promotionService.Create(productId,
-                    promotion.Description,
+                var result = await promotionService.Create(promotion.Description,
                     promotion.DiscountAmount,
                     promotion.DiscountPercentage,
                     promotion.StartDate,
                     promotion.EndDate,
                     promotion.SpecialPrice); //set is active = true there
+
+                return Ok();
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("/promotions/{promotionId}")]
+        public async Task<ActionResult> Update(int promotionId, UpdatePromotionServiceModel promotion) // may receive it from a form
+        {
+            if (promotion.DiscountPercentage == null &&
+                promotion.DiscountAmount == null &&
+                promotion.SpecialPrice == null)
+            {
+                return BadRequest(new
+                {
+                    Key = "SpecialPrice",
+                    Message = "You have to make some kind of discount!"
+                });
+            }
+
+            try
+            {
+                var result = await promotionService.Update(promotionId,
+                    promotion.Description,
+                    promotion.DiscountAmount,
+                    promotion.DiscountPercentage,
+                    promotion.SpecialPrice);
 
                 return Ok();
             }

@@ -1,20 +1,26 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class Address
     {
         public int Id { get; set; }
 
-        public string? ProfileId { get; set; }
+        [Required]
+        public string ProfileId { get; set; } = null!;
 
         public Profile? Profile { get; set; }
 
-        public string? Street { get; set; }
+        [Required]
+        public string Street { get; set; } = null!;
 
         public int? StreetNumber { get; set; }
 
-        public string? Country { get; set; }
+        [Required]
+        public string Country { get; set; } = null!;
 
-        public string? City { get; set; }
+        [Required]
+        public string City { get; set; } = null!;
 
         public int? PostalCode { get; set; }
     }

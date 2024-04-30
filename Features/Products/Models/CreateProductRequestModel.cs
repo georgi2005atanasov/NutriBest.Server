@@ -1,15 +1,15 @@
 ﻿namespace NutriBest.Server.Features.Products.Models
 {
     using System.ComponentModel.DataAnnotations;
-    using static WebConstants.ProductConstants;
+    using static ServicesConstants.Product;
 
     public class CreateProductRequestModel
     {
         [Required]
+        [StringLength(MaxNameLength, MinimumLength = 1)]
         public string Name { get; set; } = null!;
 
         [Required]
-        [Range(MinPrice, MaxPrice)]
         public string? Price { get; set; } = null;
 
         public int? Quantity { get; set; }

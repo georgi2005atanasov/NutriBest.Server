@@ -2,7 +2,7 @@
 {
     using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
-    using static WebConstants.ProductConstants;
+    using static ServicesConstants.Product;
 
     public class ProductDetailsServiceModel
     {
@@ -10,7 +10,7 @@
         public int ProductId { get; set; }
 
         [Required]
-        [MaxLength(MaxNameLength)]
+        [StringLength(MaxNameLength)]
         public string Name { get; set; } = null!;
 
         [Required]
