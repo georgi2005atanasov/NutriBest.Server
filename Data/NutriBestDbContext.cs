@@ -22,8 +22,6 @@
 
         public DbSet<Promotion> Promotions { get; set; } = null!;
 
-        public DbSet<ProductPromotion> ProductsPromotions { get; set; } = null!;
-
         public DbSet<ProductImage> ProductsImages { get; set; } = null!;
 
         public DbSet<Category> Categories { get; set; } = null!;
@@ -148,9 +146,9 @@
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
-                .HasMany(x => x.ProductPromotions)
-                .WithOne(x => x.Product)
-                .HasForeignKey(x => x.ProductId)
+                .HasOne(x => x.Promotion)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.PromotionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
@@ -178,19 +176,7 @@
                 .HasQueryFilter(x => !x.IsDeleted);
 
             builder.Entity<Promotion>()
-                .HasMany(x => x.ProductPromotions)
-                .WithOne(x => x.Promotion)
-                .HasForeignKey(x => x.PromotionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Promotion>()
                 .HasQueryFilter(x => !x.IsDeleted && x.IsActive);
-
-            builder.Entity<ProductPromotion>()
-                .HasKey(x => new { x.ProductId, x.PromotionId });
-
-            builder.Entity<ProductPromotion>()
-                .HasQueryFilter(x => !x.IsDeleted);
 
             builder.Entity<ProductDetails>()
                 .HasQueryFilter(x => !x.IsDeleted);

@@ -31,6 +31,13 @@
 
                 return Ok(product);
             }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    Message = err.Message
+                });
+            }
             catch (InvalidOperationException err)
             {
                 return BadRequest(new

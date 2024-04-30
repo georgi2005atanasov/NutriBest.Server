@@ -23,6 +23,13 @@
 
                 return Ok(promotion);
             }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
             catch (InvalidOperationException err)
             {
                 return BadRequest(new

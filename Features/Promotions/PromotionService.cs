@@ -51,7 +51,7 @@
                 .FirstOrDefaultAsync();
 
             if (promotion == null)
-                throw new InvalidOperationException("The promotion is not valid!");
+                throw new ArgumentNullException("The promotion is not valid!");
 
             return promotion;
         }
@@ -91,41 +91,16 @@
 
             db.Promotions.Remove(promotion);
 
-            await db.ProductsPromotions
+            await db.Products
                .Where(x => x.PromotionId == promotionId)
                .ForEachAsync(x =>
                {
-                   x.IsDeleted = true;
+                   x.PromotionId = null;
                });
 
             await db.SaveChangesAsync();
 
             return true;
-        }
-
-        public async Task<bool> CreateProductPromotion(int productId,
-            int promotionId,
-            decimal? specialPrice)
-        {
-            var productPromotion = new ProductPromotion
-            {
-                ProductId = productId,
-                PromotionId = promotionId
-            };
-
-            if (specialPrice != null)
-                productPromotion.SpecialPrice = specialPrice;
-
-            db.ProductsPromotions.Add(productPromotion);
-
-            await db.SaveChangesAsync();
-
-            return true;
-        }
-
-        public Task<bool> CreateCategoryPromotion(string category, int promotionId, decimal? specialPrice)
-        {
-            throw new NotImplementedException();
         }
     }
 }

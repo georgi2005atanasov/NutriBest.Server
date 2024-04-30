@@ -15,6 +15,6 @@
             double? energyValue,
             double? salt);
 
-        Task Remove(int productId);
+        Task<bool> Remove(int productId);
     }
 }

@@ -29,6 +29,10 @@
         [NotMapped]
         public ProductImage ProductImage { get; set; } = null!;
 
+        public int? PromotionId { get; set; }
+
+        public Promotion? Promotion { get; set; }
+
         public ProductDetails ProductDetails { get; set; } = new ProductDetails();
 
         public NutritionFacts NutritionFacts { get; set; } = new NutritionFacts();
@@ -37,7 +41,5 @@
 
         [Required]
         public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
-
-        public List<ProductPromotion> ProductPromotions { get; set; } = new List<ProductPromotion>();
     }
 }

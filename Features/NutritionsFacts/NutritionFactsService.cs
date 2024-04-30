@@ -71,13 +71,16 @@
             return facts;
         }
 
-        public async Task Remove(int productId)
+        public async Task<bool> Remove(int productId)
         {
             var product = await db.Products
-                .FirstAsync(x => x.ProductId == productId);
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             var details = await db.NutritionFacts
-                .FirstAsync(x => x.ProductId == productId);
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (details == null || product == null)
+                throw new ArgumentNullException("Invalid product!");
 
             details.Proteins = null;
             details.Sugars = null;
@@ -88,6 +91,8 @@
             details.EnergyValue = null;
 
             await db.SaveChangesAsync();
+
+            return true;
         }
     }
 }

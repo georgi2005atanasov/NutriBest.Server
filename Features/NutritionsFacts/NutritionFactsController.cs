@@ -92,7 +92,7 @@
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/nutri-facts/{id}")]
-        public async Task<ActionResult<bool>> RemoveDetails([FromRoute] int id)
+        public async Task<ActionResult<bool>> RemoveFacts([FromRoute] int id)
         {
             try
             {
@@ -101,6 +101,13 @@
                 await nutritionFactsService.Remove(id);
 
                 return Ok(true);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (InvalidOperationException err)
             {

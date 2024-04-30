@@ -1,7 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Products
 {
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Features.ProductsDetails.Models;
 
     public interface IProductService
     {

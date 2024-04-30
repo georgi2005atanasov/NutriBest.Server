@@ -9,6 +9,7 @@ using NutriBest.Server.Features.Images;
 using NutriBest.Server.Features.NutritionsFacts;
 using NutriBest.Server.Features.Products;
 using NutriBest.Server.Features.ProductsDetails;
+using NutriBest.Server.Features.ProductsPromotions;
 using NutriBest.Server.Features.Promotions;
 using NutriBest.Server.Infrastructure.Extensions;
 using NutriBest.Server.Infrastructure.Services;
@@ -39,6 +40,7 @@ builder.Services
     .AddTransient<IProductDetailsService, ProductDetailsService>()
     .AddTransient<INutritionFactsService, NutritionFactsService>()
     .AddTransient<IPromotionService, PromotionService>()
+    .AddTransient<IProductPromotionService, ProductPromotionService>()
     .AddTransient<ICartService,CartService>()
     .AddTransient<IImageService, ImageService>()
     .AddTransient<ICategoryService, CategoryService>();

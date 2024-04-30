@@ -37,7 +37,10 @@
                              ServingSize = x.ProductDetails.ServingSize,
                              ServingsPerContainer = x.ProductDetails.ServingsPerContainer
                          })
-                         .FirstAsync(x => x.ProductId == id);
+                         .FirstOrDefaultAsync(x => x.ProductId == id);
+
+            if (product == null)
+                throw new ArgumentNullException("Invalid product!");
 
             return product;
         }

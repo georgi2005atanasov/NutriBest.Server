@@ -6,13 +6,9 @@
     {
         Task<PromotionServiceModel> Get(int promotionId);
 
-        Task<bool> CreateProductPromotion(int productId,
-            int promotionId,
-            decimal? specialPrice);
-
-        Task<bool> CreateCategoryPromotion(string category,
-            int promotionId,
-            decimal? specialPrice);
+        //Task<bool> CreateCategoryPromotion(string category,
+        //    int promotionId,
+        //    decimal? specialPrice);
 
         Task<int> Create(string? description,
             decimal? discountAmount,

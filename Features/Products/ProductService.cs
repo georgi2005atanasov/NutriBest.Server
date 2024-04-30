@@ -137,7 +137,10 @@
                              },
                              Quantity = x.Quantity,
                          })
-                         .FirstAsync(x => x.ProductId == id);
+                         .FirstOrDefaultAsync(x => x.ProductId == id);
+
+            if (product == null)
+                throw new ArgumentNullException("Invalid product!");
 
             return product;
         }
@@ -221,18 +224,6 @@
                     {
                         if (nf.ProductId == productId)
                             nf.IsDeleted = true;
-                    });
-
-                await db.ProductsPromotions
-                    .Where(x => x.ProductId == productId)
-                    .ForEachAsync((pp) =>
-                    {
-                        if (pp.ProductId == productId)
-                        {
-                            pp.IsDeleted = true;
-
-                            productPromotionService.Remove(pp.ProductId);
-                        }
                     });
 
                 db.ProductsImages.Remove(productImage);

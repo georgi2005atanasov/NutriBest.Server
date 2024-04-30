@@ -24,6 +24,6 @@
 
         public bool IsActive { get; set; }
 
-        public List<ProductPromotion> ProductPromotions { get; set; } = new List<ProductPromotion>();
+        public List<Product> Products { get; set; } = new List<Product>();
     }
 }
