@@ -44,9 +44,22 @@
             return true;
         }
 
-        public Task<bool> Remove(int productId, int promotionId)
+        public async Task<bool> Remove(int productId, int promotionId)
         {
-            throw new NotImplementedException();
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            var promotion = await db.Promotions
+                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            if (promotion == null || product == null)
+                throw new ArgumentNullException("Invalid product/promotion!");
+
+            product.PromotionId = null;
+
+            await db.SaveChangesAsync();
+
+            return true;
         }
     }
 }

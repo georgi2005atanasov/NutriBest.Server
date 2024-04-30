@@ -15,7 +15,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/add-product-promotion")]
+        [Route("/promotions/add-product-promotion")]
         public async Task<ActionResult<bool>> Create(ProductPromotionServiceModel productPromotion)
         {
             try
@@ -50,24 +50,18 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/remove-product-promotion")]
-        public async Task<ActionResult<bool>> Remove(ProductPromotionServiceModel productPromotion)
+        [Route("/promotions/remove-product-promotion/{promotionId}/{productId}")]
+        public async Task<ActionResult<bool>> Remove([FromRoute] int promotionId,
+            [FromRoute] int productId)
         {
             try
             {
-                var promotion = await productPromotionService.Create(productPromotion.ProductId,
-                productPromotion.PromotionId);
+                var promotion = await productPromotionService.Remove(productId,
+                promotionId);
 
                 return Ok(true);
             }
             catch (ArgumentNullException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
-                });
-            }
-            catch (InvalidOperationException err)
             {
                 return BadRequest(new
                 {
