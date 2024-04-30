@@ -22,5 +22,13 @@
             public const int MinAmount = 0;
             public const int MaxAmount = 50000;
         }
+
+        public class Promotion
+        {
+            public const int MinPercentage = 0;
+            public const int MaxPercentage = 100;
+            public const double MinPrice = 0.1;
+            public const double MaxPrice = 3999.9;
+        }
     }
 }

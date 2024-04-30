@@ -28,9 +28,7 @@
                     var image = await imageService.GetImageByProductId(id);
 
                     if (image == null)
-                    {
                         return BadRequest();
-                    }
 
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.

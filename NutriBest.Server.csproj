@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\CategoriesPromotions\" />
+    <Folder Include="Features\ProductsCategories\" />
     <Folder Include="Features\Orders\Models\" />
   </ItemGroup>
 

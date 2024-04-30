@@ -151,15 +151,11 @@
             try
             {
                 if (page < 1)
-                {
                     return BadRequest();
-                }
 
                 if (productsView == "table" &&
                     !User.IsInRole("Administrator") && !User.IsInRole("Employee"))
-                {
                     return BadRequest();
-                }
 
                 string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
                 if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingServiceModel>> cachedProducts))
@@ -190,60 +186,48 @@
                 decimal price;
 
                 if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
-                {
                     return BadRequest(new
                     {
                         Key = "Price",
                         Message = "Product price must be a number!"
                     });
-                }
 
                 var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
 
                 if (product == null)
-                {
                     return NotFound();
-                }
 
                 if (productModel.Quantity < 0)
-                {
                     return BadRequest(new
                     {
                         Key = "Quantity",
                         Message = "Quantity must be a positive number!"
                     });
-                }
 
                 if (ProductExists(productModel.Name) && product?.Name != productModel.Name)
-                {
                     return BadRequest(new
                     {
                         Key = "Name",
                         Message = "Product with this name already exists!"
                     });
-                }
 
                 if (price <= 0)
-                {
                     return BadRequest(new
                     {
                         Key = "Price",
                         Message = "Price must be bigger than zero!"
                     });
-                }
 
                 var categoriesIds = await categoryService
                     .GetCategoriesIds(productModel.Categories);
 
                 if (categoriesIds.Count == 0)
-                {
                     BadRequest(new
                     {
                         Key = "Category",
                         Message = "You have to choose at least 1 category!"
                     });
-                }
 
                 if (productModel.Image != null)
                 {
@@ -302,9 +286,7 @@
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
                 if (product == null)
-                {
                     return NotFound();
-                }
 
                 var result = await productService.Delete(id);
 
@@ -342,9 +324,7 @@
                 .ToList();
 
             if (products.Any(name => name == productName))
-            {
                 return true;
-            }
 
             return false;
         }

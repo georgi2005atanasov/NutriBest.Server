@@ -10,38 +10,13 @@
         private readonly NutriBestDbContext db;
 
         public PromotionService(NutriBestDbContext db)
-        {
-            this.db = db;
-        }
-
-        public async Task<bool> CreateProductPromotion(int productId, //new shit
-            int promotionId,
-            decimal? specialPrice)
-        {
-            var productPromotion = new ProductPromotion
-            {
-                ProductId = productId,
-                PromotionId = promotionId
-            };
-
-            if (specialPrice != null)
-            {
-                productPromotion.SpecialPrice = specialPrice;
-            }
-
-            db.ProductsPromotions.Add(productPromotion);
-
-            await db.SaveChangesAsync();
-
-            return true;
-        }
+            => this.db = db;
 
         public async Task<int> Create(string? description,
             decimal? discountAmount,
             decimal? discountPercentage,
             DateTime startDate,
-            DateTime endDate,
-            decimal? specialPrice)
+            DateTime endDate)
         {
             var promotion = new Promotion
             {
@@ -76,34 +51,33 @@
                 .FirstOrDefaultAsync();
 
             if (promotion == null)
-            {
                 throw new InvalidOperationException("The promotion is not valid!");
-            }
-
-            var productPromotions = await db.ProductsPromotions
-                .Where(x => x.PromotionId == promotionId)
-                .FirstAsync();
-
-            promotion.SpecialPrice = productPromotions.SpecialPrice;
 
             return promotion;
         }
 
-        public async Task<bool> Update(int promotionId, string? description, decimal? discountAmount, decimal? discountPercentage, decimal? specialPrice)
+        public async Task<bool> Update(int promotionId, 
+            string? description, 
+            decimal? discountAmount, 
+            decimal? discountPercentage)
         {
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
             if (promotion == null)
-            {
                 throw new InvalidOperationException("Product does not exist!");
-            }
 
-            if (string.IsNullOrEmpty(description))
-            {
+            if (!string.IsNullOrEmpty(description))
+                promotion.Description = description;
 
-            }
-            promotion.Description = description;
+            if (discountAmount != null)
+                promotion.DiscountAmount = discountAmount;
+
+            if (discountPercentage != null)
+                promotion.DiscountPercentage = discountPercentage;
+
+            await db.SaveChangesAsync();
+
             return true;
         }
 
@@ -113,9 +87,7 @@
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
             if (promotion == null)
-            {
                 return false;
-            }
 
             db.Promotions.Remove(promotion);
 
@@ -129,6 +101,31 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<bool> CreateProductPromotion(int productId,
+            int promotionId,
+            decimal? specialPrice)
+        {
+            var productPromotion = new ProductPromotion
+            {
+                ProductId = productId,
+                PromotionId = promotionId
+            };
+
+            if (specialPrice != null)
+                productPromotion.SpecialPrice = specialPrice;
+
+            db.ProductsPromotions.Add(productPromotion);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
+        public Task<bool> CreateCategoryPromotion(string category, int promotionId, decimal? specialPrice)
+        {
+            throw new NotImplementedException();
         }
     }
 }

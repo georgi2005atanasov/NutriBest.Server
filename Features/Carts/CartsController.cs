@@ -43,12 +43,10 @@
             try
             {
                 if (cartProductModel.Count <= 0)
-                {
                     return BadRequest(new
                     {
                         Message = "Choose the quantity of this product!"
                     });
-                }
 
                 var cartProductId = await cartService.Add(cartProductModel.ProductId, cartProductModel.Count);
 
@@ -76,12 +74,10 @@
                 var result = await cartService.Remove(cartProductModel.ProductId, cartProductModel.Count);
 
                 if (!result)
-                {
                     return BadRequest(new
                     {
                         Message = "Cannot remove unexisting products from the cart!"
                     });
-                }
 
                 return Ok(result);
             }
@@ -100,12 +96,10 @@
                 var result = await cartService.Clean();
 
                 if (!result)
-                {
                     return BadRequest(new
                     {
                         Message = "The shopping cart is empty!"
                     });
-                }
 
                 return Ok(result);
             }
@@ -133,9 +127,7 @@
                 CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.CartProducts == null)
-                {
                     cart.CartProducts = new List<CartProductServiceModel>();
-                }
 
                 var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId);
 
@@ -143,12 +135,10 @@
                     .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId);
 
                 if (productFromDb == null)
-                {
                     return BadRequest(new
                     {
                         Message = "This product does not exist!"
                     });
-                }
 
                 if (existingProduct != null)
                 {
@@ -194,9 +184,7 @@
             CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
 
             if (cart.CartProducts == null)
-            {
                 cart.CartProducts = new List<CartProductServiceModel>();
-            }
 
             var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == productToRemove.ProductId);
 
@@ -234,12 +222,10 @@
                 var cart = await GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.TotalPrice == 0)
-                {
                     return BadRequest(new
                     {
                         Message = "The cart is already empty!"
                     });
-                }
 
                 await SetSessionCart(new CartServiceModel());
 
@@ -258,9 +244,7 @@
                 string cookieValue = Request.Cookies[CartCookieName]!; // be aware
 
                 if (string.IsNullOrEmpty(cookieValue))
-                {
                     return new CartServiceModel();
-                }
 
                 var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
 

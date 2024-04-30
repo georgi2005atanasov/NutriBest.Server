@@ -46,28 +46,22 @@
                 var existingRole = await roleManager.FindByNameAsync(role);
 
                 if (user == null)
-                {
                     return BadRequest(new
                     {
                         Message = "User could not be found!"
                     });
-                }
 
                 if (existingRole == null)
-                {
                     return BadRequest(new
                     {
                         Message = "Invalid role!"
                     });
-                }
 
                 if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-                {
                     return BadRequest(new
                     {
                         Message = $"'{user.UserName}' is already in the role of '{role}'!"
                     });
-                }
 
                 await userManager.AddToRoleAsync(user, role);
 
@@ -92,28 +86,22 @@
                 var existingRole = await roleManager.FindByNameAsync(role);
 
                 if (user == null)
-                {
                     return BadRequest(new
                     {
                         Message = "User could not be found!"
                     });
-                }
 
                 if (existingRole == null)
-                {
                     return BadRequest(new
                     {
                         Message = "Invalid role!"
                     });
-                }
 
                 if (!db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-                {
                     return BadRequest(new
                     {
                         Message = "The user does not have this role!"
                     });
-                }
 
                 await userManager.RemoveFromRoleAsync(user, role);
 

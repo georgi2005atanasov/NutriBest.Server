@@ -41,24 +41,26 @@
         public async Task<ActionResult> Create(CreatePromotionServiceModel promotion) // may receive it from a form
         {
             if (promotion.StartDate > promotion.EndDate)
-            {
                 return BadRequest(new
                 {
                     Key = "StartDate",
                     Message = "The start date must be before the end date!"
                 });
-            }
+
+            if (promotion.DiscountPercentage < 0 ||
+                promotion.DiscountAmount < 0)
+                return BadRequest(new
+                {
+                    Message = "Invalid discount!"
+                });
 
             if (promotion.DiscountPercentage == null &&
-                promotion.DiscountAmount == null &&
-                promotion.SpecialPrice == null)
-            {
+                promotion.DiscountAmount == null)
                 return BadRequest(new
                 {
                     Key = "SpecialPrice",
                     Message = "You have to make some kind of discount!"
                 });
-            }
 
             try
             {
@@ -66,10 +68,9 @@
                     promotion.DiscountAmount,
                     promotion.DiscountPercentage,
                     promotion.StartDate,
-                    promotion.EndDate,
-                    promotion.SpecialPrice); //set is active = true there
+                    promotion.EndDate);
 
-                return Ok();
+                return Ok(result);
             }
             catch (InvalidOperationException err)
             {
@@ -87,26 +88,21 @@
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/promotions/{promotionId}")]
-        public async Task<ActionResult> Update(int promotionId, UpdatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult> Update([FromRoute] int promotionId, UpdatePromotionServiceModel promotion) // may receive it from a form
         {
-            if (promotion.DiscountPercentage == null &&
-                promotion.DiscountAmount == null &&
-                promotion.SpecialPrice == null)
-            {
+            if (promotion.DiscountPercentage < 0 ||
+                promotion.DiscountAmount < 0)
                 return BadRequest(new
                 {
-                    Key = "SpecialPrice",
-                    Message = "You have to make some kind of discount!"
+                    Message = "Invalid discount!"
                 });
-            }
 
             try
             {
                 var result = await promotionService.Update(promotionId,
                     promotion.Description,
                     promotion.DiscountAmount,
-                    promotion.DiscountPercentage,
-                    promotion.SpecialPrice);
+                    promotion.DiscountPercentage);
 
                 return Ok();
             }

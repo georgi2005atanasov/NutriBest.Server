@@ -61,9 +61,7 @@
             Task.Run(async () =>
             {
                 if (await roleManager.RoleExistsAsync("Employee"))
-                {
                     return;
-                }
 
                 var role = new IdentityRole
                 {
@@ -79,9 +77,7 @@
         private static void SeedCategories(NutriBestDbContext db)
         {
             if (db.Categories != null && db.Categories.Any())
-            {
                 return;
-            }
 
             Task.Run(async () =>
             {
@@ -117,9 +113,7 @@
             Task.Run(async () =>
             {
                 if (await roleManager.RoleExistsAsync("Administrator"))
-                {
                     return;
-                }
 
                 var role = new IdentityRole { Name = "Administrator" };
 

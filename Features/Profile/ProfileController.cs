@@ -56,9 +56,7 @@
                 var currentUserId = currentUserService.GetUserId();
 
                 if (currentUserId == null)
-                {
                     return BadRequest();
-                }
 
                 Task<ProfileServiceModel> task = identityService.FindUserById(currentUserId);
                 return await task!;
@@ -80,12 +78,10 @@
                 profile.Gender);
 
             if (result != "success")
-            {
                 return BadRequest(new
                 {
                     Message = result
                 });
-            }
 
             return true;
         }
@@ -99,23 +95,19 @@
                 var currentUserId = currentUserService.GetUserId();
 
                 if (currentUserId == null)
-                {
                     return BadRequest(new
                     {
                         Message = "Invalid user!"
                     });
-                }
 
                 var user = await db.Users.FindAsync(currentUserId);
                 var profile = await db.Profiles.FindAsync(currentUserId);
 
                 if (user == null)
-                {
                     return BadRequest(new
                     {
                         Message = "User could not be found!"
                     });
-                }
 
                 db.Profiles.Remove(profile!);
                 db.Users.Remove(user);

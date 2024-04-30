@@ -11,9 +11,8 @@
         private readonly IProductDetailsService productDetailsService;
 
         public ProductDetailsController(IProductService productService, IProductDetailsService productDetailsService)
-        {
-            this.productDetailsService = productDetailsService;
-        }
+            => this.productDetailsService = productDetailsService;
+
 
         [HttpGet]
         [Route("/products/details/{id}/{name}")]
@@ -25,12 +24,10 @@
                 var product = await productDetailsService.GetById(id);
 
                 if (product.Name != name)
-                {
                     return BadRequest(new
                     {
                         Message = "Invalid product!"
                     });
-                }
 
                 return Ok(product);
             }

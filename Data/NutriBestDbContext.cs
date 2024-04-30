@@ -183,6 +183,9 @@
                 .HasForeignKey(x => x.PromotionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Promotion>()
+                .HasQueryFilter(x => !x.IsDeleted && x.IsActive);
+
             builder.Entity<ProductPromotion>()
                 .HasKey(x => new { x.ProductId, x.PromotionId });
 

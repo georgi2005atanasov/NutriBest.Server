@@ -212,9 +212,7 @@
                     .ForEachAsync(pd =>
                     {
                         if (pd.ProductId == productId)
-                        {
                             pd.IsDeleted = true;
-                        }
                     });
 
                 await db.NutritionFacts
@@ -222,9 +220,7 @@
                     .ForEachAsync(nf =>
                     {
                         if (nf.ProductId == productId)
-                        {
                             nf.IsDeleted = true;
-                        }
                     });
 
                 await db.ProductsPromotions
@@ -235,7 +231,7 @@
                         {
                             pp.IsDeleted = true;
 
-                            productPromotionService.Remove(pp.PromotionId);
+                            productPromotionService.Remove(pp.ProductId);
                         }
                     });
 

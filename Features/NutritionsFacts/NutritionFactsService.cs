@@ -27,33 +27,25 @@
                 .FirstAsync(x => x.ProductId == productId);
 
             if (carbohydrates != null)
-            {
                 details.NutritionFacts.Carbohydrates = carbohydrates;
-            }
+
             if (fats != null)
-            {
                 details.NutritionFacts.Fats = fats;
-            }
+
             if (saturatedFats != null)
-            {
                 details.NutritionFacts.SaturatedFats = saturatedFats;
-            }
+
             if (sugars != null)
-            {
                 details.NutritionFacts.Sugars = sugars;
-            }
+
             if (proteins != null)
-            {
                 details.NutritionFacts.Proteins = proteins;
-            }
+
             if (energyValue != null)
-            {
                 details.NutritionFacts.EnergyValue = energyValue;
-            }
+
             if (salt != null)
-            {
                 details.NutritionFacts.Salt = salt;
-            }
 
             await db.SaveChangesAsync();
         }

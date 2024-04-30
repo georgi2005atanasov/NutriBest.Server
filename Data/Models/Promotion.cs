@@ -2,6 +2,7 @@
 {
     using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
+    using static Validation.Promotion;
 
     public class Promotion : DeletableEntity
     {
@@ -11,8 +12,10 @@
 
         public string? Description { get; set; }
 
+        [Range(MinPercentage, MaxPercentage)]
         public decimal? DiscountPercentage { get; set; }
 
+        [Range(MinPrice, MaxPrice)]
         public decimal? DiscountAmount { get; set; }
 
         public DateTime StartDate { get; set; }

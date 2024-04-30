@@ -48,17 +48,13 @@
                 .FirstAsync(x => x.ProductId == productId);
 
             if (!string.IsNullOrEmpty(howToUse))
-            {
                 details.HowToUse = howToUse;
-            }
+
             if (!string.IsNullOrEmpty(servingSize))
-            {
                 details.ServingSize = servingSize;
-            }
+
             if (!string.IsNullOrEmpty(servingsPerContainer))
-            {
                 details.ServingsPerContainer = servingsPerContainer;
-            }
 
             await db.SaveChangesAsync();
         }

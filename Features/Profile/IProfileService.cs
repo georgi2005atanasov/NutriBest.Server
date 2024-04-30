@@ -7,7 +7,5 @@
             string? email,
             int? age,
             string? gender);
-
-        Task DeleteProfile();
     }
 }

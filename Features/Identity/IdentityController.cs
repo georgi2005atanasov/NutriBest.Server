@@ -28,12 +28,10 @@
             try
             {
                 if (userModel.ConfirmPassword != userModel.Password)
-                {
                     return BadRequest(new {
                         Key = "Password",
                         Message = "Both passwords should match!"
                     });
-                }
 
                 var result = await identityService
                          .CreateUser(userModel.UserName,
@@ -41,12 +39,10 @@
                                      userModel.Password);
 
                 if (result.Succeeded)
-                {
                     return Ok(new
                     {
                         Message = "Successfully added new user!"
                     });
-                }
 
                 return BadRequest(result.Errors);
             }
@@ -68,21 +64,15 @@
                 var user = await identityService.FindUserByUserName(userModel.UserName);
 
                 if (user == null)
-                {
                     return Unauthorized();
-                }
 
                 if (user.IsDeleted)
-                {
                     return Unauthorized();
-                }
 
                 var passwordValid = await identityService.CheckUserPassword(user, userModel.Password);
 
                 if (!passwordValid)
-                {
                     return Unauthorized();
-                }
 
                 var encryptedToken = await identityService.GetEncryptedToken(user);
                 return encryptedToken;

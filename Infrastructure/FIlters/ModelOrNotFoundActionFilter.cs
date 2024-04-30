@@ -12,9 +12,7 @@
                 var model = result.Value;
 
                 if (result == null)
-                {
                     context.Result = new NotFoundResult();
-                }
             }
         }
     }
