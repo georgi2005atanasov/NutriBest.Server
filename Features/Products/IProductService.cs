@@ -22,7 +22,7 @@
 
         Task<ProductServiceModel> Get(int id);
 
-        Task<ProductWithPromotionListingServiceModel> GetWithPromotion(int productId, int promotionId);
+        Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId);
 
         Task<int> Update(int id,
             string name,

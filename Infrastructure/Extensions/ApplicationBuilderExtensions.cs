@@ -94,7 +94,7 @@
                     new Category{ Name="Vegan" },
                     new Category{ Name="Recovery" },
                     new Category{ Name="Fish Oils" },
-                    new Category{ Name="Offers" },
+                    new Category{ Name="Promotions" }
                 });
 
                 await db.SaveChangesAsync();

@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240428175223_AddedNutritionFactsTable")]
-    partial class AddedNutritionFactsTable
+    [Migration("20240501151521_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -166,21 +166,25 @@ namespace NutriBest.Server.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PostalCode")
                         .HasColumnType("int");
 
                     b.Property<string>("ProfileId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProfileUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Street")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("StreetNumber")
@@ -189,8 +193,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProfileId")
-                        .IsUnique()
-                        .HasFilter("[ProfileId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("ProfileUserId");
 
@@ -397,13 +400,16 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductImageId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PromotionId")
                         .HasColumnType("int");
 
                     b.Property<int?>("Quantity")
@@ -413,6 +419,8 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("ProductImageId")
                         .IsUnique();
+
+                    b.HasIndex("PromotionId");
 
                     b.ToTable("Products");
                 });
@@ -497,27 +505,6 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasKey("ProductImageId");
 
                     b.ToTable("ProductsImages");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPromotion", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PromotionId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("SpecialPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("ProductId", "PromotionId");
-
-                    b.HasIndex("PromotionId");
-
-                    b.ToTable("ProductsPromotions");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductReview", b =>
@@ -625,7 +612,9 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<decimal?>("DiscountAmount")
                         .HasColumnType("decimal(18,2)");
@@ -798,7 +787,8 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasOne("NutriBest.Server.Data.Models.Profile", null)
                         .WithOne("Address")
                         .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
                         .WithMany()
@@ -875,7 +865,14 @@ namespace NutriBest.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("NutriBest.Server.Data.Models.Promotion", "Promotion")
+                        .WithMany("Products")
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("ProductImage");
+
+                    b.Navigation("Promotion");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductCategory", b =>
@@ -904,25 +901,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasForeignKey("NutriBest.Server.Data.Models.ProductDetails", "ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPromotion", b =>
-                {
-                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
-                        .WithMany("ProductPromotions")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("NutriBest.Server.Data.Models.Promotion", "Promotion")
-                        .WithMany("ProductPromotions")
-                        .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Promotion");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductReview", b =>
@@ -979,11 +957,11 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
                 {
-                    b.Navigation("NutritionFacts");
+                    b.Navigation("NutritionFacts")
+                        .IsRequired();
 
-                    b.Navigation("ProductDetails");
-
-                    b.Navigation("ProductPromotions");
+                    b.Navigation("ProductDetails")
+                        .IsRequired();
 
                     b.Navigation("ProductReviews");
 
@@ -1005,7 +983,7 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
                 {
-                    b.Navigation("ProductPromotions");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.User", b =>

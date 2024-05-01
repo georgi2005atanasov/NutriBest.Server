@@ -108,12 +108,19 @@ namespace NutriBest.Server.Data.Migrations
                 {
                     PromotionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -287,11 +294,12 @@ namespace NutriBest.Server.Data.Migrations
                 {
                     ProductId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     ProductImageId = table.Column<int>(type: "int", nullable: false),
+                    PromotionId = table.Column<int>(type: "int", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -309,6 +317,12 @@ namespace NutriBest.Server.Data.Migrations
                         principalTable: "ProductsImages",
                         principalColumn: "ProductImageId",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Promotions_PromotionId",
+                        column: x => x.PromotionId,
+                        principalTable: "Promotions",
+                        principalColumn: "PromotionId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -317,12 +331,12 @@ namespace NutriBest.Server.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProfileId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProfileUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreetNumber = table.Column<int>(type: "int", nullable: true),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostalCode = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -375,6 +389,31 @@ namespace NutriBest.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NutritionFacts",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    EnergyValue = table.Column<double>(type: "float", nullable: true),
+                    Fats = table.Column<double>(type: "float", nullable: true),
+                    SaturatedFats = table.Column<double>(type: "float", nullable: true),
+                    Carbohydrates = table.Column<double>(type: "float", nullable: true),
+                    Sugars = table.Column<double>(type: "float", nullable: true),
+                    Proteins = table.Column<double>(type: "float", nullable: true),
+                    Salt = table.Column<double>(type: "float", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NutritionFacts", x => x.ProductId);
+                    table.ForeignKey(
+                        name: "FK_NutritionFacts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductsCategories",
                 columns: table => new
                 {
@@ -406,7 +445,7 @@ namespace NutriBest.Server.Data.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     HowToUse = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ServingSize = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NutritionFacts = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServingsPerContainer = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -421,31 +460,6 @@ namespace NutriBest.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductsPromotions",
-                columns: table => new
-                {
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    PromotionId = table.Column<int>(type: "int", nullable: false),
-                    SpecialPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductsPromotions", x => new { x.ProductId, x.PromotionId });
-                    table.ForeignKey(
-                        name: "FK_ProductsPromotions_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ProductsPromotions_Promotions_PromotionId",
-                        column: x => x.PromotionId,
-                        principalTable: "Promotions",
-                        principalColumn: "PromotionId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProductsReviews",
                 columns: table => new
                 {
@@ -455,7 +469,8 @@ namespace NutriBest.Server.Data.Migrations
                     ProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -482,7 +497,8 @@ namespace NutriBest.Server.Data.Migrations
                     PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false),
                     IsShipped = table.Column<bool>(type: "bit", nullable: false),
-                    AddressId = table.Column<int>(type: "int", nullable: false)
+                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -505,8 +521,7 @@ namespace NutriBest.Server.Data.Migrations
                 name: "IX_Addresses_ProfileId",
                 table: "Addresses",
                 column: "ProfileId",
-                unique: true,
-                filter: "[ProfileId] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_ProfileUserId",
@@ -580,14 +595,14 @@ namespace NutriBest.Server.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_PromotionId",
+                table: "Products",
+                column: "PromotionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductsCategories_CategoryId",
                 table: "ProductsCategories",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductsPromotions_PromotionId",
-                table: "ProductsPromotions",
-                column: "PromotionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductsReviews_ProductId",
@@ -628,6 +643,9 @@ namespace NutriBest.Server.Data.Migrations
                 name: "CartProducts");
 
             migrationBuilder.DropTable(
+                name: "NutritionFacts");
+
+            migrationBuilder.DropTable(
                 name: "OrdersDetails");
 
             migrationBuilder.DropTable(
@@ -635,9 +653,6 @@ namespace NutriBest.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductsDetails");
-
-            migrationBuilder.DropTable(
-                name: "ProductsPromotions");
 
             migrationBuilder.DropTable(
                 name: "ProductsReviews");
@@ -655,9 +670,6 @@ namespace NutriBest.Server.Data.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Promotions");
-
-            migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
@@ -665,6 +677,9 @@ namespace NutriBest.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductsImages");
+
+            migrationBuilder.DropTable(
+                name: "Promotions");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

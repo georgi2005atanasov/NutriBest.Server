@@ -3,7 +3,7 @@
     using System.ComponentModel.DataAnnotations;
     using static ServicesConstants.Product;
 
-    public class ProductWithPromotionListingServiceModel : ProductServiceModel
+    public class ProductWithPromotionDetailsServiceModel : ProductServiceModel
     {
         [Required]
         [Range(MinPrice, MaxPrice)]

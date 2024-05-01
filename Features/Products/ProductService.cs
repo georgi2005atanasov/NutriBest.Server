@@ -67,6 +67,24 @@
 
             var products = await queryProducts.ToListAsync();
 
+            foreach (var product in products)
+            {
+                if (product.PromotionId != null)
+                {
+                    var promotion = await promotionService.Get((int)product.PromotionId);
+
+                    if (promotion != null && promotion.DiscountPercentage != null)
+                    {
+                        product.DiscountPercentage = promotion.DiscountPercentage;
+                    }
+
+                    if (promotion != null && promotion.DiscountAmount != null)
+                    {
+                        product.DiscountPercentage =  promotion.DiscountAmount * 100 / product.Price;
+                    }
+                }
+            }
+
             var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);
 
@@ -239,7 +257,7 @@
             }
         }
 
-        public async Task<ProductWithPromotionListingServiceModel> GetWithPromotion(int productId, int promotionId)
+        public async Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId)
         {
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
@@ -263,7 +281,7 @@
 
             var productListingModel = await Get(productId);
 
-            var productWithPromotion = new ProductWithPromotionListingServiceModel
+            var productWithPromotion = new ProductWithPromotionDetailsServiceModel
             {
                 Categories = productListingModel.Categories,
                 Image = productListingModel.Image,

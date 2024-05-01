@@ -10,6 +10,8 @@
         [Required]
         public int PromotionId { get; set; }
 
+        [Required]
+        [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string? Description { get; set; }
 
         [Range(MinPercentage, MaxPercentage)]

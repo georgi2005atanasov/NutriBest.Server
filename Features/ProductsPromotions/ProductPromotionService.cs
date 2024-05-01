@@ -24,6 +24,24 @@
             if (promotion == null || product == null)
                 throw new ArgumentNullException("Invalid product/promotion!");
 
+            if (await db.ProductsCategories
+                .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+            {
+                var promotionCategory = await db.ProductsCategories
+                    .FirstAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1);
+
+                promotionCategory.IsDeleted = false;
+            }
+            else
+            {
+                db.ProductsCategories.Add(new Data.Models.ProductCategory
+                {
+                    ProductId = product.ProductId,
+                    CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                });
+            }
+
+
             if (product.PromotionId != null)
             {
                 if (product.PromotionId == promotionId)
@@ -44,15 +62,21 @@
             return true;
         }
 
-        public async Task<bool> Remove(int productId, int promotionId)
+        public async Task<bool> Remove(int productId)
         {
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
-            var promotion = await db.Promotions
-                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+            if (await db.ProductsCategories
+                .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+            {
+                var promotionCategory = await db.ProductsCategories
+                    .FirstAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1);
 
-            if (promotion == null || product == null)
+                promotionCategory.IsDeleted = true;
+            }
+
+            if (product == null)
                 throw new ArgumentNullException("Invalid product/promotion!");
 
             product.PromotionId = null;

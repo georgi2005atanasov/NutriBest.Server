@@ -5,7 +5,6 @@
         Task<bool> Create(int productId,
             int promotionId);
 
-        Task<bool> Remove(int productId,
-            int promotionId);
+        Task<bool> Remove(int productId);
     }
 }

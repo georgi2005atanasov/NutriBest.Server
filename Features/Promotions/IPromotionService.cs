@@ -4,6 +4,8 @@
 
     public interface IPromotionService
     {
+        Task<IEnumerable<PromotionServiceModel>> All();
+
         Task<PromotionServiceModel> Get(int promotionId);
 
         //Task<bool> CreateCategoryPromotion(string category,

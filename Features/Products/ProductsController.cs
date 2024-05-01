@@ -326,7 +326,7 @@
 
         [HttpGet]
         [Route("promotion/{promotionId}/{productId}")]
-        public async Task<ActionResult<ProductWithPromotionListingServiceModel>> GetWithPromotion([FromRoute] int promotionId,
+        public async Task<ActionResult<ProductWithPromotionDetailsServiceModel>> GetWithPromotion([FromRoute] int promotionId,
             [FromRoute] int productId)
         {
             try

@@ -172,17 +172,8 @@
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
-            builder.Entity<ProductCategory>()
-                .HasQueryFilter(x => !x.IsDeleted);
-
             builder.Entity<Promotion>()
                 .HasQueryFilter(x => !x.IsDeleted && x.IsActive);
-
-            builder.Entity<ProductDetails>()
-                .HasQueryFilter(x => !x.IsDeleted);
-
-            builder.Entity<NutritionFacts>()
-                .HasQueryFilter(x => !x.IsDeleted);
         }
 
         private void ApplyAuditInformation()

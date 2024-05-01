@@ -4,6 +4,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Promotions.Models;
+    using System.Collections.Generic;
 
     public class PromotionService : IPromotionService
     {
@@ -65,7 +66,7 @@
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
             if (promotion == null)
-                throw new InvalidOperationException("Product does not exist!");
+                throw new InvalidOperationException("Promotion does not exist!");
 
             if (!string.IsNullOrEmpty(description))
                 promotion.Description = description;
@@ -101,6 +102,24 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<IEnumerable<PromotionServiceModel>> All()
+        {
+            var promotions = await db.Promotions
+                .Select(x => new PromotionServiceModel
+                {
+                    Description = x.Description,
+                    DiscountAmount = x.DiscountAmount,
+                    DiscountPercentage = x.DiscountPercentage,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    IsActive = x.IsActive,
+                    PromotionId = x.PromotionId
+                })
+                .ToListAsync();
+
+            return promotions;
         }
     }
 }

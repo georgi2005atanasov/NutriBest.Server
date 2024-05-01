@@ -14,6 +14,21 @@
         }
 
         [HttpGet]
+        public async Task<ActionResult<IEnumerable<PromotionServiceModel>>> All()
+        {
+            try
+            {
+                var promotions = await promotionService.All();
+
+                return Ok(promotions);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
         [Route("/promotions/{promotionId}")]
         public async Task<ActionResult> Get([FromRoute] int promotionId)
         {
@@ -67,6 +82,14 @@
                 {
                     Key = "SpecialPrice",
                     Message = "You have to make some kind of discount!"
+                });
+
+            if (promotion.DiscountPercentage != null &&
+                promotion.DiscountAmount != null)
+                return BadRequest(new
+                {
+                    Key = "SpecialPrice",
+                    Message = "You have to choose type of discount!"
                 });
 
             try

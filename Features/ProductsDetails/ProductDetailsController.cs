@@ -53,7 +53,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/details/{id}/{name}")]
+        [Route("/products/details/{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
             [FromBody] CreateProductDetailsServiceModel details)
         {

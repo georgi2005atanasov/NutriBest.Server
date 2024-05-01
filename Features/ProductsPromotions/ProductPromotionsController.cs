@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.ProductsPromotions.Models;
 
     public class ProductPromotionsController : ApiController
     {
@@ -15,13 +14,14 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/add-product-promotion")]
-        public async Task<ActionResult<bool>> Create(ProductPromotionServiceModel productPromotion)
+        [Route("/promotions/add-product-promotion/{promotionId}/{productId}")]
+        public async Task<ActionResult<bool>> Create([FromRoute] int promotionId,
+            [FromRoute] int productId)
         {
             try
             {
-                var promotion = await productPromotionService.Create(productPromotion.ProductId,
-                productPromotion.PromotionId);
+                var promotion = await productPromotionService.Create(productId,
+                promotionId);
 
                 return Ok(true);
             }
@@ -50,14 +50,12 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/remove-product-promotion/{promotionId}/{productId}")]
-        public async Task<ActionResult<bool>> Remove([FromRoute] int promotionId,
-            [FromRoute] int productId)
+        [Route("/promotions/remove-product-promotion/{productId}")]
+        public async Task<ActionResult<bool>> Remove([FromRoute] int productId)
         {
             try
             {
-                var promotion = await productPromotionService.Remove(productId,
-                promotionId);
+                var promotion = await productPromotionService.Remove(productId);
 
                 return Ok(true);
             }
@@ -72,7 +70,7 @@
             {
                 return BadRequest(new
                 {
-                    Message = "Could not create a new promotion for the product!"
+                    Message = "Could not remove the promotion for the product!"
                 });
             }
         }

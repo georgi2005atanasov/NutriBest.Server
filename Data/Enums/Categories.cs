@@ -13,6 +13,6 @@
         Vegan = 8,
         Recovery = 9,
         FishOils = 10,
-        Offers = 11,
+        Promotions = 11,
     }
 }
