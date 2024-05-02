@@ -165,6 +165,7 @@
                     return BadRequest();
 
                 string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
+
                 if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingServiceModel>> cachedProducts))
                 {
                     var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);

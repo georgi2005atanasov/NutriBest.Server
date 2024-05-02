@@ -5,6 +5,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Promotions.Models;
     using System.Collections.Generic;
 
@@ -12,12 +13,15 @@
     {
         private readonly NutriBestDbContext db;
         private readonly IMapper mapper;
+        private readonly ICategoryService categoryService;
 
         public PromotionService(NutriBestDbContext db,
-            IMapper mapper)
+            IMapper mapper,
+            ICategoryService categoryService)
         {
             this.db = db;
             this.mapper = mapper;
+            this.categoryService = categoryService;
         }
 
         public async Task<int> Create(string? description,
@@ -26,8 +30,21 @@
             DateTime startDate,
             DateTime? endDate,
             decimal? minPrice,
-            List<string>? categories)
+            string? category)
         {
+            if (minPrice <= discountAmount)
+            {
+                throw new ArgumentException("The minimum price must be bigger that the discount amount!");
+            }
+
+            if (await db.Promotions.AnyAsync(x => x.Description == description))
+            {
+                throw new ArgumentException("Promotion with this description already exists!");
+            }
+
+            var productsToApplyPromotion = db.Products
+                .AsQueryable();
+
             var promotion = new Promotion
             {
                 StartDate = startDate,
@@ -36,11 +53,15 @@
                 DiscountAmount = discountAmount,
                 DiscountPercentage = discountPercentage,
                 IsActive = true,
+                MinimumPrice = minPrice,
+                Category = category
             };
 
             db.Promotions.Add(promotion);
 
             await db.SaveChangesAsync();
+
+            await ApplyPromotion(db, categoryService, promotion);
 
             return promotion.PromotionId;
         }
@@ -58,13 +79,23 @@
             return promotion;
         }
 
-        public async Task<bool> Update(int promotionId, 
-            string? description, 
-            decimal? discountAmount, 
+        public async Task<bool> Update(int promotionId,
+            string? description,
+            decimal? discountAmount,
             decimal? discountPercentage,
             decimal? minPrice,
-            List<string>? categories)
+            string? category)
         {
+            if (minPrice <= discountAmount)
+            {
+                throw new ArgumentException("The minimum price must be bigger that the discount amount!");
+            }
+
+            if (await db.Promotions.AnyAsync(x => x.Description == description))
+            {
+                throw new ArgumentException("Promotion with this description already exists!");
+            }
+
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
@@ -100,7 +131,15 @@
             if (discountPercentage != null)
                 promotion.DiscountPercentage = discountPercentage;
 
+            if (minPrice != null)
+                promotion.MinimumPrice = minPrice;
+
+            if (category != null)
+                promotion.Category = category;
+
             await db.SaveChangesAsync();
+
+            await ApplyPromotion(db, categoryService, promotion);
 
             return true;
         }
@@ -115,19 +154,21 @@
 
             db.Promotions.Remove(promotion);
 
-            await db.Products
+            var products = db.Products
                .Where(x => x.PromotionId == promotionId)
-               .ForEachAsync(x =>
-               {
-                   x.PromotionId = null;
-               });
+               .AsQueryable();
 
-            await db.Categories
-               .Where(x => x.PromotionId == promotionId)
-               .ForEachAsync(x =>
-               {
-                   x.PromotionId = null;
-               });
+            foreach (var product in products)
+            {
+                product.PromotionId = null;
+
+                var productCategory = await db.ProductsCategories
+                .Where(x => x.ProductId == product.ProductId && x.CategoryId ==
+                 (int)Data.Enums.Categories.Promotions + 1)
+                .FirstAsync();
+
+                db.ProductsCategories.Remove(productCategory);
+            }
 
             await db.SaveChangesAsync();
 
@@ -141,6 +182,49 @@
                 .ToListAsync();
 
             return promotions;
+        }
+
+        private static async Task ApplyPromotion(NutriBestDbContext db, ICategoryService categoryService, Promotion promotion)
+        {
+            var productsToApplyPromotion = db.Products
+                .AsQueryable();
+
+            if (promotion.MinimumPrice != null)
+            {
+                productsToApplyPromotion = productsToApplyPromotion
+                    .Where(x => x.Price >= promotion.MinimumPrice);
+            }
+
+            if (promotion.Category != null)
+            {
+                var categoriesIds = await categoryService.GetCategoriesIds(new List<string> { promotion.Category });
+
+                foreach (var product in productsToApplyPromotion.ToList())
+                {
+                    var categoriesOfProduct = await db.ProductsCategories
+                        .Where(x => x.ProductId == product.ProductId)
+                        .Select(x => x.CategoryId)
+                        .ToListAsync();
+
+                    if (categoriesOfProduct.Contains(categoriesIds[0]))
+                    {
+                        product.PromotionId = promotion.PromotionId;
+
+                        if (!await db.ProductsCategories
+                            .AnyAsync(x => x.ProductId == product.ProductId &&
+                            x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+                        {
+                            db.ProductsCategories.Add(new Data.Models.ProductCategory
+                            {
+                                ProductId = product.ProductId,
+                                CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                            });
+                        }
+                    }
+                }
+            }
+
+            await db.SaveChangesAsync();
         }
     }
 }

@@ -11,9 +11,5 @@
         public string Name { get; set; } = null!;
 
         public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
-
-        public int? PromotionId { get; set; }
-
-        public Promotion? Promotion { get; set; }
     }
 }

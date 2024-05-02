@@ -2,37 +2,29 @@
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Categories;
 
     public class ProductPromotionService : IProductPromotionService
     {
         private readonly NutriBestDbContext db;
+        private readonly ICategoryService categoryService;
 
-        public ProductPromotionService(NutriBestDbContext db)
+        public ProductPromotionService(NutriBestDbContext db,
+            ICategoryService categoryService)
         {
             this.db = db;
+            this.categoryService = categoryService;
         }
 
-        public async Task<bool> Create(int productId,
-            int promotionId)
+        public async Task<bool> Create(int productId, int promotionId)
         {
-            var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == productId);
+            var (product, promotion) = await ValidateProductAndPromotionExistence(productId, promotionId);
+            await ValidateProductCategory(productId, promotion.Category);
+            ValidatePromotionPrice(product, promotion.DiscountAmount);
 
-            var promotion = await db.Promotions
-                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
-
-            if (promotion == null || product == null)
-                throw new ArgumentNullException("Invalid product/promotion!");
-
-            if (await db.ProductsCategories
+            if (!await db.ProductsCategories
                 .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
-            {
-                var promotionCategory = await db.ProductsCategories
-                    .FirstAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1);
-
-                promotionCategory.IsDeleted = false;
-            }
-            else
             {
                 db.ProductsCategories.Add(new Data.Models.ProductCategory
                 {
@@ -41,18 +33,8 @@
                 });
             }
 
-            if (product.PromotionId != null)
-            {
-                if (product.PromotionId == promotionId)
-                {
-                    throw new InvalidOperationException("The promotion cannot be the same!");
-                }
-
-                product.PromotionId = null;
-            }
-
-            if (product.Price <= promotion.DiscountAmount)
-                throw new InvalidOperationException("The price of the product must be bigger than the discount!");
+            if (product.PromotionId != null && product.PromotionId == promotionId)
+                throw new InvalidOperationException("The promotion cannot be the same!");
 
             product.PromotionId = promotionId;
 
@@ -63,8 +45,10 @@
 
         public async Task<bool> Remove(int productId)
         {
-            var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == productId);
+            var product = await db.Products.FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (product == null)
+                throw new ArgumentNullException("Invalid product ID!");
 
             if (await db.ProductsCategories
                 .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
@@ -75,14 +59,40 @@
                 db.ProductsCategories.Remove(promotionCategory);
             }
 
-            if (product == null)
-                throw new ArgumentNullException("Invalid product/promotion!");
-
             product.PromotionId = null;
 
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotionExistence(int productId, int promotionId)
+        {
+            var product = await db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+            var promotion = await db.Promotions.FirstOrDefaultAsync(p => p.PromotionId == promotionId);
+
+            if (product == null || promotion == null)
+                throw new ArgumentNullException("Invalid product or promotion!");
+
+            return (product, promotion);
+        }
+
+        private async Task ValidateProductCategory(int productId, string? category)
+        {
+            var promotionCategoryId = await categoryService.GetCategoriesIds(new List<string> { category ?? "" });
+            if (promotionCategoryId.Count > 0)
+            {
+                bool isProductInCategory = await db.ProductsCategories
+                    .AnyAsync(pc => pc.ProductId == productId && pc.CategoryId == promotionCategoryId[0]);
+                if (!isProductInCategory)
+                    throw new InvalidOperationException($"The product is not of category {category}");
+            }
+        }
+
+        private void ValidatePromotionPrice(Product product, decimal? discountAmount)
+        {
+            if (discountAmount != null && product.Price <= discountAmount)
+                throw new InvalidOperationException("The price of the product must be bigger than the discount!");
         }
     }
 }

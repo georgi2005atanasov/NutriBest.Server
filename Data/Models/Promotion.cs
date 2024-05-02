@@ -30,6 +30,6 @@
 
         public decimal? MinimumPrice { get; set; }
 
-        public List<Category>? Categories { get; set; } = new List<Category>();
+        public string? Category { get; set; }
     }
 }

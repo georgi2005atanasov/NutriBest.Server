@@ -100,9 +100,16 @@
                     promotion.StartDate,
                     promotion.EndDate,
                     promotion.MinimumPrice,
-                    promotion.Categories);
+                    promotion.Category);
 
                 return Ok(result);
+            }
+            catch (ArgumentException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (InvalidOperationException err)
             {
@@ -136,7 +143,7 @@
                     promotion.DiscountAmount,
                     promotion.DiscountPercentage,
                     promotion.MinimumPrice,
-                    promotion.Categories);
+                    promotion.Category);
 
                 return Ok();
             }

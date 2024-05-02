@@ -248,17 +248,7 @@
 
         public async Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId)
         {
-            var promotion = await db.Promotions
-                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
-
-            var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == productId);
-
-            if (promotion == null || product == null)
-                throw new ArgumentNullException("Invalid product!");
-
-            if (product.PromotionId != promotionId)
-                throw new InvalidOperationException("The product does not have this promotion!");
+            var (product, promotion) = await ValidateProductAndPromotionExistence(productId, promotionId);
 
             decimal newPrice = 0;
 
@@ -286,6 +276,23 @@
             };
 
             return productWithPromotion;
+        }
+
+        private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotionExistence(int productId, int promotionId)
+        {
+            var promotion = await db.Promotions
+                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+            if (promotion == null || product == null)
+                throw new ArgumentNullException("Invalid product!");
+
+            if (product.PromotionId != promotionId)
+                throw new InvalidOperationException("The product does not have this promotion!");
+
+            return (product, promotion);
         }
     }
 }

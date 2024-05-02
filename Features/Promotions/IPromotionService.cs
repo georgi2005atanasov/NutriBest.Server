@@ -18,14 +18,14 @@
             DateTime startDate,
             DateTime? endDate,
             decimal? minimumPrice,
-            List<string>? categories);
+            string? category);
 
         Task<bool> Update(int promotionId,
             string? description,
             decimal? discountAmount,
             decimal? discountPercentage,
             decimal? minPrice,
-            List<string>? categories);
+            string? category);
 
         Task<bool> Remove(int promotionId);
     }
