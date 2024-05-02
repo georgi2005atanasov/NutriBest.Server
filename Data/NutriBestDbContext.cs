@@ -177,6 +177,12 @@
 
             builder.Entity<Promotion>()
                 .HasQueryFilter(x => !x.IsDeleted && x.IsActive);
+
+            builder.Entity<Promotion>()
+                .HasMany(x => x.Categories)
+                .WithOne(x => x.Promotion)
+                .HasForeignKey(x => x.PromotionId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private void ApplyAuditInformation()

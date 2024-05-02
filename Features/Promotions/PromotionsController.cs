@@ -98,7 +98,9 @@
                     promotion.DiscountAmount,
                     promotion.DiscountPercentage,
                     promotion.StartDate,
-                    promotion.EndDate);
+                    promotion.EndDate,
+                    promotion.MinimumPrice,
+                    promotion.Categories);
 
                 return Ok(result);
             }
@@ -132,11 +134,13 @@
                 var result = await promotionService.Update(promotionId,
                     promotion.Description,
                     promotion.DiscountAmount,
-                    promotion.DiscountPercentage);
+                    promotion.DiscountPercentage,
+                    promotion.MinimumPrice,
+                    promotion.Categories);
 
                 return Ok();
             }
-            catch(ArgumentException err)
+            catch (ArgumentException err)
             {
                 return BadRequest(new
                 {

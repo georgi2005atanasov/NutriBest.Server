@@ -27,5 +27,9 @@
         public bool IsActive { get; set; }
 
         public List<Product> Products { get; set; } = new List<Product>();
+
+        public decimal? MinimumPrice { get; set; }
+
+        public List<Category>? Categories { get; set; } = new List<Category>();
     }
 }

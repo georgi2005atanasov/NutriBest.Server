@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240501151521_InitDb")]
-    partial class InitDb
+    [Migration("20240502115420_AddedPromotionIdColumnToCategoriesTable")]
+    partial class AddedPromotionIdColumnToCategoriesTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -252,7 +252,12 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PromotionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PromotionId");
 
                     b.ToTable("Categories");
                 });
@@ -613,8 +618,8 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<decimal?>("DiscountAmount")
                         .HasColumnType("decimal(18,2)");
@@ -622,7 +627,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<decimal?>("DiscountPercentage")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -630,6 +635,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<decimal?>("MinimumPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -808,6 +816,16 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("Cart");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Category", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Promotion", "Promotion")
+                        .WithMany("Categories")
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Promotion");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
@@ -983,6 +1001,8 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Products");
                 });
 

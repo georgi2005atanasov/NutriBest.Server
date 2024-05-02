@@ -16,12 +16,16 @@
             decimal? discountAmount,
             decimal? discountPercentage,
             DateTime startDate,
-            DateTime endDate);
+            DateTime? endDate,
+            decimal? minimumPrice,
+            List<string>? categories);
 
         Task<bool> Update(int promotionId,
             string? description,
             decimal? discountAmount,
-            decimal? discountPercentage);
+            decimal? discountPercentage,
+            decimal? minPrice,
+            List<string>? categories);
 
         Task<bool> Remove(int promotionId);
     }

@@ -13,5 +13,9 @@
 
         [Range(MinPrice, MaxPrice)]
         public decimal? DiscountAmount { get; set; }
+
+        public decimal? MinimumPrice { get; set; }
+
+        public List<string> Categories { get; set; } = new List<string>();
     }
 }

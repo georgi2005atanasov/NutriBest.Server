@@ -24,7 +24,9 @@
             decimal? discountAmount,
             decimal? discountPercentage,
             DateTime startDate,
-            DateTime endDate)
+            DateTime? endDate,
+            decimal? minPrice,
+            List<string>? categories)
         {
             var promotion = new Promotion
             {
@@ -59,7 +61,9 @@
         public async Task<bool> Update(int promotionId, 
             string? description, 
             decimal? discountAmount, 
-            decimal? discountPercentage)
+            decimal? discountPercentage,
+            decimal? minPrice,
+            List<string>? categories)
         {
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
@@ -112,6 +116,13 @@
             db.Promotions.Remove(promotion);
 
             await db.Products
+               .Where(x => x.PromotionId == promotionId)
+               .ForEachAsync(x =>
+               {
+                   x.PromotionId = null;
+               });
+
+            await db.Categories
                .Where(x => x.PromotionId == promotionId)
                .ForEachAsync(x =>
                {
