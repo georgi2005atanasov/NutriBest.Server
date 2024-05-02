@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NutriBest.Server;
@@ -30,8 +31,20 @@ var appSettings = applicationSettings
 
 var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 
+//configure automapper
+var configuration = new MapperConfiguration(cfg =>
+{
+    cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
+});
+
+configuration.AssertConfigurationIsValid();
+
+var mapper = configuration.CreateMapper();
+//configure automapper
+
 //make extension method for adding services
 builder.Services
+    .AddSingleton(mapper)
     .AddScoped<ICurrentUserService, CurrentUserService>()
     .AddTransient<IAdminService, AdminService>()
     .AddTransient<IIdentityService, IdentityService>()

@@ -5,6 +5,7 @@
 
     public class UpdatePromotionServiceModel
     {
+        [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string? Description { get; set; }
 
         [Range(MinPercentage, MaxPercentage)]

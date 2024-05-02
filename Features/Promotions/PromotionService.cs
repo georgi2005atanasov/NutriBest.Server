@@ -1,5 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Promotions
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
@@ -9,9 +11,14 @@
     public class PromotionService : IPromotionService
     {
         private readonly NutriBestDbContext db;
+        private readonly IMapper mapper;
 
-        public PromotionService(NutriBestDbContext db)
-            => this.db = db;
+        public PromotionService(NutriBestDbContext db,
+            IMapper mapper)
+        {
+            this.db = db;
+            this.mapper = mapper;
+        }
 
         public async Task<int> Create(string? description,
             decimal? discountAmount,
@@ -40,15 +47,7 @@
         {
             var promotion = await db.Promotions
                 .Where(x => x.PromotionId == promotionId)
-                .Select(x => new PromotionServiceModel
-                {
-                    Description = x.Description,
-                    DiscountAmount = x.DiscountAmount,
-                    DiscountPercentage = x.DiscountPercentage,
-                    StartDate = x.StartDate,
-                    EndDate = x.EndDate,
-                    IsActive = x.StartDate < x.EndDate
-                })
+                .ProjectTo<PromotionServiceModel>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
             if (promotion == null)
@@ -67,6 +66,16 @@
 
             if (promotion == null)
                 throw new InvalidOperationException("Promotion does not exist!");
+
+            if (discountAmount != null && promotion.DiscountPercentage != null)
+            {
+                throw new InvalidOperationException("You can only change the discount percentage!");
+            }
+
+            if (discountPercentage != null && promotion.DiscountAmount != null)
+            {
+                throw new InvalidOperationException("You can only change the discount amount!");
+            }
 
             if (!string.IsNullOrEmpty(description))
                 promotion.Description = description;
@@ -107,16 +116,7 @@
         public async Task<IEnumerable<PromotionServiceModel>> All()
         {
             var promotions = await db.Promotions
-                .Select(x => new PromotionServiceModel
-                {
-                    Description = x.Description,
-                    DiscountAmount = x.DiscountAmount,
-                    DiscountPercentage = x.DiscountPercentage,
-                    EndDate = x.EndDate,
-                    StartDate = x.StartDate,
-                    IsActive = x.IsActive,
-                    PromotionId = x.PromotionId
-                })
+                .ProjectTo<PromotionServiceModel>(mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return promotions;

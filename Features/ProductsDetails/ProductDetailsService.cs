@@ -1,43 +1,28 @@
 ﻿namespace NutriBest.Server.Features.ProductsDetails
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.ProductsDetails.Models;
 
     public class ProductDetailsService : IProductDetailsService
     {
         private readonly NutriBestDbContext db;
+        private readonly IMapper mapper;
 
-        public ProductDetailsService(NutriBestDbContext db)
+        public ProductDetailsService(NutriBestDbContext db,
+            IMapper mapper)
         {
             this.db = db;
+            this.mapper = mapper;
         }
 
         public async Task<ProductDetailsServiceModel> GetById(int id)
         {
             var product = await db.Products
                          .Include(x => x.ProductDetails)
-                         .Select(x => new ProductDetailsServiceModel
-                         {
-                             ProductId = x.ProductId,
-                             Name = x.Name,
-                             Price = x.Price,
-                             Categories = x.ProductsCategories
-                             .Select(c => c.Category.Name)
-                             .ToList(),
-                             Description = x.Description,
-                             Image = new ImageListingServiceModel
-                             {
-                                 ContentType = x.ProductImage.ContentType,
-                                 ImageData = x.ProductImage.ImageData
-                             },
-                             Quantity = x.Quantity,
-                             PromotionId = x.PromotionId,
-                             HowToUse = x.ProductDetails.HowToUse,
-                             ServingSize = x.ProductDetails.ServingSize,
-                             ServingsPerContainer = x.ProductDetails.ServingsPerContainer
-                         })
+                         .ProjectTo<ProductDetailsServiceModel>(mapper.ConfigurationProvider)
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)

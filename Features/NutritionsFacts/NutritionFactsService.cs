@@ -1,5 +1,7 @@
 ﻿namespace NutriBest.Server.Features.NutritionsFacts
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.NutritionsFacts.Models;
@@ -7,10 +9,13 @@
     public class NutritionFactsService : INutritionFactsService
     {
         private readonly NutriBestDbContext db;
+        private readonly IMapper mapper;
 
-        public NutritionFactsService(NutriBestDbContext db)
+        public NutritionFactsService(NutriBestDbContext db,
+            IMapper mapper)
         {
             this.db = db;
+            this.mapper = mapper;
         }
 
         public async Task Add(int productId,
@@ -52,21 +57,10 @@
 
         public async Task<NutritionFactsServiceModel> Get(int productId)
         {
-            var product = await db.Products
+            var facts = await db.Products
                 .Include(x => x.NutritionFacts)
+                .ProjectTo<NutritionFactsServiceModel>(mapper.ConfigurationProvider)
                 .FirstAsync(x => x.ProductId == productId);
-
-            var facts = new NutritionFactsServiceModel
-            {
-                ProductId = productId,
-                Carbohydrates = product.NutritionFacts.Carbohydrates,
-                SaturatedFats = product.NutritionFacts.SaturatedFats,
-                Fats = product.NutritionFacts.Fats,
-                Sugars = product.NutritionFacts.Sugars,
-                Proteins = product.NutritionFacts.Proteins,
-                EnergyValue = product.NutritionFacts.EnergyValue,
-                Salt = product.NutritionFacts.Salt,
-            };
 
             return facts;
         }

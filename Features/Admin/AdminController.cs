@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
+    using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
@@ -14,16 +15,19 @@
         private readonly IAdminService adminService;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IMapper mapper;
 
         public AdminController(NutriBestDbContext db,
             IAdminService adminService,
             UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IMapper mapper)
         {
             this.db = db;
             this.adminService = adminService;
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.mapper = mapper;
         }
 
         [HttpGet]

@@ -1,5 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Products
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
@@ -13,12 +15,15 @@
     {
         private readonly NutriBestDbContext db;
         private readonly IPromotionService promotionService;
+        private readonly IMapper mapper;
 
         public ProductService(NutriBestDbContext db,
-            IPromotionService promotionService)
+            IPromotionService promotionService,
+            IMapper mapper)
         {
             this.db = db;
             this.promotionService = promotionService;
+            this.mapper = mapper;
         }
 
         public async Task<AllProductsServiceModel> All(int page,
@@ -140,22 +145,7 @@
         {
             var product = await db.Products
                          .Include(x => x.ProductDetails)
-                         .Select(x => new ProductServiceModel
-                         {
-                             ProductId = x.ProductId,
-                             Name = x.Name,
-                             Price = x.Price,
-                             Categories = x.ProductsCategories
-                             .Select(c => c.Category.Name)
-                             .ToList(),
-                             Description = x.Description,
-                             Image = new ImageListingServiceModel
-                             {
-                                 ContentType = x.ProductImage.ContentType,
-                                 ImageData = x.ProductImage.ImageData
-                             },
-                             Quantity = x.Quantity,
-                         })
+                         .ProjectTo<ProductServiceModel>(mapper.ConfigurationProvider)
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
