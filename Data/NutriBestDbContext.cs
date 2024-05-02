@@ -154,6 +154,9 @@
             builder.Entity<Product>()
                 .HasQueryFilter(x => !x.IsDeleted);
 
+            builder.Entity<ProductCategory>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
             builder.Entity<ProductImage>()
                 .HasQueryFilter(x => !x.IsDeleted);
 

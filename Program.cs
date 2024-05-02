@@ -2,18 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NutriBest.Server;
-using NutriBest.Server.Features.Admin;
-using NutriBest.Server.Features.Carts;
-using NutriBest.Server.Features.Categories;
-using NutriBest.Server.Features.Identity;
-using NutriBest.Server.Features.Images;
-using NutriBest.Server.Features.NutritionsFacts;
-using NutriBest.Server.Features.Products;
-using NutriBest.Server.Features.ProductsDetails;
-using NutriBest.Server.Features.ProductsPromotions;
-using NutriBest.Server.Features.Promotions;
 using NutriBest.Server.Infrastructure.Extensions;
-using NutriBest.Server.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +20,6 @@ var appSettings = applicationSettings
 
 var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
 
-//configure automapper
 var configuration = new MapperConfiguration(cfg =>
 {
     cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
@@ -40,26 +28,11 @@ var configuration = new MapperConfiguration(cfg =>
 configuration.AssertConfigurationIsValid();
 
 var mapper = configuration.CreateMapper();
-//configure automapper
-
-//make extension method for adding services
-builder.Services
-    .AddSingleton(mapper)
-    .AddScoped<ICurrentUserService, CurrentUserService>()
-    .AddTransient<IAdminService, AdminService>()
-    .AddTransient<IIdentityService, IdentityService>()
-    .AddTransient<IProfileService, ProfileService>()
-    .AddTransient<IProductService, ProductService>()
-    .AddTransient<IProductDetailsService, ProductDetailsService>()
-    .AddTransient<INutritionFactsService, NutritionFactsService>()
-    .AddTransient<IPromotionService, PromotionService>()
-    .AddTransient<IProductPromotionService, ProductPromotionService>()
-    .AddTransient<ICartService,CartService>()
-    .AddTransient<IImageService, ImageService>()
-    .AddTransient<ICategoryService, CategoryService>();
 
 builder
     .Services
+    .AddSingleton(mapper)
+    .AddServices()
     .AddHttpContextAccessor()
     .AddMemoryCache()
     .AddDatabase(connectionString)

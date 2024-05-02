@@ -64,6 +64,16 @@
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
+            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.Price <= discountAmount))
+            {
+                var possiblePrice = await db.Products
+                    .Where(x => x.PromotionId == promotionId && x.Price <= discountAmount)
+                    .OrderBy(x => x.Price)
+                    .FirstAsync();
+
+                throw new ArgumentException($"Promotion price cannot be higher than {possiblePrice.Price - 0.1m}");
+            }
+
             if (promotion == null)
                 throw new InvalidOperationException("Promotion does not exist!");
 

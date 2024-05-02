@@ -5,7 +5,6 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;

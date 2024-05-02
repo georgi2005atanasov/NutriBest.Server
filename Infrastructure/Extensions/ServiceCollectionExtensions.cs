@@ -6,10 +6,40 @@
     using Microsoft.IdentityModel.Tokens;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Admin;
+    using NutriBest.Server.Features.Carts;
+    using NutriBest.Server.Features.Categories;
+    using NutriBest.Server.Features.Identity;
+    using NutriBest.Server.Features.Images;
+    using NutriBest.Server.Features.NutritionsFacts;
+    using NutriBest.Server.Features.Products;
+    using NutriBest.Server.Features.ProductsDetails;
+    using NutriBest.Server.Features.ProductsPromotions;
+    using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Filters;
+    using NutriBest.Server.Infrastructure.Services;
 
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services
+                .AddScoped<ICurrentUserService, CurrentUserService>()
+                .AddTransient<IAdminService, AdminService>()
+                .AddTransient<IIdentityService, IdentityService>()
+                .AddTransient<IProfileService, ProfileService>()
+                .AddTransient<IProductService, ProductService>()
+                .AddTransient<IProductDetailsService, ProductDetailsService>()
+                .AddTransient<INutritionFactsService, NutritionFactsService>()
+                .AddTransient<IPromotionService, PromotionService>()
+                .AddTransient<IProductPromotionService, ProductPromotionService>()
+                .AddTransient<ICartService, CartService>()
+                .AddTransient<IImageService, ImageService>()
+                .AddTransient<ICategoryService, CategoryService>();
+
+            return services;
+        }
+
         public static IServiceCollection AddIdentity(this IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole>(options =>

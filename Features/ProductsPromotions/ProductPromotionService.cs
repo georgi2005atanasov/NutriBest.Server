@@ -41,7 +41,6 @@
                 });
             }
 
-
             if (product.PromotionId != null)
             {
                 if (product.PromotionId == promotionId)
@@ -52,8 +51,8 @@
                 product.PromotionId = null;
             }
 
-            if (product.Price < promotion.DiscountAmount)
-                throw new InvalidOperationException("The price of the product is less than the discount!");
+            if (product.Price <= promotion.DiscountAmount)
+                throw new InvalidOperationException("The price of the product must be bigger than the discount!");
 
             product.PromotionId = promotionId;
 
@@ -73,7 +72,7 @@
                 var promotionCategory = await db.ProductsCategories
                     .FirstAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1);
 
-                promotionCategory.IsDeleted = true;
+                db.ProductsCategories.Remove(promotionCategory);
             }
 
             if (product == null)

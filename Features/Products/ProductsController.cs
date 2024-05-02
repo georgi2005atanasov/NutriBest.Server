@@ -236,6 +236,21 @@
                         Message = "You have to choose at least 1 category!"
                     });
 
+                if (product.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == product.PromotionId);
+
+                    if (promotion.DiscountAmount != null && price <= promotion.DiscountAmount)
+                    {
+                        return BadRequest(new
+                        {
+                            Key = "Price",
+                            Message = "The price must be bigger, because of the applied promotion!"
+                        });
+                    }
+                }
+
                 if (productModel.Image != null)
                 {
                     var productImage = await imageService
@@ -275,6 +290,10 @@
 
                     return productId;
                 }
+            }
+            catch (ArgumentNullException)
+            {
+                return BadRequest();
             }
             catch (Exception)
             {
