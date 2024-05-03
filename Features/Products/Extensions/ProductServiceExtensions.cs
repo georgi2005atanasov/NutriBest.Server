@@ -68,11 +68,9 @@ namespace NutriBest.Server.Features.Products.Extensions
             {
                 if (priceFilter == "desc")
                     queryProducts = queryProducts
-                        .Where(x => x.PromotionId != null)
                         .OrderByDescending(x => x.Price);
                 else if (priceFilter == "asc")
                     queryProducts = queryProducts
-                        .Where(x => x.PromotionId != null)
                         .OrderBy(x => x.Price);
             }
 

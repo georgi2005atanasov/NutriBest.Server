@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240502125353_RemovedPromotionIdColumnToCategoriesTable")]
-    partial class RemovedPromotionIdColumnToCategoriesTable
+    [Migration("20240503084344_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -252,12 +252,7 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PromotionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PromotionId");
 
                     b.ToTable("Categories");
                 });
@@ -604,6 +599,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromotionId"), 1L, 1);
 
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -816,13 +814,6 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("Cart");
                 });
 
-            modelBuilder.Entity("NutriBest.Server.Data.Models.Category", b =>
-                {
-                    b.HasOne("NutriBest.Server.Data.Models.Promotion", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("PromotionId");
-                });
-
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
@@ -998,8 +989,6 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
                 {
-                    b.Navigation("Categories");
-
                     b.Navigation("Products");
                 });
 

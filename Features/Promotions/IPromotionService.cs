@@ -28,5 +28,7 @@
             string? category);
 
         Task<bool> Remove(int promotionId);
+
+        Task<bool> ChangeIsActive(int promotionId);
     }
 }

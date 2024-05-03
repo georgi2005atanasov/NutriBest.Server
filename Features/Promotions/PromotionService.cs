@@ -99,14 +99,14 @@
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
-            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.Price <= discountAmount))
+            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.Price <= discountAmount || (minPrice != null && x.Price < minPrice)))
             {
                 var possiblePrice = await db.Products
-                    .Where(x => x.PromotionId == promotionId && x.Price <= discountAmount)
+                    .Where(x => x.PromotionId == promotionId && x.Price <= discountAmount || x.Price < minPrice)
                     .OrderBy(x => x.Price)
-                    .FirstAsync();
+                    .FirstOrDefaultAsync();
 
-                throw new ArgumentException($"Promotion price cannot be higher than {possiblePrice.Price - 0.1m}");
+                throw new ArgumentException($"The discount cannot be applied to all the products!");
             }
 
             if (promotion == null)
@@ -151,6 +151,8 @@
 
             if (promotion == null)
                 return false;
+
+            promotion.IsActive = false;
 
             db.Promotions.Remove(promotion);
 
@@ -201,30 +203,53 @@
 
                 foreach (var product in productsToApplyPromotion.ToList())
                 {
-                    var categoriesOfProduct = await db.ProductsCategories
-                        .Where(x => x.ProductId == product.ProductId)
-                        .Select(x => x.CategoryId)
-                        .ToListAsync();
-
-                    if (categoriesOfProduct.Contains(categoriesIds[0]))
+                    if ((promotion.MinimumPrice != null && product.Price >= promotion.MinimumPrice) ||
+                        promotion.MinimumPrice == null)
                     {
-                        product.PromotionId = promotion.PromotionId;
+                        var categoriesOfProduct = await db.ProductsCategories
+                            .Where(x => x.ProductId == product.ProductId)
+                            .Select(x => x.CategoryId)
+                            .ToListAsync();
 
-                        if (!await db.ProductsCategories
-                            .AnyAsync(x => x.ProductId == product.ProductId &&
-                            x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+                        if (categoriesOfProduct.Contains(categoriesIds[0]))
                         {
-                            db.ProductsCategories.Add(new Data.Models.ProductCategory
+                            product.PromotionId = promotion.PromotionId;
+
+                            if (!await db.ProductsCategories
+                                .AnyAsync(x => x.ProductId == product.ProductId &&
+                                x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
                             {
-                                ProductId = product.ProductId,
-                                CategoryId = (int)Data.Enums.Categories.Promotions + 1
-                            });
+                                db.ProductsCategories.Add(new Data.Models.ProductCategory
+                                {
+                                    ProductId = product.ProductId,
+                                    CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                                });
+                            }
                         }
                     }
                 }
             }
 
             await db.SaveChangesAsync();
+        }
+
+        public async Task<bool> ChangeIsActive(int promotionId)
+        {
+            var promotion = await db.Promotions
+                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            if (promotion == null)
+            {
+                throw new ArgumentNullException("The promotion is not valid!");
+            }
+
+            promotion.IsActive = !promotion.IsActive;
+
+            await ApplyPromotion(db, categoryService, promotion);
+
+            await db.SaveChangesAsync();
+
+            return true;
         }
     }
 }

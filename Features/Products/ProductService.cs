@@ -64,7 +64,6 @@
 
             queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
 
-
             queryProducts = queryProducts
                 .Skip(pagesToSkip)
                 .Take((productsView == "all") ? productsPerPage : productsPerTable);
@@ -75,16 +74,28 @@
             {
                 if (product.PromotionId != null)
                 {
-                    var promotion = await promotionService.Get((int)product.PromotionId);
-
-                    if (promotion != null && promotion.DiscountPercentage != null)
+                    try
                     {
-                        product.DiscountPercentage = promotion.DiscountPercentage;
+                        var promotion = await promotionService.Get((int)product.PromotionId);
+
+                        if (!promotion.IsActive)
+                        {
+                            throw new Exception();
+                        }
+
+                        if (promotion != null && promotion.DiscountPercentage != null)
+                        {
+                            product.DiscountPercentage = promotion.DiscountPercentage;
+                        }
+
+                        if (promotion != null && promotion.DiscountAmount != null)
+                        {
+                            product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Price;
+                        }
                     }
-
-                    if (promotion != null && promotion.DiscountAmount != null)
+                    catch (Exception)
                     {
-                        product.DiscountPercentage =  promotion.DiscountAmount * 100 / product.Price;
+                        continue;
                     }
                 }
             }

@@ -22,9 +22,9 @@
 
                 return Ok(promotions);
             }
-            catch (Exception)
+            catch (Exception err)
             {
-                return BadRequest();
+                return BadRequest(err.Message);
             }
         }
 
@@ -177,6 +177,30 @@
                 var result = await promotionService.Remove(promotionId);
 
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("/promotions/status/{promotionId}")]
+        public async Task<ActionResult<bool>> ChangePromotionStatus([FromRoute] int promotionId)
+        {
+            try
+            {
+                var result = await promotionService.ChangeIsActive(promotionId);
+
+                return Ok(result);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {

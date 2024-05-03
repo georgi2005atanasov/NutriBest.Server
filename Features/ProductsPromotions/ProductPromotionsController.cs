@@ -32,6 +32,13 @@
                     err.Message
                 });
             }
+            catch (ArgumentException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
             catch (InvalidOperationException err)
             {
                 return BadRequest(new

@@ -23,6 +23,16 @@
             await ValidateProductCategory(productId, promotion.Category);
             ValidatePromotionPrice(product, promotion.DiscountAmount);
 
+            if (!promotion.IsActive)
+            {
+                throw new ArgumentException("The promotion is not active!");
+            }
+
+            if (product.Price < promotion.MinimumPrice)
+            {
+                throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
+            }
+
             if (!await db.ProductsCategories
                 .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
             {
