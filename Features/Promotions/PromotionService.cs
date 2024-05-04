@@ -52,10 +52,11 @@
                 Description = description,
                 DiscountAmount = discountAmount,
                 DiscountPercentage = discountPercentage,
-                IsActive = true,
                 MinimumPrice = minPrice,
                 Category = category
             };
+
+            promotion.IsActive = startDate <= DateTime.UtcNow;
 
             db.Promotions.Add(promotion);
 
@@ -114,12 +115,14 @@
 
             if (discountAmount != null && promotion.DiscountPercentage != null)
             {
-                throw new InvalidOperationException("You can only change the discount percentage!");
+                promotion.DiscountPercentage = null;
+                //throw new InvalidOperationException("You can only change the discount percentage!");
             }
 
             if (discountPercentage != null && promotion.DiscountAmount != null)
             {
-                throw new InvalidOperationException("You can only change the discount amount!");
+                promotion.DiscountAmount = null;
+                //throw new InvalidOperationException("You can only change the discount amount!");
             }
 
             if (!string.IsNullOrEmpty(description))
@@ -241,6 +244,12 @@
             if (promotion == null)
             {
                 throw new ArgumentNullException("The promotion is not valid!");
+            }
+
+            if ((promotion.EndDate != null && promotion.EndDate < DateTime.UtcNow) ||
+                promotion.StartDate > DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("You cannot change the status of the promotion!");
             }
 
             promotion.IsActive = !promotion.IsActive;

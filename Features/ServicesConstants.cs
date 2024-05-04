@@ -31,7 +31,7 @@
 
         public class Promotion
         {
-            public const int MaxDescriptionLength = 40;
+            public const int MaxDescriptionLength = 50;
             public const int MinDescriptionLength = 5;
             public const int MinPercentage = 0;
             public const int MaxPercentage = 100;

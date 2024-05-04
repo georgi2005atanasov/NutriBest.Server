@@ -19,19 +19,9 @@
 
         public async Task<bool> Create(int productId, int promotionId)
         {
-            var (product, promotion) = await ValidateProductAndPromotionExistence(productId, promotionId);
+            var (product, promotion) = await ValidateProductAndPromotion(productId, promotionId);
             await ValidateProductCategory(productId, promotion.Category);
             ValidatePromotionPrice(product, promotion.DiscountAmount);
-
-            if (!promotion.IsActive)
-            {
-                throw new ArgumentException("The promotion is not active!");
-            }
-
-            if (product.Price < promotion.MinimumPrice)
-            {
-                throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
-            }
 
             if (!await db.ProductsCategories
                 .AnyAsync(x => x.ProductId == productId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
@@ -76,13 +66,23 @@
             return true;
         }
 
-        private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotionExistence(int productId, int promotionId)
+        private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotion(int productId, int promotionId)
         {
             var product = await db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
             var promotion = await db.Promotions.FirstOrDefaultAsync(p => p.PromotionId == promotionId);
 
             if (product == null || promotion == null)
                 throw new ArgumentNullException("Invalid product or promotion!");
+
+            if (!promotion.IsActive)
+            {
+                throw new ArgumentException("The promotion is not active!");
+            }
+
+            if (product.Price < promotion.MinimumPrice)
+            {
+                throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
+            }
 
             return (product, promotion);
         }

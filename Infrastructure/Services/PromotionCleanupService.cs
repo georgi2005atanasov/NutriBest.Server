@@ -22,13 +22,14 @@
                     var now = DateTime.UtcNow;
 
                     var expiredPromotions = db.Promotions
-                        .Where(p => p.EndDate <= now && p.IsActive)
+                        .Where(p => p.EndDate != null && p.EndDate <= now && p.IsActive)
                         .ToList();
 
                     foreach (var promotion in expiredPromotions)
                     {
                         promotion.IsActive = false;
                     }
+                    db.Promotions.RemoveRange(expiredPromotions);
 
                     await db.SaveChangesAsync();
                 }

@@ -24,6 +24,8 @@
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services
+                .AddHostedService<PromotionCleanupService>()
+                .AddHostedService<PromotionActivationService>()
                 .AddScoped<ICurrentUserService, CurrentUserService>()
                 .AddTransient<IAdminService, AdminService>()
                 .AddTransient<IIdentityService, IdentityService>()

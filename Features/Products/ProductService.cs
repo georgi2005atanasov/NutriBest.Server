@@ -97,6 +97,9 @@
                     {
                         continue;
                     }
+                    // this try catch is placed in here since if a product with invalid promotion 
+                    // id is being passed it will throw an exception. Since we do not want to do this,
+                    // we just continue with the rest of the products.
                 }
             }
 

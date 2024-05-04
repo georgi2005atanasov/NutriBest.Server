@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NutriBest.Server;
 using NutriBest.Server.Infrastructure.Extensions;
-using NutriBest.Server.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +31,6 @@ var mapper = configuration.CreateMapper();
 
 builder
     .Services
-    .AddHostedService<PromotionCleanupService>()
     .AddSingleton(mapper)
     .AddServices()
     .AddHttpContextAccessor()
