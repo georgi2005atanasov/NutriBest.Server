@@ -85,20 +85,25 @@
             decimal? discountAmount,
             decimal? discountPercentage,
             decimal? minPrice,
-            string? category)
+            string? category,
+            DateTime? startDate,
+            DateTime? endDate)
         {
             if (minPrice <= discountAmount)
             {
                 throw new ArgumentException("The minimum price must be bigger that the discount amount!");
             }
 
-            if (await db.Promotions.AnyAsync(x => x.Description == description))
+            if (await db.Promotions.AnyAsync(x => x.Description == description && x.PromotionId != promotionId))
             {
                 throw new ArgumentException("Promotion with this description already exists!");
             }
 
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            if (promotion == null)
+                throw new InvalidOperationException("Promotion does not exist!");
 
             if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.Price <= discountAmount || (minPrice != null && x.Price < minPrice)))
             {
@@ -109,9 +114,6 @@
 
                 throw new ArgumentException($"The discount cannot be applied to all the products!");
             }
-
-            if (promotion == null)
-                throw new InvalidOperationException("Promotion does not exist!");
 
             if (discountAmount != null && promotion.DiscountPercentage != null)
             {
@@ -139,6 +141,11 @@
 
             if (category != null)
                 promotion.Category = category;
+
+            if (endDate != null)
+            {
+                promotion.EndDate = endDate;
+            }
 
             await db.SaveChangesAsync();
 

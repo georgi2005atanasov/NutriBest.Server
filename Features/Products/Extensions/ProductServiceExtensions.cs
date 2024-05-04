@@ -93,12 +93,16 @@ namespace NutriBest.Server.Features.Products.Extensions
         }
 
         public static IQueryable<Product> GetBySearch(this IProductService service, IQueryable<Product> queryProducts, string search)
-        => search != ""
-            ? queryProducts = queryProducts
-                .Where(x => x.Name.ToLower().Contains(search.ToLower()) || x.ProductsCategories
-                                .Select(x => x.Category.Name)
-                                .Any(y => y.ToLower() == search.ToLower()))
-            : queryProducts;
+        {
+            //extend this
+            if (search != "")
+            {
+                queryProducts = queryProducts
+                    .Where(x => x.Name.ToLower().Contains(search.ToLower()));
+            }
+
+            return queryProducts;
+        }
 
         public static IQueryable<Product> GetByPriceRange(this IProductService service, IQueryable<Product> query, string priceRange = "")
         {

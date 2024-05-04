@@ -146,12 +146,26 @@
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/promotions/{promotionId}")]
-        public async Task<ActionResult> Update([FromRoute] int promotionId, UpdatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage, minimumPrice) = ValidatePromotionPrices(promotion.DiscountAmount,
                 promotion.DiscountPercentage,
                 promotion.MinimumPrice
                 );
+
+            if (promotion.StartDate > promotion.EndDate)
+                return BadRequest(new
+                {
+                    Key = "StartDate",
+                    Message = "The start date must be before the end date!"
+                });
+
+            if (promotion.EndDate < DateTime.UtcNow)
+                return BadRequest(new
+                {
+                    Key = "EndDate",
+                    Message = "The end date must be at least with one day duration!"
+                });
 
             try
             {
@@ -160,7 +174,9 @@
                     discountAmount,
                     discountPercentage,
                     minimumPrice,
-                    promotion.Category);
+                    promotion.Category,
+                    promotion.StartDate,
+                    promotion.EndDate);
 
                 return Ok();
             }

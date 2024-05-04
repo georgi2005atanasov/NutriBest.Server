@@ -25,7 +25,9 @@
             decimal? discountAmount,
             decimal? discountPercentage,
             decimal? minPrice,
-            string? category);
+            string? category,
+            DateTime? startDate,
+            DateTime? endDate);
 
         Task<bool> Remove(int promotionId);
 

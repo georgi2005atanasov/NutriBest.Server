@@ -8,10 +8,12 @@
         [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string? Description { get; set; }
 
-        [Range(MinPercentage, MaxPercentage)]
+        public DateTime? StartDate { get; set; }
+
+        public DateTime? EndDate { get; set; }
+
         public string? DiscountPercentage { get; set; }
 
-        [Range(MinPrice, MaxPrice)]
         public string? DiscountAmount { get; set; }
 
         public string? MinimumPrice { get; set; }
