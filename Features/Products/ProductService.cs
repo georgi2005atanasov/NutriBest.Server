@@ -41,6 +41,8 @@
             query = this.GetBySearch(query, search ?? "");
             query = this.GetByPriceRangeWithPromotions(query, priceRange ?? "");
 
+            var productsCount = query.Count();
+
             int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
             var queryProducts = query
@@ -58,11 +60,7 @@
                          })
                          .AsQueryable();
 
-            var productsWithPromotions = await this.CleanPromotions(promotionService, queryProducts, priceRange ?? "");
-
             queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
-
-            //var productsCount = queryProducts.Count();
 
             queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
 
@@ -70,12 +68,9 @@
                 .Skip(pagesToSkip)
                 .Take((productsView == "all") ? productsPerPage : productsPerTable);
 
-            var products = await queryProducts
-                .Where(x => x.PromotionId == null)
-                .ToListAsync();
-            var productsPromotions = await productsWithPromotions.ToListAsync();
+            var products = await Task.Run(() => queryProducts.ToList());
 
-            foreach (var product in productsPromotions)
+            foreach (var product in products)
             {
                 if (product.PromotionId != null)
                 {
@@ -102,15 +97,8 @@
                     {
                         continue;
                     }
-                    // this try catch is placed in here since if a product with invalid promotion 
-                    // id is being passed it will throw an exception. Since we do not want to do this,
-                    // we just continue with the rest of the products.
                 }
             }
-
-            products.AddRange(productsPromotions);
-
-            var productsCount = products.Count;
 
             var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);

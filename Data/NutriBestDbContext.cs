@@ -18,8 +18,6 @@
 
         public DbSet<ProductDetails> ProductsDetails { get; set; } = null!;
 
-        public DbSet<ProductReview> ProductsReviews { get; set; } = null!;
-
         public DbSet<Promotion> Promotions { get; set; } = null!;
 
         public DbSet<ProductImage> ProductsImages { get; set; } = null!;
@@ -137,12 +135,6 @@
                 .HasOne(x => x.NutritionFacts)
                 .WithOne(x => x.Product)
                 .HasForeignKey<NutritionFacts>(x => x.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Product>()
-                .HasMany(x => x.ProductReviews)
-                .WithOne(x => x.Product)
-                .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()

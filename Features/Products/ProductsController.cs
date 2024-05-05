@@ -179,7 +179,7 @@
 
                 return Ok(cachedProducts);
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 return BadRequest();
             }

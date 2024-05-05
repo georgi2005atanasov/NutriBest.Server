@@ -38,8 +38,6 @@
 
         public NutritionFacts NutritionFacts { get; set; } = new NutritionFacts();
 
-        public List<ProductReview> ProductReviews { get; set; } = new List<ProductReview>();
-
         [Required]
         public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
     }

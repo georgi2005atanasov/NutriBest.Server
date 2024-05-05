@@ -4,6 +4,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
+    using System.Collections.Concurrent;
 
     public static class ProductServiceExtensions
     {
@@ -76,6 +77,16 @@
             }
 
             return queryProducts;
+        }
+
+        private static async Task<decimal> GetActivePrice(IProductService productService, decimal price, int productId, int? promotionId)
+        {
+            if (promotionId == null)
+                return price;
+
+            var product = await productService.GetWithPromotion((int)productId, (int)promotionId);
+
+            return product.NewPrice;
         }
 
         public static IQueryable<ProductListingServiceModel> OrderByName(this IProductService service, IQueryable<ProductListingServiceModel> queryProducts, string alphaFilter = "")
@@ -151,7 +162,7 @@
                 IQueryable<ProductListingServiceModel> productPromotions = query
                     .Where(x => x.PromotionId != null);
 
-                var invalidProductIds = new List<int>();
+                var invalidProductIds = new HashSet<int>();
 
                 foreach (var x in productPromotions)
                 {
@@ -160,11 +171,11 @@
 
                     if (promotion.DiscountPercentage != null)
                     {
-                        priceToCheck = x.Price * ((100 - promotion.DiscountPercentage.Value) / 100.0m);
+                        priceToCheck = x.Price * ((100 - promotion.DiscountPercentage) / 100.0m);
                     }
                     else if (promotion.DiscountAmount != null)
                     {
-                        priceToCheck = x.Price - promotion.DiscountAmount.Value;
+                        priceToCheck = x.Price - promotion.DiscountAmount;
                     }
                     else
                     {
