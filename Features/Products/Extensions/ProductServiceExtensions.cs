@@ -136,7 +136,10 @@
         {
             if (priceRange == "")
             {
-                return query;
+                IQueryable<ProductListingServiceModel> productPromotions = query
+                    .Where(x => x.PromotionId != null);
+
+                return productPromotions;
             }
 
             try
@@ -163,8 +166,16 @@
                     {
                         priceToCheck = x.Price - promotion.DiscountAmount.Value;
                     }
+                    else
+                    {
+                        invalidProductIds.Add(x.ProductId);
+                    }
 
-                    if (!(priceToCheck != null && priceToCheck >= minPrice && priceToCheck <= maxPrice))
+                    if (priceToCheck != null && priceToCheck >= minPrice && priceToCheck <= maxPrice)
+                    {
+                        continue;
+                    }
+                    else
                     {
                         invalidProductIds.Add(x.ProductId);
                     }
