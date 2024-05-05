@@ -39,7 +39,7 @@
 
             query = this.SelectByCategories(query, categoriesFilter ?? "");
             query = this.GetBySearch(query, search ?? "");
-            query = this.GetByPriceRange(query, priceRange ?? "");
+            query = this.GetByPriceRangeWithPromotions(query, priceRange ?? "");
 
             int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
 
@@ -54,13 +54,15 @@
                              .Select(c => c.Category.Name)
                              .ToList(),
                              Quantity = x.Quantity,
-                             PromotionId = x.PromotionId
+                             PromotionId = x.PromotionId,
                          })
                          .AsQueryable();
 
+            var productsWithPromotions = await this.CleanPromotions(promotionService, queryProducts, priceRange ?? "");
+
             queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
 
-            var productsCount = queryProducts.Count();
+            //var productsCount = queryProducts.Count();
 
             queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
 
@@ -68,9 +70,12 @@
                 .Skip(pagesToSkip)
                 .Take((productsView == "all") ? productsPerPage : productsPerTable);
 
-            var products = await queryProducts.ToListAsync();
+            var products = await queryProducts
+                .Where(x => x.PromotionId == null)
+                .ToListAsync();
+            var productsPromotions = await productsWithPromotions.ToListAsync();
 
-            foreach (var product in products)
+            foreach (var product in productsPromotions)
             {
                 if (product.PromotionId != null)
                 {
@@ -102,6 +107,10 @@
                     // we just continue with the rest of the products.
                 }
             }
+
+            products.AddRange(productsPromotions);
+
+            var productsCount = products.Count;
 
             var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);

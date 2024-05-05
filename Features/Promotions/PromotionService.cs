@@ -6,6 +6,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
+    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
     using System.Collections.Generic;
 
@@ -198,6 +199,20 @@
 
         private static async Task ApplyPromotion(NutriBestDbContext db, ICategoryService categoryService, Promotion promotion)
         {
+            if (!promotion.IsActive)
+            {
+                await db.Products
+                    .Where(x => x.PromotionId == promotion.PromotionId)
+                    .ForEachAsync(x =>
+                    {
+                        x.PromotionId =
+                        null;
+                    });
+
+                return;
+            }
+
+
             var productsToApplyPromotion = db.Products
                 .AsQueryable();
 
@@ -221,20 +236,22 @@
                             .Select(x => x.CategoryId)
                             .ToListAsync();
 
-                        if (categoriesOfProduct.Contains(categoriesIds[0]))
+                        if (!categoriesOfProduct.Contains(categoriesIds[0]))
                         {
-                            product.PromotionId = promotion.PromotionId;
+                            continue;
+                        }
 
-                            if (!await db.ProductsCategories
-                                .AnyAsync(x => x.ProductId == product.ProductId &&
-                                x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+                        product.PromotionId = promotion.PromotionId;
+
+                        if (!await db.ProductsCategories
+                            .AnyAsync(x => x.ProductId == product.ProductId &&
+                            x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+                        {
+                            db.ProductsCategories.Add(new Data.Models.ProductCategory
                             {
-                                db.ProductsCategories.Add(new Data.Models.ProductCategory
-                                {
-                                    ProductId = product.ProductId,
-                                    CategoryId = (int)Data.Enums.Categories.Promotions + 1
-                                });
-                            }
+                                ProductId = product.ProductId,
+                                CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                            });
                         }
                     }
                 }
@@ -266,6 +283,23 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<ProductServiceModel>> GetProductsOfPromotion(int promotionId)
+        {
+            var promotion = await db.Promotions
+                .Where(x => x.IsActive)
+                .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
+
+            if (promotion == null)
+                return new List<ProductServiceModel>();
+
+            var products = await db.Products
+                .Where(x => x.PromotionId == promotionId)
+                .ProjectTo<ProductServiceModel>(mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return products;
         }
     }
 }

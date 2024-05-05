@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
     using System.Globalization;
 
@@ -234,6 +235,30 @@
                 {
                     err.Message
                 });
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("{promotionId}/products")]
+        public async Task<ActionResult<List<ProductServiceModel>>> GetProductsOfPromotion([FromRoute] int promotionId)
+        {
+            try
+            {
+                var products = await promotionService.GetProductsOfPromotion(promotionId);
+
+                return Ok(products);
             }
             catch (ArgumentNullException err)
             {

@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Promotions
 {
+    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
 
     public interface IPromotionService
@@ -32,5 +33,7 @@
         Task<bool> Remove(int promotionId);
 
         Task<bool> ChangeIsActive(int promotionId);
+
+        Task<List<ProductServiceModel>> GetProductsOfPromotion(int promotionId);
     }
 }

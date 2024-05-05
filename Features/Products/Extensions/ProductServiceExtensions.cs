@@ -1,8 +1,9 @@
-﻿
-namespace NutriBest.Server.Features.Products.Extensions
+﻿namespace NutriBest.Server.Features.Products.Extensions
 {
+    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Promotions;
 
     public static class ProductServiceExtensions
     {
@@ -104,7 +105,7 @@ namespace NutriBest.Server.Features.Products.Extensions
             return queryProducts;
         }
 
-        public static IQueryable<Product> GetByPriceRange(this IProductService service, IQueryable<Product> query, string priceRange = "")
+        public static IQueryable<Product> GetByPriceRangeWithPromotions(this IProductService service, IQueryable<Product> query, string priceRange = "")
         {
             if (priceRange == "")
             {
@@ -118,9 +119,60 @@ namespace NutriBest.Server.Features.Products.Extensions
                 var maxPrice = int.Parse(numbers[1]);
 
                 query = query
-                    .Where(x => x.Price >= minPrice && x.Price <= maxPrice);
+                    .Where(x => x.Price >= minPrice && x.Price <= maxPrice || x.PromotionId != null);
 
                 return query;
+            }
+            catch (Exception)
+            {
+                return query;
+            }
+        }
+
+        public static async Task<IQueryable<ProductListingServiceModel>> CleanPromotions(this IProductService service,
+            IPromotionService promotionService,
+            IQueryable<ProductListingServiceModel> query,
+            string priceRange = "")
+        {
+            if (priceRange == "")
+            {
+                return query;
+            }
+
+            try
+            {
+                var numbers = priceRange.Split();
+                var minPrice = int.Parse(numbers[0]);
+                var maxPrice = int.Parse(numbers[1]);
+
+                IQueryable<ProductListingServiceModel> productPromotions = query
+                    .Where(x => x.PromotionId != null);
+
+                var invalidProductIds = new List<int>();
+
+                foreach (var x in productPromotions)
+                {
+                    var promotion = await promotionService.Get((int)x.PromotionId);
+                    decimal? priceToCheck = null;
+
+                    if (promotion.DiscountPercentage != null)
+                    {
+                        priceToCheck = x.Price * ((100 - promotion.DiscountPercentage.Value) / 100.0m);
+                    }
+                    else if (promotion.DiscountAmount != null)
+                    {
+                        priceToCheck = x.Price - promotion.DiscountAmount.Value;
+                    }
+
+                    if (!(priceToCheck != null && priceToCheck >= minPrice && priceToCheck <= maxPrice))
+                    {
+                        invalidProductIds.Add(x.ProductId);
+                    }
+                }
+
+                productPromotions = productPromotions.Where(x => !invalidProductIds.Contains(x.ProductId));
+
+                return productPromotions;
             }
             catch (Exception)
             {
