@@ -5,7 +5,6 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
@@ -57,12 +56,7 @@
                              .Select(c => c.Category.Name)
                              .ToList(),
                              Quantity = x.Quantity,
-                             PromotionId = x.PromotionId,
-                             Image = new ImageListingServiceModel
-                             {
-                                 ImageData = x.ProductImage.ImageData,
-                                 ContentType = x.ProductImage.ContentType
-                             }
+                             PromotionId = x.PromotionId
                          })
                          .AsQueryable();
 
