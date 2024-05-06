@@ -6,6 +6,7 @@
     {
         Task<int> Create(string name,
             string description,
+            string brand,
             decimal price,
             int? quantity,
             List<int> categoriesIds,
@@ -27,6 +28,7 @@
         Task<int> Update(int id,
             string name,
             string description,
+            string brand,
             decimal price,
             int? quantity,
             List<int> categoriesIds,

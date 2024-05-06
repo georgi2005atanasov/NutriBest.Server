@@ -20,6 +20,7 @@
 
             SeedAdministrator(services.ServiceProvider);
             SeedCategories(dbContext);
+            SeedBrands(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
         }
@@ -101,8 +102,31 @@
             })
                 .GetAwaiter()
                 .GetResult();
-
         }
+
+        private static void SeedBrands(NutriBestDbContext db)
+        {
+            if (db.Brands != null && db.Brands.Any())
+                return;
+
+            Task.Run(async () =>
+            {
+                await db.Brands!.AddRangeAsync(new List<Brand>
+                {
+                    new Brand{ Name="Nordic Naturals" },
+                    new Brand{ Name="Garden of Life" },
+                    new Brand{ Name="Klean Athlete" },
+                    new Brand{ Name="Nature Made" },
+                    new Brand{ Name="Optimim Nutrition" },
+                    new Brand{ Name="Musle Tech" },
+                });
+
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
+        }
+
 
         private static void SeedAdministrator(IServiceProvider serviceProvider)
         {

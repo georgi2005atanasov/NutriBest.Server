@@ -121,6 +121,7 @@
                     var productId = await productService
                         .Create(productModel.Name,
                         productModel.Description,
+                        productModel.Brand,
                         price,
                         productModel.Quantity,
                         categoriesIds,
@@ -261,6 +262,7 @@
                         .Update(productModel.ProductId,
                         productModel.Name,
                         productModel.Description,
+                        productModel.Brand,
                         price,
                         productModel.Quantity,
                         categoriesIds,
@@ -280,6 +282,7 @@
                         .Update(productModel.ProductId,
                         productModel.Name,
                         productModel.Description,
+                        productModel.Brand,
                         price,
                         productModel.Quantity,
                         categoriesIds,

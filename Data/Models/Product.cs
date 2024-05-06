@@ -25,6 +25,10 @@
         [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string Description { get; set; } = null!;
 
+        public int? BrandId { get; set; }
+
+        public Brand? Brand { get; set; }
+
         public int ProductImageId { get; set; }
 
         [NotMapped]

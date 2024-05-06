@@ -3,6 +3,7 @@
     using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
     using static ServicesConstants.Product;
+    using static ServicesConstants.Brand;
 
     public class ProductServiceModel
     {
@@ -22,6 +23,10 @@
         [Required]
         [StringLength(MaxDescriptionLength, MinimumLength = MinDescriptionLength)]
         public string Description { get; set; } = null!;
+
+        //[Required]
+        //[StringLength(MaxBrandLength)]
+        //public string Brand { get; set; } = null!;
 
         [Required]
         public List<string> Categories { get; set; } = new List<string>();

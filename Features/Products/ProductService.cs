@@ -5,6 +5,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Images.Models;
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
@@ -57,6 +58,11 @@
                              .ToList(),
                              Quantity = x.Quantity,
                              PromotionId = x.PromotionId,
+                             Image = new ImageListingServiceModel
+                             {
+                                 ImageData = x.ProductImage.ImageData,
+                                 ContentType = x.ProductImage.ContentType
+                             }
                          })
                          .AsQueryable();
 
@@ -113,6 +119,7 @@
 
         public async Task<int> Create(string name,
             string description,
+            string brand,
             decimal price,
             int? quantity,
             List<int> categoriesIds,
@@ -134,6 +141,8 @@
                 CreatedOn = DateTime.Now,
                 Quantity = quantity
             };
+
+            //add brand
 
             foreach (var id in categoriesIds)
             {
@@ -167,6 +176,7 @@
         public async Task<int> Update(int productId,
             string name,
             string description,
+            string brand,
             decimal price,
             int? quantity,
             List<int> categoriesIds,
@@ -188,6 +198,8 @@
             product.ProductImage = productImage;
             product.ProductsCategories = new List<ProductCategory>();
             product.Quantity = quantity;
+
+            //update the brand;
 
             var existingMappings = db.ProductsCategories
                 .Where(pc => pc.ProductId == productId);

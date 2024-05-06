@@ -36,5 +36,11 @@
             public const double MinPrice = 0.1;
             public const double MaxPrice = 3999.9;
         }
+
+        public class Brand
+        {
+            public const int MaxBrandLength = 40;
+            public const int MaxBrandDescriptionLength = 1000;
+        }
     }
 }

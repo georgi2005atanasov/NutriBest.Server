@@ -24,6 +24,8 @@
 
         public DbSet<Category> Categories { get; set; } = null!;
 
+        public DbSet<Brand> Brands { get; set; } = null!;
+
         public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 
         public DbSet<Profile> Profiles { get; set; } = null!;
@@ -125,6 +127,14 @@
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<Product>(e =>
+            {
+                e.HasOne(x => x.Brand)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.BrandId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<Product>()
                 .HasOne(x => x.ProductDetails)
                 .WithOne()
@@ -169,6 +179,14 @@
 
             builder.Entity<Promotion>()
                 .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<Brand>(e =>
+            {
+                e.HasOne(x => x.BrandLogo)
+                .WithOne(x => x.Brand)
+                .HasForeignKey<Brand>(x => x.BrandLogoId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
         private void ApplyAuditInformation()
