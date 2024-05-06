@@ -7,6 +7,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Features.Promotions.Models;
     using System.Collections.Generic;
 
@@ -14,14 +15,17 @@
     {
         private readonly NutriBestDbContext db;
         private readonly IMapper mapper;
+        private readonly IProductPromotionService productPromotionService;
         private readonly ICategoryService categoryService;
 
         public PromotionService(NutriBestDbContext db,
             IMapper mapper,
+            IProductPromotionService productPromotionService,
             ICategoryService categoryService)
         {
             this.db = db;
             this.mapper = mapper;
+            this.productPromotionService = productPromotionService;
             this.categoryService = categoryService;
         }
 
@@ -57,7 +61,8 @@
                 Category = category
             };
 
-            promotion.IsActive = startDate <= DateTime.UtcNow;
+            promotion.IsActive = false;
+            //promotion.IsActive = startDate <= DateTime.UtcNow;
 
             db.Promotions.Add(promotion);
 
@@ -201,13 +206,24 @@
         {
             if (!promotion.IsActive)
             {
-                await db.Products
-                    .Where(x => x.PromotionId == promotion.PromotionId)
-                    .ForEachAsync(x =>
+                var productsToChange = db.Products
+                    .Where(x => x.PromotionId == promotion.PromotionId);
+
+                //the code below is copied from the productPromotionService
+                foreach (var product in productsToChange)
+                {
+                    if (await db.ProductsCategories
+                        .AnyAsync(x => x.ProductId == product.ProductId &&
+                        x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
                     {
-                        x.PromotionId =
-                        null;
-                    });
+                        var promotionCategory = await db.ProductsCategories
+                            .FirstAsync(x => x.ProductId == product.ProductId && x.CategoryId == (int)Data.Enums.Categories.Promotions + 1);
+
+                        db.ProductsCategories.Remove(promotionCategory);
+                    }
+
+                    product.PromotionId = null;
+                }
 
                 return;
             }
