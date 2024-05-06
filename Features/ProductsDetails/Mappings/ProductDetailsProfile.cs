@@ -9,6 +9,7 @@
         public ProductDetailsProfile()
         {
             CreateMap<Product, ProductDetailsServiceModel>()
+                .ForMember(dest => dest.Brand, src => src.MapFrom(x => x.Brand!.Name))
                 .ForMember(dest => dest.Image, src => src
                           .MapFrom(x => new ImageListingServiceModel
                           {

@@ -19,7 +19,8 @@
             DateTime startDate,
             DateTime? endDate,
             decimal? minimumPrice,
-            string? category);
+            string? category,
+            string? brand);
 
         Task<bool> Update(int promotionId,
             string? description,
@@ -27,6 +28,7 @@
             decimal? discountPercentage,
             decimal? minPrice,
             string? category,
+            string? brand,
             DateTime? startDate,
             DateTime? endDate);
 

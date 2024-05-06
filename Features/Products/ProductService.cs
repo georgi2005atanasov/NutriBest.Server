@@ -113,13 +113,19 @@
 
         public async Task<int> Create(string name,
             string description,
-            string brand,
+            string brandName,
             decimal price,
             int? quantity,
             List<int> categoriesIds,
             string imageData,
             string contentType)
         {
+            var brand = await db.Brands
+                    .FirstOrDefaultAsync(x => x.Name == brandName);
+
+            if (brand == null)
+                throw new ArgumentNullException("Invalid Brand!");
+
             var productImage = new ProductImage
             {
                 ImageData = imageData,
@@ -132,6 +138,7 @@
                 Description = description,
                 Price = price,
                 ProductImage = productImage,
+                Brand = brand,
                 CreatedOn = DateTime.Now,
                 Quantity = quantity
             };
@@ -170,7 +177,7 @@
         public async Task<int> Update(int productId,
             string name,
             string description,
-            string brand,
+            string brandName,
             decimal price,
             int? quantity,
             List<int> categoriesIds,
@@ -192,6 +199,14 @@
             product.ProductImage = productImage;
             product.ProductsCategories = new List<ProductCategory>();
             product.Quantity = quantity;
+
+            var brand = await db.Brands
+                    .FirstOrDefaultAsync(x => x.Name == brandName);
+
+            if (brand == null)
+                throw new ArgumentNullException("Invalid Brand!");
+
+            product.Brand = brand;
 
             //update the brand;
 

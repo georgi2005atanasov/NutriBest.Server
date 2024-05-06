@@ -35,7 +35,8 @@
             DateTime startDate,
             DateTime? endDate,
             decimal? minPrice,
-            string? category)
+            string? category,
+            string? brandName)
         {
             if (minPrice <= discountAmount)
             {
@@ -60,6 +61,17 @@
                 MinimumPrice = minPrice,
                 Category = category
             };
+
+            if (brandName != null)
+            {
+                var brand = await db.Brands
+                    .FirstOrDefaultAsync(x => x.Name == brandName);
+
+                if (brand == null)
+                    throw new InvalidOperationException("Invalid brand!");
+
+                promotion.Brand = brandName;
+            }
 
             promotion.IsActive = false;
             //promotion.IsActive = startDate <= DateTime.UtcNow;
@@ -92,6 +104,7 @@
             decimal? discountPercentage,
             decimal? minPrice,
             string? category,
+            string? brandName,
             DateTime? startDate,
             DateTime? endDate)
         {
@@ -151,6 +164,17 @@
             if (endDate != null)
             {
                 promotion.EndDate = endDate;
+            }
+
+            if (brandName != null)
+            {
+                var brand = await db.Brands
+                    .FirstOrDefaultAsync(x => x.Name == brandName);
+
+                if (brand == null)
+                    throw new InvalidOperationException("Invalid brand!");
+
+                promotion.Brand = brandName;
             }
 
             await db.SaveChangesAsync();
@@ -228,21 +252,18 @@
                 return;
             }
 
-
             var productsToApplyPromotion = db.Products
                 .AsQueryable();
 
             if (promotion.MinimumPrice != null)
-            {
                 productsToApplyPromotion = productsToApplyPromotion
                     .Where(x => x.Price >= promotion.MinimumPrice);
-            }
 
             if (promotion.Category != null)
             {
                 var categoriesIds = await categoryService.GetCategoriesIds(new List<string> { promotion.Category });
 
-                foreach (var product in productsToApplyPromotion.ToList())
+                foreach (var product in productsToApplyPromotion.ToList()) //idk i make this to be a list
                 {
                     if ((promotion.MinimumPrice != null && product.Price >= promotion.MinimumPrice) ||
                         promotion.MinimumPrice == null)
@@ -253,9 +274,7 @@
                             .ToListAsync();
 
                         if (!categoriesOfProduct.Contains(categoriesIds[0]))
-                        {
                             continue;
-                        }
 
                         product.PromotionId = promotion.PromotionId;
 
@@ -270,6 +289,18 @@
                             });
                         }
                     }
+                }
+            }
+
+            if (promotion.Brand != null)
+            {
+                var brand = await db.Brands
+                    .FirstAsync(x => x.Name == promotion.Brand);
+
+                foreach (var product in productsToApplyPromotion)
+                {
+                    if (product.BrandId == brand.Id)
+                        product.PromotionId = promotion.PromotionId;
                 }
             }
 

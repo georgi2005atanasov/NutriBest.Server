@@ -56,6 +56,20 @@ namespace NutriBest.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BrandLogo",
+                columns: table => new
+                {
+                    BrandLogoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImageData = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BrandLogo", x => x.BrandLogoId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Carts",
                 columns: table => new
                 {
@@ -108,7 +122,7 @@ namespace NutriBest.Server.Data.Migrations
                 {
                     PromotionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -116,6 +130,7 @@ namespace NutriBest.Server.Data.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     MinimumPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -236,6 +251,27 @@ namespace NutriBest.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Brands",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    BrandLogoId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Brands", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Brands_BrandLogo_BrandLogoId",
+                        column: x => x.BrandLogoId,
+                        principalTable: "BrandLogo",
+                        principalColumn: "BrandLogoId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CartProducts",
                 columns: table => new
                 {
@@ -300,6 +336,7 @@ namespace NutriBest.Server.Data.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    BrandId = table.Column<int>(type: "int", nullable: true),
                     ProductImageId = table.Column<int>(type: "int", nullable: false),
                     PromotionId = table.Column<int>(type: "int", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -313,6 +350,12 @@ namespace NutriBest.Server.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.ProductId);
+                    table.ForeignKey(
+                        name: "FK_Products_Brands_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "Brands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Products_ProductsImages_ProductImageId",
                         column: x => x.ProductImageId,
@@ -462,36 +505,6 @@ namespace NutriBest.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductsReviews",
-                columns: table => new
-                {
-                    ReviewId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    ProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductsReviews", x => x.ReviewId);
-                    table.ForeignKey(
-                        name: "FK_ProductsReviews_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ProductsReviews_Profiles_ProfileId",
-                        column: x => x.ProfileId,
-                        principalTable: "Profiles",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrdersDetails",
                 columns: table => new
                 {
@@ -570,6 +583,13 @@ namespace NutriBest.Server.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Brands_BrandLogoId",
+                table: "Brands",
+                column: "BrandLogoId",
+                unique: true,
+                filter: "[BrandLogoId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CartProducts_CartId",
                 table: "CartProducts",
                 column: "CartId");
@@ -591,6 +611,11 @@ namespace NutriBest.Server.Data.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_BrandId",
+                table: "Products",
+                column: "BrandId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_ProductImageId",
                 table: "Products",
                 column: "ProductImageId",
@@ -605,16 +630,6 @@ namespace NutriBest.Server.Data.Migrations
                 name: "IX_ProductsCategories_CategoryId",
                 table: "ProductsCategories",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductsReviews_ProductId",
-                table: "ProductsReviews",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductsReviews_ProfileId",
-                table: "ProductsReviews",
-                column: "ProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Profiles_CartId",
@@ -657,9 +672,6 @@ namespace NutriBest.Server.Data.Migrations
                 name: "ProductsDetails");
 
             migrationBuilder.DropTable(
-                name: "ProductsReviews");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -678,6 +690,9 @@ namespace NutriBest.Server.Data.Migrations
                 name: "Profiles");
 
             migrationBuilder.DropTable(
+                name: "Brands");
+
+            migrationBuilder.DropTable(
                 name: "ProductsImages");
 
             migrationBuilder.DropTable(
@@ -688,6 +703,9 @@ namespace NutriBest.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "BrandLogo");
         }
     }
 }

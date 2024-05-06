@@ -27,7 +27,6 @@
         [Required]
         public List<string> Categories { get; set; } = null!;
 
-        [Required]
         public IFormFile Image { get; set; } = null!;
     }
 }

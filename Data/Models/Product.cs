@@ -32,7 +32,7 @@
         public int ProductImageId { get; set; }
 
         [NotMapped]
-        public ProductImage ProductImage { get; set; } = null!;
+        public ProductImage? ProductImage { get; set; }
 
         public int? PromotionId { get; set; }
 

@@ -25,13 +25,8 @@
         public string Description { get; set; } = null!;
 
         [Required]
-        [StringLength(MaxBrandLength)]
-        public string Brand { get; set; } = null!;
-
-        [Required]
         public List<string> Categories { get; set; } = new List<string>();
 
-        [Required]
         public ImageListingServiceModel Image { get; set; } = null!;
     }
 }

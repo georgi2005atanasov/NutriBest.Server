@@ -15,7 +15,7 @@
         [StringLength(MaxBrandDescriptionLength)]
         public string? Description { get; set; }
 
-        public int BrandLogoId { get; set; }
+        public int? BrandLogoId { get; set; }
 
         [NotMapped]
         public BrandLogo? BrandLogo { get; set; }

@@ -140,6 +140,13 @@
                     });
                 }
             }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
             catch (Exception)
             {
                 return BadRequest();
@@ -180,7 +187,7 @@
 
                 return Ok(cachedProducts);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

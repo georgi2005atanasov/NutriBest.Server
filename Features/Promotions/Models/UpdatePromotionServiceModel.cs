@@ -19,5 +19,7 @@
         public string? MinimumPrice { get; set; }
 
         public string? Category { get; set; }
+
+        public string? Brand { get; set; }
     }
 }

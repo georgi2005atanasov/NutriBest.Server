@@ -25,6 +25,8 @@
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
+        public string Brand { get; set; } = null!;
+
         [Required]
         public List<string> Categories { get; set; } = new List<string>();
 
