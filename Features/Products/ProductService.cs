@@ -308,6 +308,11 @@
                 NewPrice = newPrice
             };
 
+            var brand = await db.Brands
+                .FirstOrDefaultAsync(x => x.Name == productListingModel.Brand);
+
+            productWithPromotion.Brand = brand.Name;
+
             return productWithPromotion;
         }
 

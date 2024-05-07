@@ -366,7 +366,7 @@
             .ToListAsync());
 
         [HttpGet]
-        [Route("promotion/{promotionId}/{productId}")]
+        [Route("{promotionId}/{productId}")]
         public async Task<ActionResult<ProductWithPromotionDetailsServiceModel>> GetWithPromotion([FromRoute] int promotionId,
             [FromRoute] int productId)
         {
