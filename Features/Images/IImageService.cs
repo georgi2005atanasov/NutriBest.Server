@@ -5,7 +5,7 @@
 
     public interface IImageService
     {
-        Task<ProductImage> CreateImage(IFormFile image, string contentType);
+        Task<T> CreateImage<T>(IFormFile image, string contentType) where T: IFileData, new();
 
         Task<ImageListingServiceModel> GetImageByProductId(int productId);
     }

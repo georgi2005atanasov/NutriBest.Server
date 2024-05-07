@@ -42,6 +42,7 @@
         public class Brand
         {
             public const int MaxBrandLength = 40;
+            public const int MaxBrandDescriptionLength = 1000;
         }
     }
 }

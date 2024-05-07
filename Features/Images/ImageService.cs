@@ -2,7 +2,6 @@
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Images.Models;
 
     public class ImageService : IImageService
@@ -12,7 +11,7 @@
         public ImageService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<ProductImage> CreateImage(IFormFile image, string contentType)
+        public async Task<T> CreateImage<T>(IFormFile image, string contentType) where T : IFileData, new()
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -21,7 +20,7 @@
                 var imageByteArray = memoryStream.ToArray();
                 var imageData = Convert.ToBase64String(imageByteArray);
 
-                return new ProductImage
+                return new T
                 {
                     ImageData = imageData,
                     ContentType = contentType
@@ -43,7 +42,7 @@
                 {
                     ContentType = x.ContentType,
                     ImageData = x.ImageData,
-                    
+
                 })
                 .FirstOrDefaultAsync();
 

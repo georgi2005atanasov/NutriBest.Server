@@ -7,6 +7,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Admin;
+    using NutriBest.Server.Features.Brands;
     using NutriBest.Server.Features.Carts;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Identity;
@@ -37,7 +38,8 @@
                 .AddTransient<IProductPromotionService, ProductPromotionService>()
                 .AddTransient<ICartService, CartService>()
                 .AddTransient<IImageService, ImageService>()
-                .AddTransient<ICategoryService, CategoryService>();
+                .AddTransient<ICategoryService, CategoryService>()
+                .AddTransient<IBrandService, BrandService>();
 
             return services;
         }

@@ -1,9 +1,10 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class BrandLogo
+    public class BrandLogo : IFileData
     {
         [Key]
         [Required]

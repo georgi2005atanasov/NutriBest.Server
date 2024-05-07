@@ -1,10 +1,11 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using NutriBest.Server.Data.Models.Base;
+    using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class ProductImage : DeletableEntity
+    public class ProductImage : DeletableEntity, IFileData
     {
         public int ProductImageId { get; set; }
 

@@ -5,6 +5,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
@@ -125,7 +126,7 @@
                 if (productModel.Image != null)
                 {
                     var productImage = await imageService
-                        .CreateImage(productModel.Image, productModel.Image.ContentType);
+                        .CreateImage<ProductImage>(productModel.Image, productModel.Image.ContentType);
 
                     var productId = await productService
                         .Create(productModel.Name,
@@ -273,7 +274,7 @@
                 if (productModel.Image != null)
                 {
                     var productImage = await imageService
-                        .CreateImage(productModel.Image, productModel.Image.ContentType);
+                        .CreateImage<ProductImage>(productModel.Image, productModel.Image.ContentType);
 
                     int productId = await productService
                         .Update(productModel.ProductId,

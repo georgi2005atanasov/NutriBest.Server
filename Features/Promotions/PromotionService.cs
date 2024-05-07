@@ -137,13 +137,11 @@
             if (discountAmount != null && promotion.DiscountPercentage != null)
             {
                 promotion.DiscountPercentage = null;
-                //throw new InvalidOperationException("You can only change the discount percentage!");
             }
 
             if (discountPercentage != null && promotion.DiscountAmount != null)
             {
                 promotion.DiscountAmount = null;
-                //throw new InvalidOperationException("You can only change the discount amount!");
             }
 
             if (!string.IsNullOrEmpty(description))
