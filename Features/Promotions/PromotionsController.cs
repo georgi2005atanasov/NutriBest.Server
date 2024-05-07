@@ -62,7 +62,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult> Create([FromBody] CreatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult> Create([FromForm] CreatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage, minimumPrice) = ValidatePromotionPrices(promotion.DiscountAmount,
                 promotion.DiscountPercentage,
@@ -148,7 +148,7 @@
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/promotions/{promotionId}")]
-        public async Task<ActionResult> Update([FromRoute] int promotionId, [FromBody] UpdatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage, minimumPrice) = ValidatePromotionPrices(promotion.DiscountAmount,
                 promotion.DiscountPercentage,

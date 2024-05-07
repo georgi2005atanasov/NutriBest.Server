@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Brands\" />
     <Folder Include="Features\Orders\Models\" />
   </ItemGroup>
 

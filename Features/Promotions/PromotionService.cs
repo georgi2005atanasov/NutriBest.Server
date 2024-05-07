@@ -265,7 +265,8 @@
 
                 foreach (var product in productsToApplyPromotion.ToList()) //idk i make this to be a list
                 {
-                    if ((promotion.MinimumPrice != null && product.Price >= promotion.MinimumPrice) ||
+                    if ((promotion.MinimumPrice != null && 
+                        product.Price >= promotion.MinimumPrice) ||
                         promotion.MinimumPrice == null)
                     {
                         var categoriesOfProduct = await db.ProductsCategories
@@ -274,6 +275,12 @@
                             .ToListAsync();
 
                         if (!categoriesOfProduct.Contains(categoriesIds[0]))
+                            continue;
+
+                        var brand = await db.Brands
+                                .FirstAsync(x => x.Name == promotion.Brand);
+
+                        if (brand.Id != product.BrandId)
                             continue;
 
                         product.PromotionId = promotion.PromotionId;
@@ -289,18 +296,6 @@
                             });
                         }
                     }
-                }
-            }
-
-            if (promotion.Brand != null)
-            {
-                var brand = await db.Brands
-                    .FirstAsync(x => x.Name == promotion.Brand);
-
-                foreach (var product in productsToApplyPromotion)
-                {
-                    if (product.BrandId == brand.Id)
-                        product.PromotionId = promotion.PromotionId;
                 }
             }
 
