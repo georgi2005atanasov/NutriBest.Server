@@ -56,7 +56,8 @@
                              .Select(c => c.Category.Name)
                              .ToList(),
                              Quantity = x.Quantity,
-                             PromotionId = x.PromotionId
+                             PromotionId = x.PromotionId,
+                             Brand = x.Brand.Name
                          })
                          .AsQueryable();
 
@@ -142,8 +143,6 @@
                 CreatedOn = DateTime.Now,
                 Quantity = quantity
             };
-
-            //add brand
 
             foreach (var id in categoriesIds)
             {

@@ -72,6 +72,15 @@
                 .Split(",")
                 .ToList();
 
+                if (productModel.Image == null)
+                {
+                    return BadRequest(new
+                    {
+                        Key = "Image",
+                        Message = "Image is required!"
+                    });
+                }
+
                 if (ProductExists(productModel.Name))
                 {
                     return BadRequest(new
@@ -112,6 +121,16 @@
                         Message = "You have to choose at least 1 category!"
                     });
                 }
+
+                //var brand = await db.Brands
+                //    .FirstOrDefaultAsync(x => x.Name == productModel.Brand);
+
+                //if (brand == null)
+                //    return BadRequest(new
+                //    {
+                //        Key = "Category",
+                //        Message = "Invalid Brand!"
+                //    });
 
                 if (productModel.Image != null)
                 {
