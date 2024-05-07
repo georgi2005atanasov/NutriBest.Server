@@ -44,15 +44,6 @@
             return true;
         }
 
-        private async Task ValidateBrand(Product product, string? brandName)
-        {
-            var brand = await db.Brands
-                .FirstAsync(x => x.Name == brandName);
-
-            if (brand.Id != product.BrandId)
-                throw new InvalidOperationException("The promotion cannot be applied due to its Brand!");
-        }
-
         public async Task<bool> Remove(int productId)
         {
             var product = await db.Products.FirstOrDefaultAsync(x => x.ProductId == productId);
@@ -74,6 +65,15 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task ValidateBrand(Product product, string? brandName)
+        {
+            var brand = await db.Brands
+                .FirstAsync(x => x.Name == brandName);
+
+            if (brand.Id != product.BrandId)
+                throw new InvalidOperationException("The promotion cannot be applied due to its Brand!");
         }
 
         private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotion(int productId, int promotionId)

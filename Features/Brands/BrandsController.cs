@@ -37,7 +37,7 @@
 
         [HttpGet]
         [Route("{name}")]
-        public async Task<ActionResult<BrandServiceModel>> GetBrand(string name)
+        public async Task<ActionResult<BrandServiceModel>> Get(string name)
         {
             try
             {
@@ -50,6 +50,13 @@
                     });
 
                 return Ok(brand);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {
@@ -65,11 +72,11 @@
         {
             try
             {
-                //var brand = await brandService.Create(brandModel.Name,
-                //    brandModel.Description,
-                //    brandModel.Image);
+                var brandId = await brandService.Create(brandModel.Name,
+                    brandModel.Description,
+                    brandModel.Image);
 
-                return Ok();
+                return Ok(brandId);
             }
             catch (Exception)
             {
@@ -77,6 +84,22 @@
                 {
                     Message = "Could not create brand!"
                 });
+            }
+        }
+
+        [HttpDelete]
+        [Route("{name}")]
+        public async Task<ActionResult<bool>> Remove([FromRoute] string name)
+        {
+            try
+            {
+                var result = await brandService.Remove(name);
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
             }
         }
     }

@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images;
 
@@ -11,7 +12,7 @@
         private readonly NutriBestDbContext db;
         private readonly IImageService imageService;
 
-        public BrandService(NutriBestDbContext db, 
+        public BrandService(NutriBestDbContext db,
             IImageService imageService)
         {
             this.db = db;
@@ -19,7 +20,8 @@
         }
 
         public async Task<IEnumerable<BrandServiceModel>> All()
-            => await db.Brands
+        {
+            var brands = await db.Brands
             .Select(x => new BrandServiceModel
             {
                 Name = x.Name,
@@ -27,10 +29,42 @@
             })
             .ToListAsync();
 
-        //public Task<int> Create(string name, string? description, IFormFile image)
-        //{
-        //    var image
-        //}
+            foreach (var brand in brands)
+            {
+                if (brand.BrandLogoId != null)
+                {
+                    brand.BrandLogo = await imageService.GetImageByBrandLogoId((int)brand.BrandLogoId);
+                }
+            }
+
+            return brands;
+        }
+
+        public async Task<int> Create(string name, string? description, IFormFile? image)
+        {
+            var brandLogo = new BrandLogo();
+
+            if (image != null)
+            {
+                brandLogo = await imageService
+                    .CreateImage<BrandLogo>(image, image.ContentType);
+            }
+
+            db.BrandsLogos.Add(brandLogo);
+
+            var brand = new Brand
+            {
+                Name = name,
+                Description = description,
+                BrandLogo = brandLogo
+            };
+
+            db.Brands.Add(brand);
+
+            await db.SaveChangesAsync();
+
+            return brand.Id;
+        }
 
         public async Task<BrandDetailsServiceModel?> Get(string brandName)
             => await db.Brands
@@ -38,19 +72,35 @@
             .Select(x => new BrandDetailsServiceModel
             {
                 Name = x.Name,
-                BrandLogoId = x.BrandLogoId,
-                Description = x.Description
+                BrandLogoId = x.BrandLogoId
             })
             .FirstOrDefaultAsync();
 
-        public Task<BrandServiceModel> Remove(string brandName)
+        // The deletion of a brand will delete the products
+        // with this brand and also the promotions
+        // gotta be aware of the fact that i might have problems in here
+        public async Task<bool> Remove(string brandName)
         {
-            throw new NotImplementedException();
-        }
+            var brand = await db.Brands
+                .FirstOrDefaultAsync(x => x.Name == brandName);
 
-        Task<BrandServiceModel> IBrandService.Get(string brandName)
-        {
-            throw new NotImplementedException();
+            if (brand == null)
+                throw new ArgumentNullException("Invalid brand!");
+
+            var productsToDelete = db.Products
+                .Where(x => x.BrandId == brand.Id)
+                .AsQueryable();
+
+            var promotionsToDelete = db.Promotions
+                .Where(x => x.Brand == brand.Name)
+                .AsQueryable();
+
+            db.Products.RemoveRange(productsToDelete);
+            db.Promotions.RemoveRange(promotionsToDelete);
+
+            await db.SaveChangesAsync();
+
+            return true;
         }
     }
 }

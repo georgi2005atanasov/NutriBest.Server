@@ -3,6 +3,7 @@
     public interface IFileData
     {
         string ImageData { get; set; }
+
         string ContentType { get; set; }
     }
 }

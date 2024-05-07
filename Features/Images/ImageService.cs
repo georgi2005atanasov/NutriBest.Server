@@ -28,6 +28,27 @@
             }
         }
 
+        public async Task<ImageListingServiceModel> GetImageByBrandLogoId(int brandLogoId)
+        {
+            var brand = await db.Brands
+                .FirstOrDefaultAsync(x => x.BrandLogoId == brandLogoId);
+
+            if (brand == null)
+                return null!;
+
+            var image = await db.BrandsLogos
+                .Where(x => x.BrandLogoId == brand.BrandLogoId)
+                .Select(x => new ImageListingServiceModel
+                {
+                    ContentType = x.ContentType,
+                    ImageData = x.ImageData,
+
+                })
+                .FirstOrDefaultAsync();
+
+            return image!;
+        }
+
         public async Task<ImageListingServiceModel> GetImageByProductId(int productId)
         {
             var product = await db.Products

@@ -6,11 +6,11 @@
     {
         Task<IEnumerable<BrandServiceModel>> All();
 
-        Task<BrandServiceModel> Get(string brandName);
+        Task<BrandDetailsServiceModel?> Get(string brandName);
 
-        Task<BrandServiceModel> Remove(string brandName);
+        Task<bool> Remove(string brandName);
 
-        //Task<int> Create(string name, string? description, IFormFile image);
+        Task<int> Create(string name, string? description, IFormFile? image);
         //Task<BrandServiceModel> Update(string brandName); gotta think more on update
     }
 }

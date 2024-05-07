@@ -26,6 +26,8 @@
 
         public DbSet<Brand> Brands { get; set; } = null!;
 
+        public DbSet<BrandLogo> BrandsLogos { get; set; } = null;
+
         public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 
         public DbSet<Profile> Profiles { get; set; } = null!;

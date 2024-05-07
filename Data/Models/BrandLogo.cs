@@ -11,9 +11,6 @@
         public int BrandLogoId { get; set; }
 
         [NotMapped]
-        public int BrandId { get; set; }
-
-        [NotMapped]
         public Brand? Brand { get; set; }
 
         [Required]
