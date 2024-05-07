@@ -27,6 +27,7 @@
 
         public async Task<AllProductsServiceModel> All(int page,
             string? categoriesFilter,
+            string? brand,
             string? priceFilter,
             string? alphaFilter,
             string? productsView,
@@ -40,6 +41,7 @@
             query = this.SelectByCategories(query, categoriesFilter ?? "");
             query = this.GetBySearch(query, search ?? "");
             query = this.GetByPriceRangeWithPromotions(query, priceRange ?? "");
+            query = this.GetByBrand(query, brand ?? "");
 
             var productsCount = query.Count();
 

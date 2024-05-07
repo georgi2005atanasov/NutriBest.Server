@@ -15,6 +15,7 @@
 
         Task<AllProductsServiceModel> All(int page,
             string? categories,
+            string? brand,
             string? priceFilter,
             string? alphaFilter,
             string? productsView,

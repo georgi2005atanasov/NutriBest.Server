@@ -21,6 +21,7 @@
         {
             var (product, promotion) = await ValidateProductAndPromotion(productId, promotionId);
             await ValidateProductCategory(productId, promotion.Category);
+            await ValidateBrand(product, promotion.Brand);
             ValidatePromotionPrice(product, promotion.DiscountAmount);
 
             if (!await db.ProductsCategories
@@ -41,6 +42,15 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task ValidateBrand(Product product, string? brandName)
+        {
+            var brand = await db.Brands
+                .FirstAsync(x => x.Name == brandName);
+
+            if (brand.Id != product.BrandId)
+                throw new InvalidOperationException("The promotion cannot be applied due to its Brand!");
         }
 
         public async Task<bool> Remove(int productId)

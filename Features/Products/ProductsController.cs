@@ -122,16 +122,6 @@
                     });
                 }
 
-                //var brand = await db.Brands
-                //    .FirstOrDefaultAsync(x => x.Name == productModel.Brand);
-
-                //if (brand == null)
-                //    return BadRequest(new
-                //    {
-                //        Key = "Category",
-                //        Message = "Invalid Brand!"
-                //    });
-
                 if (productModel.Image != null)
                 {
                     var productImage = await imageService
@@ -176,6 +166,7 @@
         public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingServiceModel>>>> All(
             [FromQuery] int page = 1,
             [FromQuery] string? categories = "",
+            [FromQuery] string? brand = "",
             [FromQuery] string? price = "",
             [FromQuery] string? alpha = "",
             [FromQuery] string? productsView = "all",
@@ -195,7 +186,7 @@
 
                 if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingServiceModel>> cachedProducts))
                 {
-                    var products = await productService.All(page, categories, price, alpha, productsView, search, priceRange);
+                    var products = await productService.All(page, categories, brand, price, alpha, productsView, search, priceRange);
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                         .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry

@@ -116,6 +116,9 @@
             return queryProducts;
         }
 
+        public static IQueryable<Product> GetByBrand(this IProductService service, IQueryable<Product> queryProducts, string brand)
+            => brand != "" ? queryProducts.Where(x => x.Brand.Name == brand) : queryProducts;
+
         public static IQueryable<Product> GetByPriceRangeWithPromotions(this IProductService service, IQueryable<Product> query, string priceRange = "")
         {
             if (priceRange == "")

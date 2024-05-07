@@ -246,6 +246,15 @@
                         db.ProductsCategories.Remove(promotionCategory);
                     }
 
+                    if (promotion.Brand != null)
+                    {
+                        var brand = await db.Brands
+                                .FirstAsync(x => x.Name == promotion.Brand);
+
+                        if (brand.Id != product.BrandId)
+                            continue;
+                    }
+
                     product.PromotionId = null;
                 }
 
@@ -258,6 +267,15 @@
             if (promotion.MinimumPrice != null)
                 productsToApplyPromotion = productsToApplyPromotion
                     .Where(x => x.Price >= promotion.MinimumPrice);
+
+            if (promotion.Brand != null)
+            {
+                var brand = await db.Brands
+                        .FirstAsync(x => x.Name == promotion.Brand);
+
+                productsToApplyPromotion = productsToApplyPromotion
+                    .Where(x => x.BrandId == brand.Id);
+            }
 
             if (promotion.Category != null)
             {
@@ -277,15 +295,6 @@
                         if (!categoriesOfProduct.Contains(categoriesIds[0]))
                             continue;
 
-                        if (promotion.Brand != null)
-                        {
-                            var brand = await db.Brands
-                                    .FirstAsync(x => x.Name == promotion.Brand);
-
-                            if (brand.Id != product.BrandId)
-                                continue;
-                        }
-
                         product.PromotionId = promotion.PromotionId;
 
                         if (!await db.ProductsCategories
@@ -299,6 +308,24 @@
                             });
                         }
                     }
+                }
+            }
+            else
+            {
+                foreach (var product in productsToApplyPromotion)
+                {
+                    if (!await db.ProductsCategories
+                            .AnyAsync(x => x.ProductId == product.ProductId &&
+                            x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
+                    {
+                        db.ProductsCategories.Add(new Data.Models.ProductCategory
+                        {
+                            ProductId = product.ProductId,
+                            CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                        });
+                    }
+
+                    product.PromotionId = promotion.PromotionId;
                 }
             }
 
