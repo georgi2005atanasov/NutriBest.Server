@@ -24,8 +24,10 @@
             var brands = await db.Brands
             .Select(x => new BrandServiceModel
             {
+                Id = x.Id,
                 Name = x.Name,
-                BrandLogoId = x.BrandLogoId
+                BrandLogoId = x.BrandLogoId,
+                Description = x.Description
             })
             .ToListAsync();
 
@@ -33,7 +35,7 @@
             {
                 if (brand.BrandLogoId != null)
                 {
-                    brand.BrandLogo = await imageService.GetImageByBrandLogoId((int)brand.BrandLogoId);
+                    brand.BrandLogo = await imageService.GetImageByBrandId(brand.Name);
                 }
             }
 
@@ -87,6 +89,9 @@
             if (brand == null)
                 throw new ArgumentNullException("Invalid brand!");
 
+            var brandLogo = await db.BrandsLogos
+                .FirstOrDefaultAsync(x => x.BrandLogoId == brand.BrandLogoId);
+
             var productsToDelete = db.Products
                 .Where(x => x.BrandId == brand.Id)
                 .AsQueryable();
@@ -95,8 +100,14 @@
                 .Where(x => x.Brand == brand.Name)
                 .AsQueryable();
 
+            if (brandLogo != null)
+                db.BrandsLogos.Remove(brandLogo);
+
             db.Products.RemoveRange(productsToDelete);
+
             db.Promotions.RemoveRange(promotionsToDelete);
+
+            db.Brands.Remove(brand);
 
             await db.SaveChangesAsync();
 

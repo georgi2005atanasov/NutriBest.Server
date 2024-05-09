@@ -8,6 +8,6 @@
 
         Task<ImageListingServiceModel> GetImageByProductId(int productId);
 
-        Task<ImageListingServiceModel> GetImageByBrandLogoId(int brandId);
+        Task<ImageListingServiceModel> GetImageByBrandId(string name);
     }
 }

@@ -189,6 +189,9 @@
                 .HasForeignKey<Brand>(x => x.BrandLogoId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
+            builder.Entity<Brand>()
+                .HasQueryFilter(x => !x.IsDeleted);
         }
 
         private void ApplyAuditInformation()

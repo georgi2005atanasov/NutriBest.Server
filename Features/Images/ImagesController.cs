@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images.Models;
 
     public class ImagesController : ApiController
@@ -15,7 +16,7 @@
             this.imageService = imageService;
             this.memoryCache = memoryCache;
         }
-            
+
         [Route("{id}")]
         [HttpGet]
         public async Task<ActionResult<ProductImage>>? GetImageByProductId(int id)
@@ -40,6 +41,22 @@
 
 
                 return Ok(cachedImage);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Route("brand/{name}")] // important!!!
+        public async Task<ActionResult<BrandServiceModel>> GetImageByBrandId([FromRoute] string name)
+        {
+            try
+            {
+                var brand = await imageService.GetImageByBrandId(name);
+
+                return Ok(brand);
             }
             catch (Exception)
             {

@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Categories
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
@@ -40,8 +41,8 @@
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Create([FromBody] CreateCategoryServiceModel categoryModel) // have to change it to 
-                                                                            //[FromForm] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        [Authorize(Roles = "Administrator,Employee")]
+        public async Task<ActionResult<int>> Create([FromForm] CreateCategoryServiceModel categoryModel)
         {
             try
             {
@@ -63,6 +64,7 @@
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route("{name}")]
         public async Task<ActionResult<bool>> Remove([FromRoute] string name)
         {

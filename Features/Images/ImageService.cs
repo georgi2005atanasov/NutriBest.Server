@@ -28,16 +28,16 @@
             }
         }
 
-        public async Task<ImageListingServiceModel> GetImageByBrandLogoId(int brandLogoId)
+        public async Task<ImageListingServiceModel> GetImageByBrandId(string name)
         {
             var brand = await db.Brands
-                .FirstOrDefaultAsync(x => x.BrandLogoId == brandLogoId);
+                .FirstOrDefaultAsync(x => x.Name == name);
 
             if (brand == null)
                 return null!;
 
             var image = await db.BrandsLogos
-                .Where(x => x.BrandLogoId == brand.BrandLogoId)
+                .Where(x => x.Brand == brand)
                 .Select(x => new ImageListingServiceModel
                 {
                     ContentType = x.ContentType,

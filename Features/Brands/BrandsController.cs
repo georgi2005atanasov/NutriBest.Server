@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Brands
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
@@ -37,6 +38,7 @@
 
         [HttpGet]
         [Route("{name}")]
+        //[Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<BrandServiceModel>> Get(string name)
         {
             try
@@ -68,6 +70,7 @@
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<int>> Create([FromForm] CreateBrandServiceModel brandModel)
         {
             try
@@ -88,6 +91,7 @@
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route("{name}")]
         public async Task<ActionResult<bool>> Remove([FromRoute] string name)
         {
@@ -97,7 +101,7 @@
 
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 return BadRequest();
             }
