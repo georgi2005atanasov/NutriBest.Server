@@ -23,7 +23,7 @@
         {
             try
             {
-                string cacheKey = $"image_{id}";
+                string cacheKey = $"product_image_{id}";
                 if (!memoryCache.TryGetValue(cacheKey, out ImageListingServiceModel cachedImage))
                 {
                     var image = await imageService.GetImageByProductId(id);
@@ -50,13 +50,28 @@
 
         [HttpGet]
         [Route("brand/{name}")] // important!!!
-        public async Task<ActionResult<BrandServiceModel>> GetImageByBrandId([FromRoute] string name)
+        public async Task<ActionResult<ImageListingServiceModel>> GetImageByBrandId([FromRoute] string name)
         {
             try
             {
-                var brand = await imageService.GetImageByBrandId(name);
+                string cacheKey = $"brand_logo_image_{name}";
+                if (!memoryCache.TryGetValue(cacheKey, out ImageListingServiceModel cachedImage))
+                {
+                    var image = await imageService.GetImageByBrandId(name);
 
-                return Ok(brand);
+                    if (image == null)
+                        return BadRequest();
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
+
+                    memoryCache.Set(cacheKey, image, cacheEntryOptions);
+                    return Ok(image);
+                }
+
+
+                return Ok(cachedImage);
             }
             catch (Exception)
             {

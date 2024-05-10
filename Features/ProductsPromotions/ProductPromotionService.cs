@@ -69,6 +69,9 @@
 
         private async Task ValidateBrand(Product product, string? brandName)
         {
+            if (brandName == null)
+                return;
+
             var brand = await db.Brands
                 .FirstAsync(x => x.Name == brandName);
 
