@@ -42,5 +42,10 @@
             public const int MaxBrandLength = 40;
             public const int MaxBrandDescriptionLength = 1000;
         }
+
+        public class Category
+        {
+            public const int MaxNameLength = 40;
+        }
     }
 }

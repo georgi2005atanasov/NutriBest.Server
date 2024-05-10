@@ -18,6 +18,7 @@
         }
 
         [HttpGet]
+        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<CategoryServiceModel>> All()
         {
             try

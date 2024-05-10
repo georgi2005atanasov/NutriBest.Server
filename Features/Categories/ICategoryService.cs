@@ -8,7 +8,7 @@
 
         Task<IEnumerable<CategoryCountServiceModel>> GetProductsCountByCategory();
 
-        Task<bool> Remove(string brandName);
+        Task<bool> Remove(string name);
 
         Task<int> Create(string name);
     }

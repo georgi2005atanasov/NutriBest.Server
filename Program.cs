@@ -35,6 +35,7 @@ builder
     .AddServices()
     .AddHttpContextAccessor()
     .AddMemoryCache()
+    .AddResponseCaching()
     .AddDatabase(connectionString)
     .AddDatabaseDeveloperPageExceptionFilter()
     .AddIdentity()
@@ -58,7 +59,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection()
     .UseStaticFiles()
     .UseRouting()
-    .UseAuthentication();
+    .UseAuthentication()
+    .UseResponseCaching();
 
 app.UseAuthorization();
 

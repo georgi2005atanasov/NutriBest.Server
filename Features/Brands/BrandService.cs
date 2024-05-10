@@ -44,22 +44,26 @@
 
         public async Task<int> Create(string name, string? description, IFormFile? image)
         {
+            if (await db.Brands.AnyAsync(x => x.Name == name))
+                throw new InvalidOperationException("Brand with this name already exists!");
+
+            var brand = new Brand
+            {
+                Name = name,
+                Description = description
+            };
+
             var brandLogo = new BrandLogo();
 
             if (image != null)
             {
                 brandLogo = await imageService
                     .CreateImage<BrandLogo>(image, image.ContentType);
+
+                db.BrandsLogos.Add(brandLogo);
+                brand.BrandLogo = brandLogo;
             }
 
-            db.BrandsLogos.Add(brandLogo);
-
-            var brand = new Brand
-            {
-                Name = name,
-                Description = description,
-                BrandLogo = brandLogo
-            };
 
             db.Brands.Add(brand);
 

@@ -2,29 +2,27 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Brands.Models;
 
     public class BrandsController : ApiController
     {
-        private readonly NutriBestDbContext db;
         private readonly IBrandService brandService;
 
-        public BrandsController(NutriBestDbContext db,
-            IBrandService brandService)
+        public BrandsController(IBrandService brandService)
         {
-            this.db = db;
             this.brandService = brandService;
         }
 
         [HttpGet]
+        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<IEnumerable<BrandServiceModel>>> All()
         {
             try
             {
                 var brands = await brandService.All();
-                
+
                 return Ok(brands);
             }
             catch (Exception)
@@ -38,7 +36,7 @@
 
         [HttpGet]
         [Route("{name}")]
-        //[Authorize(Roles = "Administrator,Employee")]
+        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<BrandServiceModel>> Get(string name)
         {
             try
@@ -81,6 +79,13 @@
 
                 return Ok(brandId);
             }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
             catch (Exception)
             {
                 return BadRequest(new
@@ -101,7 +106,7 @@
 
                 return Ok(result);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }
