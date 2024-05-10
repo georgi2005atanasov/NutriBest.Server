@@ -44,5 +44,7 @@
 
         [Required]
         public List<ProductCategory> ProductsCategories { get; set; } = new List<ProductCategory>();
+
+        public List<ProductPackageFlavour> ProductPackageFlavours { get; set; } = new List<ProductPackageFlavour>();
     }
 }

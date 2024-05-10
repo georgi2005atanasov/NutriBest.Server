@@ -47,5 +47,11 @@
         {
             public const int MaxNameLength = 40;
         }
+
+        public class Package
+        {
+            public const double MinSize = 0.1;
+            public const int MaxSize = 1_000_000;
+        }
     }
 }
