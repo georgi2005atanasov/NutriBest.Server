@@ -10,6 +10,7 @@
     using NutriBest.Server.Features.Brands;
     using NutriBest.Server.Features.Carts;
     using NutriBest.Server.Features.Categories;
+    using NutriBest.Server.Features.Flavours;
     using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.NutritionsFacts;
@@ -19,6 +20,7 @@
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
+    using System.Reflection;
 
     public static class ServiceCollectionExtensions
     {
@@ -39,7 +41,8 @@
                 .AddTransient<ICartService, CartService>()
                 .AddTransient<IImageService, ImageService>()
                 .AddTransient<ICategoryService, CategoryService>()
-                .AddTransient<IBrandService, BrandService>();
+                .AddTransient<IBrandService, BrandService>()
+                .AddTransient<IFlavourService, FlavourService>();
 
             return services;
         }

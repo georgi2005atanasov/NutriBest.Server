@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Packages\" />
     <Folder Include="Features\Orders\Models\" />
   </ItemGroup>
 

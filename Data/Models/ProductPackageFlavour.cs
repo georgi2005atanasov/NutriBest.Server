@@ -23,6 +23,6 @@
 
         public int Quantity { get; set; }
 
-        public int IsDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

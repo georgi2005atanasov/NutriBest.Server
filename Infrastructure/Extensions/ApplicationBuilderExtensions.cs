@@ -20,8 +20,61 @@
             SeedAdministrator(services.ServiceProvider);
             SeedCategories(dbContext);
             SeedBrands(dbContext);
+            SeedFlavours(dbContext);
+            SeedPackages(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
+        }
+
+        private static void SeedPackages(NutriBestDbContext db)
+        {
+            if (db.Packages != null && db.Packages.Any())
+                return;
+
+            Task.Run(async () =>
+            {
+                db.Packages!.Add(new Package { Grams = 100 });
+                db.Packages.Add(new Package { Grams = 250 });
+                db.Packages.Add(new Package { Grams = 500 });
+                db.Packages.Add(new Package { Grams = 750 });
+                db.Packages.Add(new Package { Grams = 1000 });
+                db.Packages.Add(new Package { Grams = 1500 });
+                db.Packages.Add(new Package { Grams = 2000 });
+                db.Packages.Add(new Package { Grams = 2500 });
+
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        private static void SeedFlavours(NutriBestDbContext db)
+        {
+            if (db.Flavours != null && db.Flavours.Any())
+                return;
+
+            Task.Run(async () =>
+            {
+                db.Flavours!.Add(new Flavour { FlavourName = "Chocolate" });
+                db.Flavours.Add(new Flavour { FlavourName = "Vanilla" });
+                db.Flavours.Add(new Flavour { FlavourName = "Strawberry" });
+                db.Flavours.Add(new Flavour { FlavourName = "Banana" });
+                db.Flavours.Add(new Flavour { FlavourName = "Cookies and Cream" });
+                db.Flavours.Add(new Flavour { FlavourName = "Mint Chocolate" });
+                db.Flavours.Add(new Flavour { FlavourName = "Cafe Latte" });
+                db.Flavours.Add(new Flavour { FlavourName = "Salted Caramel" });
+                db.Flavours.Add(new Flavour { FlavourName = "Lemon Lime" });
+                db.Flavours.Add(new Flavour { FlavourName = "Blueberry" });
+                db.Flavours.Add(new Flavour { FlavourName = "Mango" });
+                db.Flavours.Add(new Flavour { FlavourName = "Peanut Butter" });
+                db.Flavours.Add(new Flavour { FlavourName = "Cinnamon Roll" });
+                db.Flavours.Add(new Flavour { FlavourName = "Matcha" });
+                db.Flavours.Add(new Flavour { FlavourName = "Coconut" });
+
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
         }
 
         public static IApplicationBuilder UseSwaggerAuthorized(this IApplicationBuilder builder, IServiceProvider serviceProvider)
