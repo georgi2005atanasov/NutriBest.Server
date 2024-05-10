@@ -1,6 +1,5 @@
 ﻿namespace NutriBest.Server.Features.Flavours
 {
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
@@ -12,10 +11,10 @@
         public FlavourService(NutriBestDbContext db)
             => this.db = db;
 
-        public async Task<int> Create([FromForm] string name)
+        public async Task<int> Create(string name)
         {
             if (await db.Flavours.AnyAsync(x => x.FlavourName == name))
-                throw new InvalidOperationException("Category with this name already exists!");
+                throw new InvalidOperationException("Flavour with this name already exists!");
 
             var flavour = new Flavour
             {
@@ -35,11 +34,7 @@
                 .FirstOrDefaultAsync(x => x.FlavourName == name);
 
             if (flavour == null)
-                throw new ArgumentNullException("Invalid brand!");
-
-            var productPackageFlavours = db.ProductsPackagesFlavours
-                .Where(x => x.FlavourId == flavour.Id)
-                .AsQueryable();
+                throw new ArgumentNullException("Invalid flavour!");
 
             await db.ProductsPackagesFlavours.ForEachAsync(x =>
             {
@@ -55,6 +50,5 @@
 
             return true;
         }
-
     }
 }

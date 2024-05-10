@@ -13,7 +13,7 @@
                 .ForMember(dest => dest.Image, src => src
                           .MapFrom(x => new ImageListingServiceModel
                           {
-                              ImageData = x.ProductImage.ImageData,
+                              ImageData = x.ProductImage!.ImageData, // be aware
                               ContentType = x.ProductImage.ContentType
                           }))
                 .ForMember(dest => dest.Categories, src => src

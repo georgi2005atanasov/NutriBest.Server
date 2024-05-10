@@ -15,7 +15,7 @@ namespace NutriBest.Server.Features.Products.Mappings
                 .ForMember(dest => dest.Brand, src => src.MapFrom(x => x.Brand!.Name)) // be aware
                 .ForMember(dest => dest.Image, src => src.MapFrom(x => new ImageListingServiceModel
                  {
-                     ImageData = x.ProductImage.ImageData,
+                     ImageData = x.ProductImage!.ImageData, //be aware
                      ContentType = x.ProductImage.ContentType
                  }));
         }

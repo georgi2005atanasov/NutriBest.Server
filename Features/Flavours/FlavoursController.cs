@@ -36,7 +36,7 @@ namespace NutriBest.Server.Features.Flavours
             {
                 return BadRequest(new
                 {
-                    Message = "Could not fetch products categories!"
+                    Message = "Could not fetch flavours!"
                 });
             }
         }

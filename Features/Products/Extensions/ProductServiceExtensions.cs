@@ -169,7 +169,7 @@
 
                 foreach (var x in productPromotions)
                 {
-                    var promotion = await promotionService.Get((int)x.PromotionId);
+                    var promotion = await promotionService.Get((int)x.PromotionId!); //be aware
                     decimal? priceToCheck = null;
 
                     if (promotion.DiscountPercentage != null)
