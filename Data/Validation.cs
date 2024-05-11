@@ -52,6 +52,8 @@
         {
             public const double MinSize = 0.1;
             public const int MaxSize = 1_000_000;
+            public const int MinQuantity = 0;
+            public const int MaxQuantity = 2000;
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
+    using static Validation.Package;
 
     public class ProductPackageFlavour
     {
@@ -21,6 +22,8 @@
 
         public Flavour? Flavour { get; set; }
 
+        [Required]
+        [Range(MinQuantity, MaxQuantity)]
         public int Quantity { get; set; }
 
         public bool IsDeleted { get; set; }

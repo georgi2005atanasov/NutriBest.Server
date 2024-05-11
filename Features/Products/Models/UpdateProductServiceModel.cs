@@ -15,8 +15,6 @@
         [Required]
         public string Price { get; set; } = null!;
 
-        public int? Quantity { get; set; }
-
         [Required]
         public string Description { get; set; } = null!;
 
@@ -26,6 +24,9 @@
 
         [Required]
         public List<string> Categories { get; set; } = null!;
+
+        [Required]
+        public List<ProductSpecsServiceModel> ProductSpecs { get; set; } = new List<ProductSpecsServiceModel>();
 
         public IFormFile? Image { get; set; }
 

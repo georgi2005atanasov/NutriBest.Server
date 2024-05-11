@@ -161,26 +161,7 @@
             await db.SaveChangesAsync(); // must be aware it is finished before creating the
                                          // productPackageFlavour entities
 
-            foreach (var productSpec in productSpecs)
-            {
-                var package = await db.Packages
-                    .FirstAsync(x => x.Grams == productSpec.Grams); // must be initially seeded
-
-                var flavour = await db.Flavours
-                    .FirstAsync(x => x.FlavourName == productSpec.Flavour); // must be initially seeded
-
-                product.Quantity += productSpec.Quantity;
-
-                var productPackageFlavour = new ProductPackageFlavour
-                {
-                    ProductId = product.ProductId,
-                    PackageId = package.Id,
-                    FlavourId = flavour.Id,
-                    Quantity = productSpec.Quantity
-                };
-
-                db.ProductsPackagesFlavours.Add(productPackageFlavour);
-            }
+            await CreateProductSpecs(product, productSpecs);
 
             await db.SaveChangesAsync();
 
@@ -205,8 +186,8 @@
             string description,
             string brandName,
             decimal price,
-            int? quantity,
             List<int> categoriesIds,
+            List<ProductSpecsServiceModel> productSpecs,
             string imageData,
             string contentType)
         {
@@ -224,7 +205,8 @@
             product.Price = price;
             product.ProductImage = productImage;
             product.ProductsCategories = new List<ProductCategory>();
-            product.Quantity = quantity;
+            product.ProductPackageFlavours = new List<ProductPackageFlavour>();
+            product.Quantity = 0;
 
             var brand = await db.Brands
                     .FirstOrDefaultAsync(x => x.Name == brandName);
@@ -234,12 +216,12 @@
 
             product.Brand = brand;
 
-            //update the brand;
+            //delete and then recreate product categories
 
-            var existingMappings = db.ProductsCategories
+            var existingCategories = db.ProductsCategories
                 .Where(pc => pc.ProductId == productId);
 
-            db.ProductsCategories.RemoveRange(existingMappings);
+            db.ProductsCategories.RemoveRange(existingCategories);
 
             foreach (var id in categoriesIds)
             {
@@ -247,7 +229,20 @@
                     .Add(new ProductCategory { CategoryId = id });
             }
 
-            //handle productCategories, since they are not really being deleted.
+            //
+
+            //delete and then recreate product package flavour table rows
+
+            var existingProductSpecs = db.ProductsPackagesFlavours
+                .Where(pc => pc.ProductId == productId);
+
+            db.ProductsPackagesFlavours.RemoveRange(existingProductSpecs);
+
+            //
+
+            await db.SaveChangesAsync();
+
+            await CreateProductSpecs(product, productSpecs);
 
             await db.SaveChangesAsync();
 
@@ -290,6 +285,14 @@
                     {
                         if (nf.ProductId == productId)
                             nf.IsDeleted = true;
+                    });
+
+                await db.ProductsPackagesFlavours
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync(ppf =>
+                    {
+                        if (ppf.ProductId == productId)
+                            ppf.IsDeleted = true;
                     });
 
                 db.ProductsImages.Remove(productImage);
@@ -336,9 +339,40 @@
             var brand = await db.Brands
                 .FirstOrDefaultAsync(x => x.Name == productListingModel.Brand);
 
-            productWithPromotion.Brand = brand.Name;
+            if (brand != null) //be aware, i added this 'if' without checking
+                productWithPromotion.Brand = brand.Name;
 
             return productWithPromotion;
+        }
+
+        private async Task CreateProductSpecs(Product product, List<ProductSpecsServiceModel> productSpecs)
+        {
+            foreach (var productSpec in productSpecs)
+            {
+                var package = await db.Packages
+                    .FirstOrDefaultAsync(x => x.Grams == productSpec.Grams); // must be initially seeded
+
+                if (package == null)
+                    throw new ArgumentNullException("Invalid package!");
+
+                var flavour = await db.Flavours
+                    .FirstOrDefaultAsync(x => x.FlavourName == productSpec.Flavour); // must be initially seeded
+
+                if (flavour == null)
+                    throw new ArgumentNullException("Invalid flavour!");
+
+                product.Quantity += productSpec.Quantity;
+
+                var productPackageFlavour = new ProductPackageFlavour
+                {
+                    ProductId = product.ProductId,
+                    PackageId = package.Id,
+                    FlavourId = flavour.Id,
+                    Quantity = productSpec.Quantity
+                };
+
+                db.ProductsPackagesFlavours.Add(productPackageFlavour);
+            }
         }
 
         private async Task<(Product product, Promotion promotion)> ValidateProductAndPromotionExistence(int productId, int promotionId)

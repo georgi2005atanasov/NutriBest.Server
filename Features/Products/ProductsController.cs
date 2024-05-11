@@ -214,13 +214,6 @@
                 if (product == null)
                     return NotFound();
 
-                if (productModel.Quantity < 0)
-                    return BadRequest(new
-                    {
-                        Key = "Quantity",
-                        Message = "Quantity must be a positive number!"
-                    });
-
                 if (ProductExists(productModel.Name) && product?.Name != productModel.Name)
                     return BadRequest(new
                     {
@@ -271,8 +264,8 @@
                         productModel.Description,
                         productModel.Brand,
                         price,
-                        productModel.Quantity,
                         categoriesIds,
+                        productModel.ProductSpecs,
                         productImage.ImageData,
                         productImage.ContentType
                     );
@@ -291,8 +284,8 @@
                         productModel.Description,
                         productModel.Brand,
                         price,
-                        productModel.Quantity,
                         categoriesIds,
+                        productModel.ProductSpecs,
                         image.ImageData,
                         image.ContentType
                     );
@@ -302,11 +295,14 @@
                     return productId;
                 }
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException err)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 return BadRequest();
             }
