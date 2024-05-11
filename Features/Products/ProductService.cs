@@ -118,8 +118,8 @@
             string description,
             string brandName,
             decimal price,
-            int? quantity,
             List<int> categoriesIds,
+            List<ProductSpecsServiceModel> productSpecs,
             string imageData,
             string contentType)
         {
@@ -143,7 +143,7 @@
                 ProductImage = productImage,
                 Brand = brand,
                 CreatedOn = DateTime.Now,
-                Quantity = quantity
+                Quantity = 0
             };
 
             foreach (var id in categoriesIds)
@@ -157,6 +157,31 @@
             }
 
             db.Products.Add(product);
+
+            await db.SaveChangesAsync(); // must be aware it is finished before creating the
+                                         // productPackageFlavour entities
+
+            foreach (var productSpec in productSpecs)
+            {
+                var package = await db.Packages
+                    .FirstAsync(x => x.Grams == productSpec.Grams); // must be initially seeded
+
+                var flavour = await db.Flavours
+                    .FirstAsync(x => x.FlavourName == productSpec.Flavour); // must be initially seeded
+
+                product.Quantity += productSpec.Quantity;
+
+                var productPackageFlavour = new ProductPackageFlavour
+                {
+                    ProductId = product.ProductId,
+                    PackageId = package.Id,
+                    FlavourId = flavour.Id,
+                    Quantity = productSpec.Quantity
+                };
+
+                db.ProductsPackagesFlavours.Add(productPackageFlavour);
+            }
+
             await db.SaveChangesAsync();
 
             return product.ProductId;

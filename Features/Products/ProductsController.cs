@@ -123,32 +123,21 @@
                     });
                 }
 
-                if (productModel.Image != null)
-                {
-                    var productImage = await imageService
-                        .CreateImage<ProductImage>(productModel.Image, productModel.Image.ContentType);
+                var productImage = await imageService
+                    .CreateImage<ProductImage>(productModel.Image, productModel.Image.ContentType);
 
-                    var productId = await productService
-                        .Create(productModel.Name,
-                        productModel.Description,
-                        productModel.Brand,
-                        price,
-                        productModel.Quantity,
-                        categoriesIds,
-                        productImage.ImageData,
-                        productImage.ContentType
-                        );
+                var productId = await productService
+                    .Create(productModel.Name,
+                    productModel.Description,
+                    productModel.Brand,
+                    price,
+                    categoriesIds,
+                    productModel.ProductSpecs,
+                    productImage.ImageData,
+                    productImage.ContentType
+                    );
 
-                    return Created(nameof(Create), productId);
-                }
-                else
-                {
-                    return BadRequest(new
-                    {
-                        Key = "Image",
-                        Message = "Image is required!"
-                    });
-                }
+                return Created(nameof(Create), productId);
             }
             catch (ArgumentNullException err)
             {

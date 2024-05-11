@@ -8,8 +8,8 @@
             string description,
             string brand,
             decimal price,
-            int? quantity,
             List<int> categoriesIds,
+            List<ProductSpecsServiceModel> productSpecs,
             string imageData,
             string contentType);
 

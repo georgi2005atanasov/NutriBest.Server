@@ -13,9 +13,6 @@
         [Required]
         public string? Price { get; set; } = null;
 
-        [Range(MinQuantity, MaxQuantity)]
-        public int? Quantity { get; set; }
-
         [Required]
         [StringLength(MaxDescriptionLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
@@ -26,6 +23,9 @@
 
         [Required]
         public List<string> Categories { get; set; } = null!;
+
+        [Required]
+        public List<ProductSpecsServiceModel> ProductSpecs { get; set; } = new List<ProductSpecsServiceModel>();
 
         public IFormFile Image { get; set; } = null!;
     }
