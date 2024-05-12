@@ -25,7 +25,7 @@
         public List<string> Categories { get; set; } = null!;
 
         [Required]
-        public List<ProductSpecsServiceModel> ProductSpecs { get; set; } = new List<ProductSpecsServiceModel>();
+        public string ProductSpecs { get; set; } = null!;
 
         public IFormFile Image { get; set; } = null!;
     }

@@ -10,6 +10,7 @@
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
     using System.Globalization;
+    using System.Text.Json;
 
     public class ProductsController : ApiController
     {
@@ -63,12 +64,46 @@
             }
         }
 
+        [HttpGet]
+        [Route("specs/{id}/{name}")]
+        public async Task<ActionResult<List<ProductSpecsServiceModel>>> GetSpecs([FromRoute] int id,
+            [FromRoute] string name)
+        {
+            try
+            {
+                var specs = await productService.GetSpecs(id, name);
+
+                return Ok(specs);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult> Create([FromForm] CreateProductRequestModel productModel)
         {
             try
             {
+                var productSpecs = JsonSerializer.Deserialize<List<ProductSpecsServiceModel>>(productModel.ProductSpecs)
+                    ?? new List<ProductSpecsServiceModel>();
+
+                if (productSpecs.Count == 0)
+                    return BadRequest(new
+                    {
+                        Key = "ProductSpecs",
+                        Message = "You must add some product specifications!"
+                    });
+
                 var passedCategories = productModel.Categories[0]
                 .Split(",")
                 .ToList();
@@ -132,7 +167,7 @@
                     productModel.Brand,
                     price,
                     categoriesIds,
-                    productModel.ProductSpecs,
+                    productSpecs,
                     productImage.ImageData,
                     productImage.ContentType
                     );
@@ -195,10 +230,21 @@
 
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<int>> Update([FromForm] UpdateProductServiceModel productModel)
+        [Route("{id}")]
+        public async Task<ActionResult<int>> Update([FromRoute] int id, [FromForm] UpdateProductServiceModel productModel)
         {
             try
             {
+                var productSpecs = JsonSerializer.Deserialize<List<ProductSpecsServiceModel>>(productModel.ProductSpecs)
+                    ?? new List<ProductSpecsServiceModel>();
+
+                if (productSpecs.Count == 0)
+                    return BadRequest(new
+                    {
+                        Key = "ProductSpecs",
+                        Message = "You must add some product specifications!"
+                    });
+
                 decimal price;
 
                 if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
@@ -209,7 +255,7 @@
                     });
 
                 var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == productModel.ProductId);
+                .FirstOrDefaultAsync(x => x.ProductId == id);
 
                 if (product == null)
                     return NotFound();
@@ -259,38 +305,38 @@
                         .CreateImage<ProductImage>(productModel.Image, productModel.Image.ContentType);
 
                     int productId = await productService
-                        .Update(productModel.ProductId,
+                        .Update(id,
                         productModel.Name,
                         productModel.Description,
                         productModel.Brand,
                         price,
                         categoriesIds,
-                        productModel.ProductSpecs,
+                        productSpecs,
                         productImage.ImageData,
                         productImage.ContentType
                     );
 
-                    memoryCache.Remove($"image_{productModel.ProductId}");
+                    memoryCache.Remove($"image_{id}");
 
                     return productId;
                 }
                 else
                 {
-                    var image = await imageService.GetImageByProductId(productModel.ProductId);
+                    var image = await imageService.GetImageByProductId(id);
 
                     int productId = await productService
-                        .Update(productModel.ProductId,
+                        .Update(id,
                         productModel.Name,
                         productModel.Description,
                         productModel.Brand,
                         price,
                         categoriesIds,
-                        productModel.ProductSpecs,
+                        productSpecs,
                         image.ImageData,
                         image.ContentType
                     );
 
-                    memoryCache.Remove($"image_{productModel.ProductId}");
+                    memoryCache.Remove($"image_{id}");
 
                     return productId;
                 }
@@ -302,7 +348,7 @@
                     err.Message
                 });
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

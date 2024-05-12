@@ -181,6 +181,44 @@
             return product;
         }
 
+        public async Task<List<ProductSpecsServiceModel>> GetSpecs(int id, string name)
+        {
+            var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == id && x.Name == name);
+
+            if (product == null)
+                throw new ArgumentNullException("Invalid product!");
+
+            var productPackageFlavours = db.ProductsPackagesFlavours
+                .Where(x => x.ProductId == id)
+                .AsQueryable();
+
+            if (!productPackageFlavours.Any())
+                throw new InvalidOperationException("Product could not be found!");
+
+            var specs = new List<ProductSpecsServiceModel>();
+
+            foreach (var productPackageFlavour in productPackageFlavours)
+            {
+                var package = await db.Packages
+                    .FirstAsync(x => x.Id == productPackageFlavour.PackageId);
+
+                var flavour = await db.Flavours
+                    .FirstAsync(x => x.Id == productPackageFlavour.FlavourId);
+
+                var spec = new ProductSpecsServiceModel
+                {
+                    Flavour = flavour.FlavourName,
+                    Grams = package.Grams,
+                    Quantity = productPackageFlavour.Quantity
+                };
+
+                specs.Add(spec);
+            }
+
+            return specs;
+        }
+
         public async Task<int> Update(int productId,
             string name,
             string description,
