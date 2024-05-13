@@ -28,6 +28,7 @@ namespace NutriBest.Server.Features.Flavours
                     {
                         Name = x.FlavourName
                     })
+                    .OrderBy(x => x.Name)
                     .ToListAsync();
 
                 return Ok(flavours);
@@ -75,7 +76,7 @@ namespace NutriBest.Server.Features.Flavours
 
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 return BadRequest();
             }

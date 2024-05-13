@@ -297,6 +297,14 @@
                 var productImage = await db.ProductsImages
                     .FirstAsync(x => x.ProductImageId == product.ProductImageId);
 
+                await db.ProductsPackagesFlavours
+                    .Where(x => x.ProductId == productId)
+                    .ForEachAsync(ppf =>
+                    {
+                        if (ppf.ProductId == productId)
+                            ppf.IsDeleted = true;
+                    });
+
                 db.Products.Remove(product);
 
                 await db.ProductsCategories
@@ -323,14 +331,6 @@
                     {
                         if (nf.ProductId == productId)
                             nf.IsDeleted = true;
-                    });
-
-                await db.ProductsPackagesFlavours
-                    .Where(x => x.ProductId == productId)
-                    .ForEachAsync(ppf =>
-                    {
-                        if (ppf.ProductId == productId)
-                            ppf.IsDeleted = true;
                     });
 
                 db.ProductsImages.Remove(productImage);

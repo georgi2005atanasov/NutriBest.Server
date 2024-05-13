@@ -183,5 +183,17 @@ namespace NutriBest.Server.Data.Extensions
             builder.Entity<Promotion>()
                 .HasQueryFilter(x => !x.IsDeleted);
         }
+
+        public static void ConfigureProductPackageFlavours(this ModelBuilder builder)
+        {
+            builder.Entity<ProductPackageFlavour>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<Flavour>()
+                .HasQueryFilter(x => !x.IsDeleted);
+
+            builder.Entity<Package>()
+                .HasQueryFilter(x => !x.IsDeleted);
+        }
     }
 }

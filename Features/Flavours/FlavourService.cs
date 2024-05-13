@@ -3,13 +3,23 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products;
+    using NutriBest.Server.Infrastructure.Services;
 
     public class FlavourService : IFlavourService
     {
         private readonly NutriBestDbContext db;
+        private readonly IProductService productService;
+        private readonly ICurrentUserService currentUserService;
 
-        public FlavourService(NutriBestDbContext db)
-            => this.db = db;
+        public FlavourService(NutriBestDbContext db,
+            IProductService productService,
+            ICurrentUserService currentUserService)
+        {
+            this.db = db;
+            this.productService = productService;
+            this.currentUserService = currentUserService;
+        }
 
         public async Task<int> Create(string name)
         {
@@ -36,7 +46,14 @@
             if (flavour == null)
                 throw new ArgumentNullException("Invalid flavour!");
 
-            await db.ProductsPackagesFlavours.ForEachAsync(x =>
+            var productsPackagesFlavours = await db.ProductsPackagesFlavours
+                .Where(x => x.FlavourId == flavour.Id)
+                .ToListAsync();
+
+            var productsIds = productsPackagesFlavours
+                .Select(x => x.ProductId);
+
+            productsPackagesFlavours.ForEach(x =>
             {
                 if (x.FlavourId == flavour.Id)
                 {
@@ -44,7 +61,21 @@
                 }
             });
 
-            db.Flavours.Remove(flavour);
+            await db.SaveChangesAsync();
+
+            foreach (var id in productsIds)
+            {
+                var product = await db.Products
+                    .FirstAsync(x => x.ProductId == id);
+
+                product.IsDeleted = true;
+                product.DeletedOn = DateTime.Now;
+                product.DeletedBy = currentUserService.GetUserName();
+            }
+
+            await db.SaveChangesAsync();
+
+            flavour.IsDeleted = true;
 
             await db.SaveChangesAsync();
 

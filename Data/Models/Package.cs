@@ -14,6 +14,8 @@
         [Range(MinSize, MaxSize)]
         public int Grams { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public List<ProductPackageFlavour> ProductPackageFlavours { get; set; } = new List<ProductPackageFlavour>();
     }
 }

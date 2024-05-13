@@ -2,8 +2,6 @@
 {
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-    using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Extensions;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Data.Models.Base;
@@ -28,7 +26,7 @@
 
         public DbSet<Brand> Brands { get; set; } = null!;
 
-        public DbSet<BrandLogo> BrandsLogos { get; set; } = null;
+        public DbSet<BrandLogo> BrandsLogos { get; set; } = null!;
 
         public DbSet<ProductCategory> ProductsCategories { get; set; } = null!;
 

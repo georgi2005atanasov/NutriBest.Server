@@ -10,6 +10,8 @@
         [Required]
         public string FlavourName { get; set; } = null!;
 
+        public bool IsDeleted { get; set; }
+
         public List<ProductPackageFlavour> ProductPackageFlavours { get; set; } = new List<ProductPackageFlavour>();
     }
 }
