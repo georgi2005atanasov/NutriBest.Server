@@ -3,13 +3,19 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Infrastructure.Services;
 
     public class PackageService : IPackageService
     {
         private readonly NutriBestDbContext db;
+        private readonly ICurrentUserService currentUserService;
 
-        public PackageService(NutriBestDbContext db)
-            => this.db = db;
+        public PackageService(NutriBestDbContext db,
+            ICurrentUserService currentUserService)
+        {
+            this.db = db;
+            this.currentUserService = currentUserService;
+        }
 
         public async Task<int> Create(int grams)
         {
@@ -34,9 +40,13 @@
                 .FirstOrDefaultAsync(x => x.Grams == grams);
 
             if (package == null)
-                throw new ArgumentNullException("Invalid package!");
+                throw new ArgumentNullException("Invalid flavour!");
 
-            await db.ProductsPackagesFlavours.ForEachAsync(x =>
+            var productsPackagesFlavours = await db.ProductsPackagesFlavours
+                .Where(x => x.PackageId == package.Id)
+                .ToListAsync();
+
+            productsPackagesFlavours.ForEach(x =>
             {
                 if (x.PackageId == package.Id)
                 {
@@ -44,7 +54,7 @@
                 }
             });
 
-            db.Packages.Remove(package);
+            package.IsDeleted = true;
 
             await db.SaveChangesAsync();
 

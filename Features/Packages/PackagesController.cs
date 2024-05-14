@@ -47,6 +47,14 @@
         {
             try
             {
+                if (package.Grams == 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Invalid Grams!"
+                    });
+                }
+
                 var packageId = await packageService.Create(package.Grams);
 
                 return Ok(packageId);

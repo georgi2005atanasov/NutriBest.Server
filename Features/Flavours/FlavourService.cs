@@ -50,9 +50,6 @@
                 .Where(x => x.FlavourId == flavour.Id)
                 .ToListAsync();
 
-            var productsIds = productsPackagesFlavours
-                .Select(x => x.ProductId);
-
             productsPackagesFlavours.ForEach(x =>
             {
                 if (x.FlavourId == flavour.Id)
@@ -60,20 +57,6 @@
                     x.IsDeleted = true;
                 }
             });
-
-            await db.SaveChangesAsync();
-
-            foreach (var id in productsIds)
-            {
-                var product = await db.Products
-                    .FirstAsync(x => x.ProductId == id);
-
-                product.IsDeleted = true;
-                product.DeletedOn = DateTime.Now;
-                product.DeletedBy = currentUserService.GetUserName();
-            }
-
-            await db.SaveChangesAsync();
 
             flavour.IsDeleted = true;
 
