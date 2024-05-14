@@ -8,20 +8,24 @@
     using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Infrastructure.Services;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
     {
         private readonly NutriBestDbContext db;
         private readonly IPromotionService promotionService;
+        private readonly ICurrentUserService currentUserService;
         private readonly IMapper mapper;
 
         public ProductService(NutriBestDbContext db,
             IPromotionService promotionService,
+            ICurrentUserService currentUserService,
             IMapper mapper)
         {
             this.db = db;
             this.promotionService = promotionService;
+            this.currentUserService = currentUserService;
             this.mapper = mapper;
         }
 
@@ -297,6 +301,10 @@
                 var productImage = await db.ProductsImages
                     .FirstAsync(x => x.ProductImageId == product.ProductImageId);
 
+                product.IsDeleted = true;
+                product.DeletedBy = currentUserService.GetUserName();
+                product.DeletedOn = DateTime.Now;
+
                 await db.ProductsPackagesFlavours
                     .Where(x => x.ProductId == productId)
                     .ForEachAsync(ppf =>
@@ -304,8 +312,6 @@
                         if (ppf.ProductId == productId)
                             ppf.IsDeleted = true;
                     });
-
-                db.Products.Remove(product);
 
                 await db.ProductsCategories
                     .Where(x => x.ProductId == productId)
@@ -333,7 +339,9 @@
                             nf.IsDeleted = true;
                     });
 
-                db.ProductsImages.Remove(productImage);
+                productImage.IsDeleted = true;
+                productImage.DeletedBy = currentUserService.GetUserName();
+                productImage.DeletedOn = DateTime.Now;
 
                 await db.SaveChangesAsync();
 

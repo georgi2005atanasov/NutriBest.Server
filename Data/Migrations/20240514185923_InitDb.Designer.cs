@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240507183558_RemovedRedundantBrandIdIntBrandLogoEntity")]
-    partial class RemovedRedundantBrandIdIntBrandLogoEntity
+    [Migration("20240514185923_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -211,9 +211,30 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<int?>("BrandLogoId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -300,11 +321,32 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Flavour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FlavourName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Flavours");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
@@ -412,6 +454,25 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("AddressId");
 
                     b.ToTable("OrdersDetails");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Package", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Grams")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Packages");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -560,6 +621,32 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasKey("ProductImageId");
 
                     b.ToTable("ProductsImages");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPackageFlavour", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FlavourId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PackageId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "FlavourId", "PackageId");
+
+                    b.HasIndex("FlavourId");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("ProductsPackagesFlavours");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
@@ -948,6 +1035,33 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPackageFlavour", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Flavour", "Flavour")
+                        .WithMany("ProductPackageFlavours")
+                        .HasForeignKey("FlavourId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Package", "Package")
+                        .WithMany("ProductPackageFlavours")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
+                        .WithMany("ProductPackageFlavours")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Flavour");
+
+                    b.Navigation("Package");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Cart", "Cart")
@@ -986,9 +1100,19 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("ProductsCategories");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Flavour", b =>
+                {
+                    b.Navigation("ProductPackageFlavours");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
                 {
                     b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Package", b =>
+                {
+                    b.Navigation("ProductPackageFlavours");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -998,6 +1122,8 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Navigation("ProductDetails")
                         .IsRequired();
+
+                    b.Navigation("ProductPackageFlavours");
 
                     b.Navigation("ProductsCategories");
                 });
