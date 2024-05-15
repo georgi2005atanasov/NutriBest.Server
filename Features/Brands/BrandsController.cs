@@ -111,5 +111,21 @@
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("/products/by-brand-count")]
+        public async Task<ActionResult<List<BrandCountServiceModel>>> GetProductsByBrandCount()
+        {
+            try
+            {
+                var products = await brandService.GetProductsByBrandCount();
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

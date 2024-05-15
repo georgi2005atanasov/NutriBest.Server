@@ -81,5 +81,21 @@ namespace NutriBest.Server.Features.Flavours
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("/products/by-flavour-count")]
+        public async Task<ActionResult<List<FlavourCountServiceModel>>> GetProductsByFlavourCount()
+        {
+            try
+            {
+                var products = await flavourService.GetProductsByFlavourCount();
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

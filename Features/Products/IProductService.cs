@@ -21,7 +21,8 @@
             string? productsView,
             string? search,
             string? priceRange,
-            string? quantities);
+            string? quantities,
+            string? flavours);
 
         Task<ProductServiceModel> Get(int id);
 

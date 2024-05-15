@@ -11,6 +11,7 @@
         Task<bool> Remove(string brandName);
 
         Task<int> Create(string name, string? description, IFormFile? image);
-        //Task<BrandServiceModel> Update(string brandName); gotta think more on update
+
+        Task<List<BrandCountServiceModel>> GetProductsByBrandCount();
     }
 }

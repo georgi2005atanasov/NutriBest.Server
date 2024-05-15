@@ -197,7 +197,8 @@
             [FromQuery] string? productsView = "all",
             [FromQuery] string? search = "",
             [FromQuery] string? priceRange = "",
-            [FromQuery] string? quantities = "") //might add from the query filters
+            [FromQuery] string? quantities = "",
+            [FromQuery] string? flavours = "") //might add from the query filters
         {
             try
             {
@@ -220,7 +221,8 @@
                         productsView,
                         search,
                         priceRange,
-                        quantities);
+                        quantities,
+                        flavours);
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
                         .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry

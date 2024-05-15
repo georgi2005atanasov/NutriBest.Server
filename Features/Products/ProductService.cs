@@ -37,7 +37,8 @@
             string? productsView,
             string? search,
             string? priceRange,
-            string? quantities)
+            string? quantities,
+            string? flavours)
         {
             var query = db.Products.AsQueryable();
 
@@ -48,6 +49,7 @@
             query = this.GetByPriceRangeWithPromotions(query, priceRange ?? "");
             query = this.GetByBrand(query, brand ?? "");
             query = this.GetByQuantity(query, quantities ?? "");
+            query = this.GetByFlavours(query, flavours ?? "");
 
             var productsCount = query.Count();
 

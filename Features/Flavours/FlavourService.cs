@@ -3,8 +3,10 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Flavours.Models;
     using NutriBest.Server.Features.Products;
     using NutriBest.Server.Infrastructure.Services;
+    using System.Collections.Generic;
 
     public class FlavourService : IFlavourService
     {
@@ -63,6 +65,25 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<FlavourCountServiceModel>> GetProductsByFlavourCount()
+        {
+            var products = await db.ProductsPackagesFlavours
+                .GroupBy(ppf => ppf.FlavourId)
+                .Select(g => new FlavourCountServiceModel
+                {
+                    Name = db.Flavours
+                              .Where(p => p.Id == g.Key)
+                              .Select(p => p.FlavourName)
+                              .FirstOrDefault() ?? "",
+                    Count = g.Select(ppf => ppf.ProductId)
+                                .Distinct()
+                                .Count()
+                })
+                .ToListAsync();
+
+            return products;
         }
     }
 }

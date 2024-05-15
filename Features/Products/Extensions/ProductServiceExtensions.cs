@@ -124,6 +124,23 @@
             return query;
         }
 
+        public static IQueryable<Product> GetByFlavours(this IProductService service, IQueryable<Product> query, string flavours)
+        {
+            if (!string.IsNullOrEmpty(flavours))
+            {
+                var flavoursToCheck = flavours
+                    .Split(" and ")
+                    .ToList();
+
+                query = query
+                    .Where(x => x.ProductPackageFlavours
+                                .Select(x => x.Flavour)
+                                .Any(x => flavoursToCheck.Contains(x!.FlavourName))); // be aware
+            }
+
+            return query;
+        }
+
         public static IQueryable<Product> GetByBrand(this IProductService service, IQueryable<Product> queryProducts, string brand)
             => brand != "" ? queryProducts.Where(x => x.Brand!.Name == brand) : queryProducts; // be aware
 

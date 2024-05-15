@@ -6,6 +6,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images;
+    using System.Collections.Generic;
 
     public class BrandService : IBrandService
     {
@@ -116,6 +117,21 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<BrandCountServiceModel>> GetProductsByBrandCount()
+        {
+            var result = await db.Brands
+                .Select(x => new BrandCountServiceModel
+                {
+                    Name = x.Name,
+                    Count = db.Products
+                    .Where(y => y.BrandId == x.Id)
+                    .Count()
+                })
+                .ToListAsync();
+
+            return result;
         }
     }
 }
