@@ -286,7 +286,7 @@
                     });
 
                 var categoriesIds = await categoryService
-                    .GetCategoriesIds(productModel.Categories);
+                    .GetCategoriesIds(productModel.Categories[0].Split(",").ToList());
 
                 if (categoriesIds.Count == 0)
                     BadRequest(new
