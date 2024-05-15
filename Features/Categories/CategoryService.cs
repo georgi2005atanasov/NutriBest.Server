@@ -57,20 +57,6 @@
             return categoriesIds;
         }
 
-        public async Task<IEnumerable<CategoryCountServiceModel>> GetProductsCountByCategory()
-        {
-            var categoriesCount = await db.Categories
-                .Select(x => new CategoryCountServiceModel
-                {
-                    Category = x.Name,
-                    Count = x.ProductsCategories
-                    .Where(y => y.CategoryId == x.Id).Count(),
-                })
-                .ToListAsync();
-
-            return categoriesCount;
-        }
-
         public async Task<bool> Remove(string name)
         {
             var category = await db.Categories
@@ -100,6 +86,20 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<IEnumerable<CategoryCountServiceModel>> GetProductsCountByCategory()
+        {
+            var categoriesCount = await db.Categories
+                .Select(x => new CategoryCountServiceModel
+                {
+                    Category = x.Name,
+                    Count = x.ProductsCategories
+                    .Where(y => y.CategoryId == x.Id).Count(),
+                })
+                .ToListAsync();
+
+            return categoriesCount;
         }
     }
 }

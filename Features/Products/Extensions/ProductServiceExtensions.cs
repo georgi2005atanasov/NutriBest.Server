@@ -79,16 +79,6 @@
             return queryProducts;
         }
 
-        private static async Task<decimal> GetActivePrice(IProductService productService, decimal price, int productId, int? promotionId)
-        {
-            if (promotionId == null)
-                return price;
-
-            var product = await productService.GetWithPromotion((int)productId, (int)promotionId);
-
-            return product.NewPrice;
-        }
-
         public static IQueryable<ProductListingServiceModel> OrderByName(this IProductService service, IQueryable<ProductListingServiceModel> queryProducts, string alphaFilter = "")
         {
             if (!string.IsNullOrEmpty(alphaFilter))
@@ -116,8 +106,26 @@
             return queryProducts;
         }
 
+        public static IQueryable<Product> GetByQuantity(this IProductService service, IQueryable<Product> query, string quantities)
+        {
+            if (!string.IsNullOrEmpty(quantities))
+            {
+                var quantitiesToCheck = quantities
+                    .Split()
+                    .Select(int.Parse)
+                    .ToList();
+
+                query = query
+                    .Where(x => x.ProductPackageFlavours
+                                .Select(x => x.Package)
+                                .Any(x => quantitiesToCheck.Contains(x!.Grams))); // be aware
+            }
+
+            return query;
+        }
+
         public static IQueryable<Product> GetByBrand(this IProductService service, IQueryable<Product> queryProducts, string brand)
-            => brand != "" ? queryProducts.Where(x => x.Brand.Name == brand) : queryProducts;
+            => brand != "" ? queryProducts.Where(x => x.Brand!.Name == brand) : queryProducts; // be aware
 
         public static IQueryable<Product> GetByPriceRangeWithPromotions(this IProductService service, IQueryable<Product> query, string priceRange = "")
         {

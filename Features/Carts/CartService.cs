@@ -124,7 +124,7 @@
         {
             var (userId, profile, cart, cartProducts) = await GetDataForChangingCart();
 
-            if (cartProducts.Count() == 0 && cart.TotalPrice == 0)
+            if (cartProducts.Any() && cart.TotalPrice == 0)
             {
                 return false;
             }

@@ -88,5 +88,21 @@
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("/products/by-quantity-count")]
+        public async Task<ActionResult<PackageCountServiceModel>> GetProductsCountByQuantity()
+        {
+            try
+            {
+                var products = await packageService.GetProductsCountByQuantity();
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

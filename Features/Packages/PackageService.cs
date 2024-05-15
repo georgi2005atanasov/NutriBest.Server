@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Packages.Models;
     using NutriBest.Server.Infrastructure.Services;
 
     public class PackageService : IPackageService
@@ -59,6 +60,25 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<PackageCountServiceModel>> GetProductsCountByQuantity()
+        {
+            var products = await db.ProductsPackagesFlavours
+                .GroupBy(ppf => ppf.PackageId)
+                .Select(g => new PackageCountServiceModel
+                {
+                    Grams = db.Packages
+                              .Where(p => p.Id == g.Key)
+                              .Select(p => p.Grams)
+                              .FirstOrDefault(),
+                    Quantity = g.Select(ppf => ppf.ProductId)
+                                .Distinct()
+                                .Count()
+                })
+                .ToListAsync();
+
+            return products;
         }
     }
 }

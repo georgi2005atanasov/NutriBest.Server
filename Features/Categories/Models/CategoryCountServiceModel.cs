@@ -1,6 +1,4 @@
-﻿using NutriBest.Server.Data.Models;
-
-namespace NutriBest.Server.Features.Categories.Models
+﻿namespace NutriBest.Server.Features.Categories.Models
 {
     public class CategoryCountServiceModel
     {

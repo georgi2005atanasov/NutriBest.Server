@@ -36,7 +36,8 @@
             string? alphaFilter,
             string? productsView,
             string? search,
-            string? priceRange)
+            string? priceRange,
+            string? quantities)
         {
             var query = db.Products.AsQueryable();
 
@@ -46,6 +47,7 @@
             query = this.GetBySearch(query, search ?? "");
             query = this.GetByPriceRangeWithPromotions(query, priceRange ?? "");
             query = this.GetByBrand(query, brand ?? "");
+            query = this.GetByQuantity(query, quantities ?? "");
 
             var productsCount = query.Count();
 
@@ -63,7 +65,7 @@
                              .ToList(),
                              Quantity = x.Quantity,
                              PromotionId = x.PromotionId,
-                             Brand = x.Brand.Name
+                             Brand = x.Brand!.Name // be aware
                          })
                          .AsQueryable();
 

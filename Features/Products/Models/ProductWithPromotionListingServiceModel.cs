@@ -14,7 +14,5 @@
         public decimal? DiscountPercentage { get; set; }
 
         public int? PromotionId { get; set; }
-
-        public string? Brand { get; set; }
     }
 }

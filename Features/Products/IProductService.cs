@@ -20,7 +20,8 @@
             string? alphaFilter,
             string? productsView,
             string? search,
-            string? priceRange);
+            string? priceRange,
+            string? quantities);
 
         Task<ProductServiceModel> Get(int id);
 

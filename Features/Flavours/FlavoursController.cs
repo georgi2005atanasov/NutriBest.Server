@@ -76,7 +76,7 @@ namespace NutriBest.Server.Features.Flavours
 
                 return Ok(result);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

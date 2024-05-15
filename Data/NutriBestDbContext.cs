@@ -84,17 +84,6 @@
             {
                 method.Invoke(null, new object[] { builder });
             }
-
-            //builder.ConfigureProfile();
-            //builder.ConfigureOrder();
-            //builder.ConfigureProduct();
-            //builder.ConfigureUser();
-            //builder.ConfigureProductPackageFlavour();
-            //builder.ConfigureProductImage();
-            //builder.ConfigureProductCategory();
-            //builder.ConfigureBrand();
-            //builder.ConfigureCartProduct();
-            //builder.ConfigurePromotion();
         }
 
         private void ApplyAuditInformation()
