@@ -7,8 +7,7 @@
         Task AddDetails(
             int productId,
             string? howToUse,
-            string? servingSize,
-            string? servingsPerContainer);
+            string? servingSize);
 
         Task RemoveDetails(int productId);
 

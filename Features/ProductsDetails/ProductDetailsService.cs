@@ -31,7 +31,7 @@
             return product;
         }
 
-        public async Task AddDetails(int productId, string? howToUse, string? servingSize, string? servingsPerContainer)
+        public async Task AddDetails(int productId, string? howToUse, string? servingSize)
         {
             var details = await db.ProductsDetails
                 .FirstAsync(x => x.ProductId == productId);
@@ -41,9 +41,6 @@
 
             if (!string.IsNullOrEmpty(servingSize))
                 details.ServingSize = servingSize;
-
-            if (!string.IsNullOrEmpty(servingsPerContainer))
-                details.ServingsPerContainer = servingsPerContainer;
 
             await db.SaveChangesAsync();
         }
@@ -58,7 +55,6 @@
 
             details.HowToUse = "";
             details.ServingSize = "";
-            details.ServingsPerContainer = "";
 
             await db.SaveChangesAsync();
         }

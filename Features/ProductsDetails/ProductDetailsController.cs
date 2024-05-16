@@ -63,8 +63,7 @@
 
                 await productDetailsService.AddDetails(id,
                     details.HowToUse,
-                    details.ServingSize,
-                    details.ServingsPerContainer);
+                    details.ServingSize);
 
                 return Ok(true);
             }

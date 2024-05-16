@@ -36,7 +36,5 @@
         public string? HowToUse { get; set; }
 
         public string? ServingSize { get; set; }
-
-        public string? ServingsPerContainer { get; set; }
     }
 }

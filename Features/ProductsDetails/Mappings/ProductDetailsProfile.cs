@@ -21,7 +21,6 @@
                           .Select(c => c.Category.Name)
                           .ToList()))
                 .ForMember(dest => dest.HowToUse, src => src.MapFrom(x => x.ProductDetails.HowToUse))
-                .ForMember(dest => dest.ServingsPerContainer, src => src.MapFrom(x => x.ProductDetails.ServingsPerContainer))
                 .ForMember(dest => dest.ServingSize, src => src.MapFrom(x => x.ProductDetails.ServingSize));
         }
     }
