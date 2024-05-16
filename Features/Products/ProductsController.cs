@@ -390,6 +390,28 @@
             }
         }
 
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchProduct(int id, [FromForm] PartialUpdateProductServiceModel productModel)
+        {
+            try
+            {
+                var result = await productService.PartialUpdate(id, productModel.Description);
+
+                return Ok(result);
+            }
+            catch(ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpGet]
         [Route("by-category-count")]
         public async Task<ActionResult<bool>> GetByCategoryCount()

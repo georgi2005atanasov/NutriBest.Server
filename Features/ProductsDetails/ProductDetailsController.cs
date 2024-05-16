@@ -55,7 +55,7 @@
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/details/{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
-            [FromBody] CreateProductDetailsServiceModel details)
+            [FromForm] CreateProductDetailsServiceModel details)
         {
             try
             {

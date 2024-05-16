@@ -441,5 +441,21 @@
 
             return (product, promotion);
         }
+
+        public async Task<int> PartialUpdate(int id, string? description)
+        {
+            var product = await db.Products
+                .FirstAsync(x => x.ProductId == id);
+
+            if (product == null)
+                throw new ArgumentNullException("Invalid product!");
+
+            if (description != null)
+                product.Description = description;
+
+            await db.SaveChangesAsync();
+
+            return id;
+        }
     }
 }

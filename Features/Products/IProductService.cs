@@ -40,6 +40,8 @@
             string imageData,
             string contentType);
 
+        Task<int> PartialUpdate(int id, string? description);
+
         Task<bool> Delete(int productId);
     }
 }
