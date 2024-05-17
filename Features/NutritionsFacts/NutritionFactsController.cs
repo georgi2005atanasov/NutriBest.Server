@@ -58,7 +58,7 @@
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/products/nutri-facts/{id}")]
-        public async Task<ActionResult> SetFacts([FromRoute] int id, 
+        public async Task<ActionResult> SetFacts([FromRoute] int id,
             [FromBody] NutritionFactsServiceModel details)
         {
             try
@@ -76,16 +76,12 @@
 
                 return Ok(true);
             }
-            catch (InvalidOperationException err)
+            catch (Exception err)
             {
                 return BadRequest(new
                 {
-                    Message = err.Message
+                    err.Message
                 });
-            }
-            catch (Exception)
-            {
-                return BadRequest(false);
             }
         }
 

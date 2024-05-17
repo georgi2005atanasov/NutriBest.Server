@@ -7,13 +7,13 @@
         Task<NutritionFactsServiceModel> Get(int productId);
 
         Task Add(int productId,
-            double? proteins,
-            double? sugar,
-            double? carbohydrates,
-            double? fats,
-            double? saturatedFats,
-            double? energyValue,
-            double? salt);
+            string? proteins,
+            string? sugar,
+            string? carbohydrates,
+            string? fats,
+            string? saturatedFats,
+            string? energyValue,
+            string? salt);
 
         Task<bool> Remove(int productId);
     }

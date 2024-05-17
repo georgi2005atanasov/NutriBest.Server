@@ -31,7 +31,11 @@
             return product;
         }
 
-        public async Task AddDetails(int productId, string? howToUse, string? servingSize)
+        public async Task AddDetails(int productId,
+            string? howToUse,
+            string? servingSize,
+            string? whyChoose,
+            string? ingredients)
         {
             var details = await db.ProductsDetails
                 .FirstAsync(x => x.ProductId == productId);
@@ -41,6 +45,12 @@
 
             if (!string.IsNullOrEmpty(servingSize))
                 details.ServingSize = servingSize;
+
+            if (!string.IsNullOrEmpty(whyChoose))
+                details.WhyChoose = whyChoose;
+
+            if (!string.IsNullOrEmpty(ingredients))
+                details.Ingredients = ingredients;
 
             await db.SaveChangesAsync();
         }
@@ -55,6 +65,8 @@
 
             details.HowToUse = "";
             details.ServingSize = "";
+            details.WhyChoose = "";
+            details.Ingredients = "";
 
             await db.SaveChangesAsync();
         }

@@ -7,7 +7,9 @@
         Task AddDetails(
             int productId,
             string? howToUse,
-            string? servingSize);
+            string? servingSize,
+            string? whyChoose,
+            string? ingredients);
 
         Task RemoveDetails(int productId);
 

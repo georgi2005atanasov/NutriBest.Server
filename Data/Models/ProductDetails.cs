@@ -16,6 +16,10 @@ namespace NutriBest.Server.Data.Models
 
         public string? ServingSize { get; set; }
 
+        public string? WhyChoose { get; set; }
+        
+        public string? Ingredients { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }

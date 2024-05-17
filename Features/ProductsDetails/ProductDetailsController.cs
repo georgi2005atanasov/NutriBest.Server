@@ -63,7 +63,9 @@
 
                 await productDetailsService.AddDetails(id,
                     details.HowToUse,
-                    details.ServingSize);
+                    details.ServingSize,
+                    details.WhyChoose,
+                    details.Ingredients);
 
                 return Ok(true);
             }

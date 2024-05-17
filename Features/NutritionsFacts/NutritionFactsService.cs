@@ -19,48 +19,56 @@
         }
 
         public async Task Add(int productId,
-            double? proteins,
-            double? sugars,
-            double? carbohydrates,
-            double? fats,
-            double? saturatedFats,
-            double? energyValue,
-            double? salt)
+            string? proteins,
+            string? sugars,
+            string? carbohydrates,
+            string? fats,
+            string? saturatedFats,
+            string? energyValue,
+            string? salt)
         {
             var details = await db.Products
                 .Include(x => x.NutritionFacts)
                 .FirstAsync(x => x.ProductId == productId);
 
-            if (carbohydrates != null)
-                details.NutritionFacts.Carbohydrates = carbohydrates;
+            try
+            {
+                if (carbohydrates != null)
+                    details.NutritionFacts.Carbohydrates = double.Parse(carbohydrates);
 
-            if (fats != null)
-                details.NutritionFacts.Fats = fats;
+                if (fats != null)
+                    details.NutritionFacts.Fats = double.Parse(fats);
 
-            if (saturatedFats != null)
-                details.NutritionFacts.SaturatedFats = saturatedFats;
+                if (saturatedFats != null)
+                    details.NutritionFacts.SaturatedFats = double.Parse(saturatedFats);
 
-            if (sugars != null)
-                details.NutritionFacts.Sugars = sugars;
+                if (sugars != null)
+                    details.NutritionFacts.Sugars = double.Parse(sugars);
 
-            if (proteins != null)
-                details.NutritionFacts.Proteins = proteins;
+                if (proteins != null)
+                    details.NutritionFacts.Proteins = double.Parse(proteins);
 
-            if (energyValue != null)
-                details.NutritionFacts.EnergyValue = energyValue;
+                if (energyValue != null)
+                    details.NutritionFacts.EnergyValue = double.Parse(energyValue);
 
-            if (salt != null)
-                details.NutritionFacts.Salt = salt;
+                if (salt != null)
+                    details.NutritionFacts.Salt = double.Parse(salt);
 
-            await db.SaveChangesAsync();
+                await db.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new InvalidOperationException("Invalid nutrition facts!");
+            }
         }
 
         public async Task<NutritionFactsServiceModel> Get(int productId)
         {
             var facts = await db.Products
                 .Include(x => x.NutritionFacts)
+                .Where(x => x.ProductId == productId)
                 .ProjectTo<NutritionFactsServiceModel>(mapper.ConfigurationProvider)
-                .FirstAsync(x => x.ProductId == productId);
+                .FirstAsync();
 
             return facts;
         }

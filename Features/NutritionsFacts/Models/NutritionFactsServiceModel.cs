@@ -6,27 +6,25 @@ namespace NutriBest.Server.Features.NutritionsFacts.Models
 
     public class NutritionFactsServiceModel
     {
-        public int ProductId { get; set; }
+        [Range(MinAmount, MaxAmount)]
+        public string? EnergyValue { get; set; }
 
         [Range(MinAmount, MaxAmount)]
-        public double? EnergyValue { get; set; }
+        public string? Fats { get; set; }
 
         [Range(MinAmount, MaxAmount)]
-        public double? Fats { get; set; }
+        public string? SaturatedFats { get; set; }
 
         [Range(MinAmount, MaxAmount)]
-        public double? SaturatedFats { get; set; }
-
-        [Range(MinAmount, MaxAmount)]
-        public double? Carbohydrates { get; set; }
+        public string? Carbohydrates { get; set; }
 
         [Range(MinAmount, 50000)]
-        public double? Sugars { get; set; }
+        public string? Sugars { get; set; }
 
         [Range(MinAmount, MaxAmount)]
-        public double? Proteins { get; set; }
+        public string? Proteins { get; set; }
 
         [Range(MinAmount, MaxAmount)]
-        public double? Salt { get; set; }
+        public string? Salt { get; set; }
     }
 }
