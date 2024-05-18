@@ -1,23 +1,29 @@
 ﻿namespace NutriBest.Server.Features.Carts
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Carts.Models;
+    using NutriBest.Server.Features.Products.Models;
 
     public class CartsController : ApiController
     {
         private const string CartCookieName = "ShoppingCart";
         private readonly NutriBestDbContext db;
         private readonly ICartService cartService;
+        private readonly IMapper mapper;
 
         public CartsController(ICartService cartService,
-            NutriBestDbContext db)
+            NutriBestDbContext db,
+            IMapper mapper)
         {
             this.cartService = cartService;
             this.db = db;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -114,7 +120,36 @@
         [Route("/cart/guest/get")]
         public async Task<IActionResult> GetCartFromSession()
         {
-            return Ok(await GetSessionCart());
+            try
+            {
+                var cart = await GetSessionCart();
+
+                foreach (var cartProduct in cart.CartProducts)
+                {
+                    var product = await db.Products
+                        .Select(x => new ProductListingServiceModel
+                        {
+                            ProductId = x.ProductId,
+                            Name = x.Name,
+                            Price = x.Price,
+                            Categories = x.ProductsCategories
+                             .Select(c => c.Category.Name)
+                             .ToList(),
+                            Quantity = x.Quantity,
+                            PromotionId = x.PromotionId,
+                            Brand = x.Brand!.Name // be aware
+                        })
+                        .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+
+                    cartProduct.Product = product;
+                }
+
+                return Ok(cart);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
@@ -247,7 +282,6 @@
                     return new CartServiceModel();
 
                 var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
-
                 return cart;
             });
         }
@@ -259,7 +293,9 @@
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = DateTime.Now.AddDays(7)
+                    Expires = DateTime.Now.AddDays(7),
+                    Secure = true,
+                    SameSite = SameSiteMode.None
                 };
 
                 string serializedCart = JsonConvert.SerializeObject(cart);

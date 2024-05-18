@@ -1,6 +1,7 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class CartProduct
     {
@@ -15,6 +16,9 @@
 
         [Required]
         public int ProductId { get; set; }
+
+        [NotMapped]
+        public Product? Product { get; set; }
 
         public int Count { get; set; }
     }

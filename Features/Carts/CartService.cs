@@ -1,21 +1,27 @@
 ﻿namespace NutriBest.Server.Features.Carts
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
+    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Infrastructure.Services;
 
     public class CartService : ICartService
     {
         private readonly NutriBestDbContext db;
         private readonly ICurrentUserService currentUser;
+        private readonly IMapper mapper;
 
         public CartService(NutriBestDbContext db,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IMapper mapper)
         {
             this.db = db;
             this.currentUser = currentUser;
+            this.mapper = mapper;
         }
 
         public async Task<CartServiceModel> Get()
@@ -29,6 +35,26 @@
                     Count = x.Count
                 })
                 .ToListAsync();
+
+            foreach (var cartProduct in products)
+            {
+                var product = await db.Products
+                    .Select(x => new ProductListingServiceModel
+                    {
+                        ProductId = x.ProductId,
+                        Name = x.Name,
+                        Price = x.Price,
+                        Categories = x.ProductsCategories
+                             .Select(c => c.Category.Name)
+                             .ToList(),
+                        Quantity = x.Quantity,
+                        PromotionId = x.PromotionId,
+                        Brand = x.Brand!.Name // be aware
+                    })
+                    .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+
+                cartProduct.Product = product;
+            }
 
             var cartModel = new CartServiceModel
             {
@@ -139,9 +165,9 @@
             return true;
         }
 
-        private async Task<(string? userId, 
-            Profile? profile, 
-            Cart cart, 
+        private async Task<(string? userId,
+            Data.Models.Profile? profile,
+            Cart cart,
             IQueryable<CartProduct> cartProducts)> GetDataForChangingCart()
         {
             var userId = currentUser.GetUserId();

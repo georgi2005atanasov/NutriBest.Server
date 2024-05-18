@@ -39,7 +39,18 @@ builder
     .AddDatabase(connectionString)
     .AddDatabaseDeveloperPageExceptionFilter()
     .AddIdentity()
-    .AddCors()
+    //.AddCors() previous config
+    .AddCors(options =>
+    {
+        options.AddPolicy("MyCorsPolicy", builder =>
+        {
+            var corsOrigins = applicationSettings.GetSection("AllowedOrigins").Get<string[]>();
+            builder.WithOrigins(corsOrigins)
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
+    })
     .AddJwtAuthentication(secret)
     .Configure<ApplicationSettings>(applicationSettings)
     .AddApiControllers();
@@ -64,12 +75,15 @@ app.UseHttpsRedirection()
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader())
-    .UseEndpoints(endpoints => endpoints.MapControllers())
-    .ApplyMigrations();
+//app.UseCors(x => x
+//            .AllowAnyOrigin()
+//            .AllowAnyMethod()
+//            .AllowAnyHeader()) previous config
+
+app.UseCors("MyCorsPolicy");
+
+app.UseEndpoints(endpoints => endpoints.MapControllers())
+.ApplyMigrations();
 
 //app.UseSwaggerAuthorized(app.Services); gotta uncomment this in the future
 app.UseSwagger();
