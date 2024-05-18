@@ -7,6 +7,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Promotions.Models;
     using NutriBest.Server.Infrastructure.Services;
 
     public class CartService : ICartService
@@ -44,14 +45,17 @@
                         ProductId = x.ProductId,
                         Name = x.Name,
                         Price = x.Price,
-                        Categories = x.ProductsCategories
-                             .Select(c => c.Category.Name)
-                             .ToList(),
                         Quantity = x.Quantity,
                         PromotionId = x.PromotionId,
-                        Brand = x.Brand!.Name // be aware
+                        Brand = x.Brand!.Name, // be aware
                     })
                     .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+
+                if (product.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == product.PromotionId);
+                }
 
                 cartProduct.Product = product;
             }

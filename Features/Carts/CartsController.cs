@@ -141,6 +141,22 @@
                         })
                         .FirstAsync(x => x.ProductId == cartProduct.ProductId);
 
+                    if (product.PromotionId != null)
+                    {
+                        var promotion = await db.Promotions
+                            .FirstAsync(x => x.PromotionId == product.PromotionId);
+
+                        if (promotion.DiscountPercentage != null)
+                        {
+                            product.DiscountPercentage = promotion.DiscountPercentage;
+                        }
+
+                        if (promotion.DiscountAmount != null)
+                        {
+                            product.DiscountPercentage = (promotion.DiscountAmount * 100) / 120;
+                        }
+                    }
+
                     cartProduct.Product = product;
                 }
 
