@@ -28,6 +28,8 @@
 
         Task<List<ProductSpecsServiceModel>> GetSpecs(int id, string name);
 
+        Task<List<ProductListingServiceModel>> GetRelatedProducts(List<string>? categories, int productId);
+
         Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId);
 
         Task<int> Update(int id,

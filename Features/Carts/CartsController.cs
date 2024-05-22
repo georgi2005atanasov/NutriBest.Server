@@ -122,7 +122,7 @@
         {
             try
             {
-                var cart = await GetSessionCart();
+                var cart = GetSessionCart() ?? new CartServiceModel();
 
                 foreach (var cartProduct in cart.CartProducts)
                 {
@@ -184,13 +184,12 @@
 
             try
             {
-                CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
+                CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
                 var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId);
-
 
                 var productFromDb = await db.Products
                     .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId);
@@ -203,7 +202,21 @@
 
                 if (existingProduct != null)
                 {
-                    cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
+                    if (productFromDb.PromotionId != null)
+                    {
+                        var promotion = await db.Promotions
+                            .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                        if (promotion.DiscountPercentage != null)
+                            cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * existingProduct.Count;
+                        if (promotion.DiscountAmount != null)
+                            cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * existingProduct.Count;
+                    }
+                    else
+                    {
+                        cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
+                    }
+
                     existingProduct.Count = cartProduct.Count;
 
                     if (!CanRemoveProduct(productFromDb.Quantity, existingProduct.Count))
@@ -242,7 +255,6 @@
                     cart.TotalPrice += productFromDb.Price * cartProduct.Count;
                 }
 
-
                 await SetSessionCart(cart);
                 return Ok();
             }
@@ -267,7 +279,7 @@
 
             try
             {
-                CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
+                CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
@@ -285,7 +297,6 @@
 
                 if (existingProduct != null)
                 {
-                    cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
                     existingProduct.Count += cartProduct.Count;
 
                     if (!CanRemoveProduct(productFromDb.Quantity, existingProduct.Count))
@@ -339,7 +350,7 @@
         [Route("/cart/remove")]
         public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)
         {
-            CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
+            CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
             if (cart.CartProducts == null)
                 cart.CartProducts = new List<CartProductServiceModel>();
@@ -390,7 +401,7 @@
         {
             try
             {
-                var cart = await GetSessionCart() ?? new CartServiceModel();
+                var cart = GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.TotalPrice == 0)
                     return BadRequest(new
@@ -408,18 +419,15 @@
             }
         }
 
-        private async Task<CartServiceModel?> GetSessionCart()
+        private CartServiceModel? GetSessionCart()
         {
-            return await Task.Run(() =>
-            {
-                string cookieValue = Request.Cookies[CartCookieName]!; // be aware
+            string cookieValue = Request.Cookies[CartCookieName]!; // be aware
 
-                if (string.IsNullOrEmpty(cookieValue))
-                    return new CartServiceModel();
+            if (string.IsNullOrEmpty(cookieValue))
+                return new CartServiceModel();
 
-                var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
-                return cart;
-            });
+            var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
+            return cart;
         }
 
         private async Task SetSessionCart(CartServiceModel cart)

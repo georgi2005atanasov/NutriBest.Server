@@ -23,7 +23,8 @@
                 .ForMember(dest => dest.HowToUse, src => src.MapFrom(x => x.ProductDetails.HowToUse))
                 .ForMember(dest => dest.ServingSize, src => src.MapFrom(x => x.ProductDetails.ServingSize))
                 .ForMember(dest => dest.Ingredients, src => src.MapFrom(x => x.ProductDetails.Ingredients))
-                .ForMember(dest => dest.WhyChoose, src => src.MapFrom(x => x.ProductDetails.WhyChoose));
+                .ForMember(dest => dest.WhyChoose, src => src.MapFrom(x => x.ProductDetails.WhyChoose))
+                .ForMember(dest => dest.DiscountPercentage, opt => opt.Ignore());
         }
     }
 }

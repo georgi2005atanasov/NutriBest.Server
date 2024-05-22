@@ -81,35 +81,7 @@
 
             var products = await Task.Run(() => queryProducts.ToList());
 
-            foreach (var product in products)
-            {
-                if (product.PromotionId != null)
-                {
-                    try
-                    {
-                        var promotion = await promotionService.Get((int)product.PromotionId);
-
-                        if (!promotion.IsActive)
-                        {
-                            throw new Exception();
-                        }
-
-                        if (promotion != null && promotion.DiscountPercentage != null)
-                        {
-                            product.DiscountPercentage = promotion.DiscountPercentage;
-                        }
-
-                        if (promotion != null && promotion.DiscountAmount != null)
-                        {
-                            product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Price;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
-                }
-            }
+            await GetPromotionPercentage(products);
 
             var productsRows = this.GetProductsRows(products,
                 (productsView == "all") ? productsPerRow : productsPerRowInTable);
@@ -456,6 +428,65 @@
             await db.SaveChangesAsync();
 
             return id;
+        }
+
+        public async Task<List<ProductListingServiceModel>> GetRelatedProducts(List<string>? categories, int productId)
+        {
+            var products = categories != null ? await db.Products
+                .Where(x => x.ProductsCategories
+                            .Any(x => categories.Contains(x.Category.Name)) && x.ProductId != productId)
+                .Select(x => new ProductListingServiceModel
+                {
+                    ProductId = x.ProductId,
+                    Name = x.Name,
+                    Price = x.Price,
+                    Categories = x.ProductsCategories
+                             .Select(c => c.Category.Name)
+                             .ToList(),
+                    Quantity = x.Quantity,
+                    PromotionId = x.PromotionId,
+                    Brand = x.Brand!.Name // be aware
+                })
+                .Take(4)
+                .ToListAsync() :
+            new List<ProductListingServiceModel>();
+
+            await GetPromotionPercentage(products);
+
+            return products;
+        }
+
+        private async Task GetPromotionPercentage(List<ProductListingServiceModel> products)
+        {
+            foreach (var product in products)
+            {
+                if (product.PromotionId != null)
+                {
+                    try
+                    {
+                        var promotion = await promotionService.Get((int)product.PromotionId);
+
+                        if (!promotion.IsActive)
+                        {
+                            throw new Exception();
+                        }
+
+                        if (promotion != null && promotion.DiscountPercentage != null)
+                        {
+                            product.DiscountPercentage = promotion.DiscountPercentage;
+                        }
+
+                        if (promotion != null && promotion.DiscountAmount != null)
+                        {
+                            product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Price;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                }
+            }
         }
     }
 }

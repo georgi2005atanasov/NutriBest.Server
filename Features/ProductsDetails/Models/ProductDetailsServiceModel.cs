@@ -25,6 +25,8 @@
         [StringLength(MaxNameLength, MinimumLength = 5)]
         public string Description { get; set; } = null!;
 
+        public decimal? DiscountPercentage { get; set; }
+
         public string Brand { get; set; } = null!;
 
         [Required]

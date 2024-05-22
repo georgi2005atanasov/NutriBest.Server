@@ -5,16 +5,20 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.ProductsDetails.Models;
+    using NutriBest.Server.Features.Promotions;
 
     public class ProductDetailsService : IProductDetailsService
     {
         private readonly NutriBestDbContext db;
+        private readonly IPromotionService promotionService;
         private readonly IMapper mapper;
 
         public ProductDetailsService(NutriBestDbContext db,
+            IPromotionService promotionService,
             IMapper mapper)
         {
             this.db = db;
+            this.promotionService = promotionService;
             this.mapper = mapper;
         }
 
@@ -27,6 +31,8 @@
 
             if (product == null)
                 throw new ArgumentNullException("Invalid product!");
+
+            await GetPromotionPercentage(product);
 
             return product;
         }
@@ -70,5 +76,36 @@
 
             await db.SaveChangesAsync();
         }
+
+        private async Task GetPromotionPercentage(ProductDetailsServiceModel product)
+        {
+            if (product.PromotionId != null)
+            {
+                try
+                {
+                    var promotion = await promotionService.Get((int)product.PromotionId);
+
+                    if (!promotion.IsActive)
+                    {
+                        throw new Exception();
+                    }
+
+                    if (promotion != null && promotion.DiscountPercentage != null)
+                    {
+                        product.DiscountPercentage = promotion.DiscountPercentage;
+                    }
+
+                    if (promotion != null && promotion.DiscountAmount != null)
+                    {
+                        product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Price;
+                    }
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            }
+        }
     }
 }
+

@@ -460,6 +460,22 @@
             }
         }
 
+        [HttpPost]
+        [Route("related")]
+        public async Task<ActionResult<List<ProductListingServiceModel>>> GetRelatedProductsByCategory([FromBody] RelatedProductsServiceModel productModel)
+        {
+            try
+            {
+                var products = await productService.GetRelatedProducts(productModel.Categories, productModel.ProductId);
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         private bool ProductExists(string productName)
         {
             var products = db.Products
