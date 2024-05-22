@@ -26,98 +26,98 @@
             this.mapper = mapper;
         }
 
-        [HttpGet]
-        [Route("/cart/user/get")]
-        public async Task<ActionResult> Get()
-        {
-            try
-            {
-                var cart = await cartService.Get();
+        //[HttpGet]
+        //[Route("/cart/user/get")]
+        //public async Task<ActionResult> Get()
+        //{
+        //    try
+        //    {
+        //        var cart = await cartService.Get();
 
-                return Ok(cart);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok(cart);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
-        [HttpPost]
-        [Route("/cart/user/add")]
-        public async Task<ActionResult> Add(CartProductServiceModel cartProductModel)
-        {
-            try
-            {
-                if (cartProductModel.Count <= 0)
-                    return BadRequest(new
-                    {
-                        Message = "Choose the quantity of this product!"
-                    });
+        //[HttpPost]
+        //[Route("/cart/user/add")]
+        //public async Task<ActionResult> Add(CartProductServiceModel cartProductModel)
+        //{
+        //    try
+        //    {
+        //        if (cartProductModel.Count <= 0)
+        //            return BadRequest(new
+        //            {
+        //                Message = "Choose the quantity of this product!"
+        //            });
 
-                var cartProductId = await cartService.Add(cartProductModel.ProductId, cartProductModel.Count);
+        //        var cartProductId = await cartService.Add(cartProductModel.ProductId, cartProductModel.Count);
 
-                return Ok();
-            }
-            catch (InvalidOperationException err)
-            {
-                return BadRequest(new
-                {
-                    Message = err.Message,
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok();
+        //    }
+        //    catch (InvalidOperationException err)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Message = err.Message,
+        //        });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
-        [HttpDelete]
-        [Route("/cart/user/remove")]
-        public async Task<ActionResult<bool>> Remove(CartProductServiceModel cartProductModel)
-        {
-            try
-            {
-                var result = await cartService.Remove(cartProductModel.ProductId, cartProductModel.Count);
+        //[HttpDelete]
+        //[Route("/cart/user/remove")]
+        //public async Task<ActionResult<bool>> Remove([FromBody] CartProductServiceModel cartProductModel)
+        //{
+        //    try
+        //    {
+        //        var result = await cartService.Remove(cartProductModel.ProductId, cartProductModel.Count);
 
-                if (!result)
-                    return BadRequest(new
-                    {
-                        Message = "Cannot remove unexisting products from the cart!"
-                    });
+        //        if (!result)
+        //            return BadRequest(new
+        //            {
+        //                Message = "Cannot remove unexisting products from the cart!"
+        //            });
 
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
-        [HttpDelete]
-        [Route("/cart/user/clean")]
-        public async Task<ActionResult> Clean()
-        {
-            try
-            {
-                var result = await cartService.Clean();
+        //[HttpDelete]
+        //[Route("/cart/user/clean")]
+        //public async Task<ActionResult> Clean()
+        //{
+        //    try
+        //    {
+        //        var result = await cartService.Clean();
 
-                if (!result)
-                    return BadRequest(new
-                    {
-                        Message = "The shopping cart is empty!"
-                    });
+        //        if (!result)
+        //            return BadRequest(new
+        //            {
+        //                Message = "The shopping cart is empty!"
+        //            });
 
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("/cart/guest/get")]
+        [Route("/cart/get")]
         public async Task<IActionResult> GetCartFromSession()
         {
             try
@@ -153,7 +153,8 @@
 
                         if (promotion.DiscountAmount != null)
                         {
-                            product.DiscountPercentage = (promotion.DiscountAmount * 100) / 120;
+                            //productFromDb.Price * ((100 - (decimal)promotion.DiscountAmount) / 100) * cartProduct.Count
+                            product.DiscountPercentage = (promotion.DiscountAmount * 100) / product.Price;
                         }
                     }
 
@@ -170,9 +171,100 @@
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("/cart/guest/add")]
+        [Route("/cart/set")]
+        public async Task<ActionResult> SetProductCount([FromBody] CartProductServiceModel cartProduct)
+        {
+            if (cartProduct.Count <= 0)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid product count!"
+                });
+            }
+
+            try
+            {
+                CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
+
+                if (cart.CartProducts == null)
+                    cart.CartProducts = new List<CartProductServiceModel>();
+
+                var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId);
+
+
+                var productFromDb = await db.Products
+                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId);
+
+                if (productFromDb == null)
+                    return BadRequest(new
+                    {
+                        Message = "This product does not exist!"
+                    });
+
+                if (existingProduct != null)
+                {
+                    cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
+                    existingProduct.Count = cartProduct.Count;
+
+                    if (!CanRemoveProduct(productFromDb.Quantity, existingProduct.Count))
+                    {
+                        return BadRequest(new
+                        {
+                            Message = $"Sorry, we have {productFromDb.Quantity} units of this product available."
+                        });
+                    }
+                }
+                else
+                {
+                    cart.CartProducts.Add(cartProduct);
+
+                    if (!CanRemoveProduct(productFromDb.Quantity, cartProduct.Count))
+                    {
+                        return BadRequest(new
+                        {
+                            Message = $"Sorry, we have {productFromDb.Quantity} units of this product available."
+                        });
+                    }
+                }
+
+                if (productFromDb.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                        cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                    if (promotion.DiscountAmount != null)
+                        cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                }
+                else
+                {
+                    cart.TotalPrice += productFromDb.Price * cartProduct.Count;
+                }
+
+
+                await SetSessionCart(cart);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("/cart/add")]
         public async Task<ActionResult> AddSessionCart([FromBody] CartProductServiceModel cartProduct)
         {
+            if (cartProduct.Count <= 0)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid product count!"
+                });
+            }
+
             try
             {
                 CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
@@ -193,6 +285,7 @@
 
                 if (existingProduct != null)
                 {
+                    cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
                     existingProduct.Count += cartProduct.Count;
 
                     if (!CanRemoveProduct(productFromDb.Quantity, existingProduct.Count))
@@ -216,7 +309,21 @@
                     }
                 }
 
-                cart.TotalPrice += productFromDb.Price * cartProduct.Count;
+                if (productFromDb.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                        cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                    if (promotion.DiscountAmount != null)
+                        cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                }
+                else
+                {
+                    cart.TotalPrice += productFromDb.Price * cartProduct.Count;
+                }
+
 
                 await SetSessionCart(cart);
                 return Ok();
@@ -229,7 +336,7 @@
 
         [HttpDelete]
         [AllowAnonymous]
-        [Route("/cart/guest/remove")]
+        [Route("/cart/remove")]
         public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)
         {
             CartServiceModel cart = await GetSessionCart() ?? new CartServiceModel();
@@ -251,7 +358,20 @@
                     cart.CartProducts?.Remove(existingProduct);
                 }
 
-                cart.TotalPrice -= productFromDb.Price * productToRemove.Count;
+                if (productFromDb.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                        cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * productToRemove.Count;
+                    if (promotion.DiscountAmount != null)
+                        cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * productToRemove.Count;
+                }
+                else
+                {
+                    cart.TotalPrice -= productFromDb.Price * productToRemove.Count;
+                }
 
                 await SetSessionCart(cart);
 
@@ -265,7 +385,7 @@
         }
 
         [HttpDelete]
-        [Route("/cart/guest/clean")]
+        [Route("/cart/clean")]
         public async Task<ActionResult> CleanSessionCart()
         {
             try
