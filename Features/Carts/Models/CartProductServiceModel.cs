@@ -9,5 +9,9 @@
         public ProductListingServiceModel? Product { get; set; }
 
         public int Count { get; set; }
+
+        public string Flavour { get; set; } = null!;
+
+        public int Grams { get; set; }
     }
 }

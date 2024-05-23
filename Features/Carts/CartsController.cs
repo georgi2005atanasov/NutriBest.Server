@@ -189,10 +189,14 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
-                var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId);
+                var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
+                    i.Flavour == cartProduct.Flavour &&
+                    i.Grams == cartProduct.Grams);
 
                 var productFromDb = await db.Products
-                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId);
+                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId &&
+                    x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == cartProduct.Flavour
+                    && x.ProductPackageFlavours.Any(y => y.Package!.Grams == cartProduct.Grams)));
 
                 if (productFromDb == null)
                     return BadRequest(new
@@ -284,10 +288,16 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
-                var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId);
+                var existingProduct = cart
+                    .CartProducts
+                    .FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
+                    i.Flavour == cartProduct.Flavour &&
+                    i.Grams == cartProduct.Grams);
 
                 var productFromDb = await db.Products
-                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId);
+                   .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId &&
+                   x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == cartProduct.Flavour &&
+                   x.ProductPackageFlavours.Any(y => y.Package!.Grams == cartProduct.Grams)));
 
                 if (productFromDb == null)
                     return BadRequest(new
@@ -355,12 +365,16 @@
             if (cart.CartProducts == null)
                 cart.CartProducts = new List<CartProductServiceModel>();
 
-            var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == productToRemove.ProductId);
+            var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == productToRemove.ProductId &&
+                    i.Flavour == productToRemove.Flavour &&
+                    i.Grams == productToRemove.Grams);
 
             if (existingProduct != null)
             {
                 var productFromDb = await db.Products
-                    .FirstAsync(x => x.ProductId == existingProduct.ProductId);
+                   .FirstAsync(x => x.ProductId == productToRemove.ProductId &&
+                   x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == productToRemove.Flavour
+                   && x.ProductPackageFlavours.Any(y => y.Package!.Grams == productToRemove.Grams)));
 
                 existingProduct.Count -= productToRemove.Count;
 
@@ -436,7 +450,7 @@
             {
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,
+                    //HttpOnly = true,
                     Expires = DateTime.Now.AddDays(7),
                     Secure = true,
                     SameSite = SameSiteMode.None
