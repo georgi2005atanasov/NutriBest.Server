@@ -50,6 +50,8 @@
 
         public DbSet<ProductPackageFlavour> ProductsPackagesFlavours { get; set; } = null!;
 
+        public DbSet<PromoCode> PromoCodes { get; set; } = null!;
+
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
             : base(options)

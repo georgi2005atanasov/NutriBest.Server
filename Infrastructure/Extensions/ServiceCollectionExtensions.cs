@@ -18,6 +18,7 @@
     using NutriBest.Server.Features.Products;
     using NutriBest.Server.Features.ProductsDetails;
     using NutriBest.Server.Features.ProductsPromotions;
+    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
@@ -44,7 +45,8 @@
                 .AddTransient<ICategoryService, CategoryService>()
                 .AddTransient<IBrandService, BrandService>()
                 .AddTransient<IFlavourService, FlavourService>()
-                .AddTransient<IPackageService, PackageService>();
+                .AddTransient<IPackageService, PackageService>()
+                .AddTransient<IPromoCodeService, PromoCodeService>();
 
             return services;
         }
