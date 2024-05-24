@@ -7,6 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
 
@@ -189,14 +190,8 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
-                var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
-                    i.Flavour == cartProduct.Flavour &&
-                    i.Grams == cartProduct.Grams);
-
-                var productFromDb = await db.Products
-                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId &&
-                    x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == cartProduct.Flavour
-                    && x.ProductPackageFlavours.Any(y => y.Package!.Grams == cartProduct.Grams)));
+                var existingProduct = GetExistingProduct(cart, cartProduct);
+                var productFromDb = await GetProductFromDb(cartProduct);
 
                 if (productFromDb == null)
                     return BadRequest(new
@@ -206,20 +201,10 @@
 
                 if (existingProduct != null)
                 {
-                    if (productFromDb.PromotionId != null)
-                    {
-                        var promotion = await db.Promotions
-                            .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
-
-                        if (promotion.DiscountPercentage != null)
-                            cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * existingProduct.Count;
-                        if (promotion.DiscountAmount != null)
-                            cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * existingProduct.Count;
-                    }
-                    else
-                    {
-                        cart.TotalPrice -= productFromDb.Price * existingProduct.Count;
-                    }
+                    await CalculateTotalAmounts(isSubtracting: true,
+                        cart,
+                        existingProduct,
+                        productFromDb);
 
                     existingProduct.Count = cartProduct.Count;
 
@@ -244,20 +229,10 @@
                     }
                 }
 
-                if (productFromDb.PromotionId != null)
-                {
-                    var promotion = await db.Promotions
-                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
-
-                    if (promotion.DiscountPercentage != null)
-                        cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
-                    if (promotion.DiscountAmount != null)
-                        cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
-                }
-                else
-                {
-                    cart.TotalPrice += productFromDb.Price * cartProduct.Count;
-                }
+                await CalculateTotalAmounts(isSubtracting: false,
+                    cart,
+                    cartProduct,
+                    productFromDb);
 
                 await SetSessionCart(cart);
                 return Ok();
@@ -271,7 +246,7 @@
         [HttpPost]
         [AllowAnonymous]
         [Route("/cart/add")]
-        public async Task<ActionResult> AddSessionCart([FromBody] CartProductServiceModel cartProduct)
+        public async Task<ActionResult<string>> AddSessionCart([FromBody] CartProductServiceModel cartProduct)
         {
             if (cartProduct.Count <= 0)
             {
@@ -288,16 +263,9 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
-                var existingProduct = cart
-                    .CartProducts
-                    .FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
-                    i.Flavour == cartProduct.Flavour &&
-                    i.Grams == cartProduct.Grams);
+                var existingProduct = GetExistingProduct(cart, cartProduct);
 
-                var productFromDb = await db.Products
-                   .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId &&
-                   x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == cartProduct.Flavour &&
-                   x.ProductPackageFlavours.Any(y => y.Package!.Grams == cartProduct.Grams)));
+                var productFromDb = await GetProductFromDb(cartProduct);
 
                 if (productFromDb == null)
                     return BadRequest(new
@@ -330,24 +298,17 @@
                     }
                 }
 
-                if (productFromDb.PromotionId != null)
-                {
-                    var promotion = await db.Promotions
-                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
-
-                    if (promotion.DiscountPercentage != null)
-                        cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
-                    if (promotion.DiscountAmount != null)
-                        cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
-                }
-                else
-                {
-                    cart.TotalPrice += productFromDb.Price * cartProduct.Count;
-                }
-
+                await CalculateTotalAmounts(isSubtracting: false,
+                    cart,
+                    cartProduct,
+                    productFromDb);
 
                 await SetSessionCart(cart);
-                return Ok();
+
+                return Ok(new
+                {
+                    productFromDb.Name
+                });
             }
             catch (Exception)
             {
@@ -365,16 +326,17 @@
             if (cart.CartProducts == null)
                 cart.CartProducts = new List<CartProductServiceModel>();
 
-            var existingProduct = cart.CartProducts.FirstOrDefault(i => i.ProductId == productToRemove.ProductId &&
-                    i.Flavour == productToRemove.Flavour &&
-                    i.Grams == productToRemove.Grams);
+            var existingProduct = GetExistingProduct(cart, productToRemove);
 
             if (existingProduct != null)
             {
-                var productFromDb = await db.Products
-                   .FirstAsync(x => x.ProductId == productToRemove.ProductId &&
-                   x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == productToRemove.Flavour
-                   && x.ProductPackageFlavours.Any(y => y.Package!.Grams == productToRemove.Grams)));
+                var productFromDb = await GetProductFromDb(productToRemove);
+
+                if (productFromDb == null)
+                    return BadRequest(new
+                    {
+                        Message = "This product does not exist!"
+                    });
 
                 existingProduct.Count -= productToRemove.Count;
 
@@ -383,20 +345,10 @@
                     cart.CartProducts?.Remove(existingProduct);
                 }
 
-                if (productFromDb.PromotionId != null)
-                {
-                    var promotion = await db.Promotions
-                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
-
-                    if (promotion.DiscountPercentage != null)
-                        cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * productToRemove.Count;
-                    if (promotion.DiscountAmount != null)
-                        cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * productToRemove.Count;
-                }
-                else
-                {
-                    cart.TotalPrice -= productFromDb.Price * productToRemove.Count;
-                }
+                await CalculateTotalAmounts(isSubtracting: true,
+                    cart,
+                    productToRemove,
+                    productFromDb);
 
                 await SetSessionCart(cart);
 
@@ -450,7 +402,7 @@
             {
                 var cookieOptions = new CookieOptions
                 {
-                    //HttpOnly = true,
+                    HttpOnly = true, // this was commented to show the cookie as I type document.cookie
                     Expires = DateTime.Now.AddDays(7),
                     Secure = true,
                     SameSite = SameSiteMode.None
@@ -460,6 +412,72 @@
                 Response.Cookies.Append(CartCookieName, serializedCart, cookieOptions);
             });
         }
+
+        private async Task CalculateTotalAmounts(bool isSubtracting,
+            CartServiceModel cart,
+            CartProductServiceModel cartProduct,
+            Product productFromDb)
+        {
+            if (isSubtracting)
+            {
+                if (productFromDb.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                    {
+                        cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.TotalSaved -= (decimal)promotion.DiscountPercentage / 100 * productFromDb.Price * cartProduct.Count;
+                    }
+                    if (promotion.DiscountAmount != null)
+                    {
+                        cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.TotalSaved -= (decimal)promotion.DiscountAmount * cartProduct.Count;
+                    }
+                }
+                else
+                {
+                    cart.TotalPrice -= productFromDb.Price * cartProduct.Count;
+                }
+            }
+            else
+            {
+                if (productFromDb.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == productFromDb.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                    {
+                        cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.TotalSaved += (decimal)promotion.DiscountPercentage / 100 * productFromDb.Price * cartProduct.Count;
+                    }
+                    if (promotion.DiscountAmount != null)
+                    {
+                        cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.TotalSaved += (decimal)promotion.DiscountAmount * cartProduct.Count;
+                    }
+                }
+                else
+                {
+                    cart.TotalPrice += productFromDb.Price * cartProduct.Count;
+                }
+            }
+        }
+
+        private static CartProductServiceModel? GetExistingProduct(CartServiceModel cart, CartProductServiceModel cartProduct)
+            => cart.CartProducts
+                    .FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
+                    i.Flavour == cartProduct.Flavour &&
+                    i.Grams == cartProduct.Grams);
+
+
+        private async Task<Product?> GetProductFromDb(CartProductServiceModel cartProduct)
+            => await db.Products
+                    .FirstOrDefaultAsync(x => x.ProductId == cartProduct.ProductId &&
+                    x.ProductPackageFlavours.Any(y => y.Flavour!.FlavourName == cartProduct.Flavour
+                    && x.ProductPackageFlavours.Any(y => y.Package!.Grams == cartProduct.Grams)));
 
         private bool CanRemoveProduct(int? quantity, int count)
             => quantity >= count;
