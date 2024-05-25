@@ -23,12 +23,5 @@
 
             return promoCode.ToString();
         }
-
-        public static void Main(string[] args)
-        {
-            int promoCodeLength = 8; // Example length
-            string promoCode = GeneratePromoCode(promoCodeLength);
-            Console.WriteLine($"Generated Promo Code: {promoCode}");
-        }
     }
 }

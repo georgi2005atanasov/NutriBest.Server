@@ -722,10 +722,11 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("DiscountPercentage")
+                    b.Property<decimal>("DiscountPercentage")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")

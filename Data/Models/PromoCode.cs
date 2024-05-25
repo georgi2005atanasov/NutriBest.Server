@@ -8,11 +8,13 @@
         public int Id { get; set; }
 
         [Required]
+        public string Description { get; set; } = null!;
+
+        [Required]
         public string Code { get; set; } = null!;
 
-        public decimal? DiscountPercentage { get; set; }
-
-        public decimal? DiscountAmount { get; set; }
+        [Required]
+        public decimal DiscountPercentage { get; set; }
 
         public bool IsValid { get; set; }
     }

@@ -1,7 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Carts
 {
     using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -10,111 +9,26 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.PromoCodes;
 
     public class CartsController : ApiController
     {
         private const string CartCookieName = "ShoppingCart";
         private readonly NutriBestDbContext db;
         private readonly ICartService cartService;
+        private readonly IPromoCodeService promoCodeService;
         private readonly IMapper mapper;
 
         public CartsController(ICartService cartService,
             NutriBestDbContext db,
+            IPromoCodeService promoCodeService,
             IMapper mapper)
         {
             this.cartService = cartService;
+            this.promoCodeService = promoCodeService;
             this.db = db;
             this.mapper = mapper;
         }
-
-        //[HttpGet]
-        //[Route("/cart/user/get")]
-        //public async Task<ActionResult> Get()
-        //{
-        //    try
-        //    {
-        //        var cart = await cartService.Get();
-
-        //        return Ok(cart);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Route("/cart/user/add")]
-        //public async Task<ActionResult> Add(CartProductServiceModel cartProductModel)
-        //{
-        //    try
-        //    {
-        //        if (cartProductModel.Count <= 0)
-        //            return BadRequest(new
-        //            {
-        //                Message = "Choose the quantity of this product!"
-        //            });
-
-        //        var cartProductId = await cartService.Add(cartProductModel.ProductId, cartProductModel.Count);
-
-        //        return Ok();
-        //    }
-        //    catch (InvalidOperationException err)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            Message = err.Message,
-        //        });
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
-
-        //[HttpDelete]
-        //[Route("/cart/user/remove")]
-        //public async Task<ActionResult<bool>> Remove([FromBody] CartProductServiceModel cartProductModel)
-        //{
-        //    try
-        //    {
-        //        var result = await cartService.Remove(cartProductModel.ProductId, cartProductModel.Count);
-
-        //        if (!result)
-        //            return BadRequest(new
-        //            {
-        //                Message = "Cannot remove unexisting products from the cart!"
-        //            });
-
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
-
-        //[HttpDelete]
-        //[Route("/cart/user/clean")]
-        //public async Task<ActionResult> Clean()
-        //{
-        //    try
-        //    {
-        //        var result = await cartService.Clean();
-
-        //        if (!result)
-        //            return BadRequest(new
-        //            {
-        //                Message = "The shopping cart is empty!"
-        //            });
-
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
 
         [HttpGet]
         [AllowAnonymous]
@@ -359,6 +273,36 @@
             {
                 Message = "Product not found in the cart."
             });
+        }
+
+        [HttpPost]
+        [Route("/cart/apply-promo-code")]
+        public async Task<ActionResult<bool>> ApplyPromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
+        {
+            try
+            {
+                CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
+
+                if (cart.TotalPrice == 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "You have to add products to the cart!"
+                    });
+                }
+
+                var promoCode = await promoCodeService.GetByCode(promoCodeModel.Code);
+
+                cart.TotalPrice -= (decimal)promoCode.DiscountPercentage / 100 * cart.TotalPrice;
+
+                await SetSessionCart(cart);
+
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return BadRequest(false);
+            }
         }
 
         [HttpDelete]

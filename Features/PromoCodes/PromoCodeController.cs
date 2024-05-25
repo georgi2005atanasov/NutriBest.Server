@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.PromoCodes.Extensions;
 using NutriBest.Server.Features.PromoCodes.Models;
 
 namespace NutriBest.Server.Features.PromoCodes
@@ -18,31 +15,57 @@ namespace NutriBest.Server.Features.PromoCodes
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<List<string>>> Create([FromBody] PromoCodeServiceModel promoCodeModel)
+        public async Task<ActionResult<Dictionary<string, List<string>>>> Create([FromBody] PromoCodeServiceModel promoCodeModel)
         {
-            if (promoCodeModel.DiscountPercentage == null && promoCodeModel.DiscountAmount == null)
+            if (promoCodeModel.DiscountPercentage >= 100 ||
+                promoCodeModel.DiscountPercentage < 0.1m)
             {
                 return BadRequest(new
                 {
-                    Message = "You have to make some type of discount!"
+                    Message = "Discount percentage must be betweeen 0% and 99.9%!"
                 });
             }
 
-            if (promoCodeModel.DiscountPercentage != null && promoCodeModel.DiscountAmount != null)
+            if (promoCodeModel.Count <= 0)
             {
                 return BadRequest(new
                 {
-                    Message = "You can make only one type of discount!"
+                    Message = "Choose promo codes count!"
                 });
             }
 
             try
             {
-                var codes = await promoCodeService.Create(promoCodeModel.DiscountAmount,
-                    promoCodeModel.DiscountPercentage,
-                    promoCodeModel.Count);
+                var codes = await promoCodeService.Create(promoCodeModel.DiscountPercentage,
+                    promoCodeModel.Count,
+                    promoCodeModel.Description);
 
-                return Ok(codes);
+                var result = new Dictionary<string, List<string>>();
+                result[promoCodeModel.Description] = codes;
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PromoCodeListingModel>> GetByCode([FromForm] string code)
+        {
+            try
+            {
+                var promoCode = await promoCodeService.GetByCode(code);
+
+                return Ok(promoCode);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {

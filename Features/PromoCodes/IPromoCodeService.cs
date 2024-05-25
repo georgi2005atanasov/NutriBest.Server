@@ -1,9 +1,13 @@
 ﻿namespace NutriBest.Server.Features.PromoCodes
 {
+    using NutriBest.Server.Features.PromoCodes.Models;
+
     public interface IPromoCodeService
     {
-        Task<List<string>> Create(decimal? discountAmount,
-            decimal? discountPercentage,
-            int count);
+        Task<List<string>> Create(decimal discountPercentage,
+            int count,
+            string description);
+
+        Task<PromoCodeListingModel> GetByCode(string code);
     }
 }

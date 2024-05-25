@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NutriBest.Server.Features.PromoCodes.Models
+﻿namespace NutriBest.Server.Features.PromoCodes.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class PromoCodeServiceModel
     {
-        public decimal? DiscountPercentage { get; set; }
-
-        public decimal? DiscountAmount { get; set; }
+        public decimal DiscountPercentage { get; set; }
 
         [Required]
         public int Count { get; set; }
+
+        [Required]
+        public string Description { get; set; } = null!;
     }
 }

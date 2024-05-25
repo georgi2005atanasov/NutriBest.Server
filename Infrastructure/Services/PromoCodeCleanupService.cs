@@ -2,12 +2,12 @@
 {
     using NutriBest.Server.Data;
 
-    public class PromotionActivationService : BackgroundService
+    public class PromoCodeCleanupService : BackgroundService
     {
         private readonly IServiceProvider serviceProvider;
         private readonly TimeSpan interval = TimeSpan.FromHours(1);
 
-        public PromotionActivationService(IServiceProvider serviceProvider)
+        public PromoCodeCleanupService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -21,15 +21,15 @@
                     var dbContext = scope.ServiceProvider.GetRequiredService<NutriBestDbContext>();
                     var now = DateTime.UtcNow;
 
-                    var promotionsToActivate = dbContext.Promotions
-                        .Where(p => p.StartDate <= now && !p.IsActive);
+                    var expiredPromoCodes = dbContext.PromoCodes
+                        .Where(p => (p.CreatedOn - DateTime.Now).Days > 10);
 
-                    foreach (var promotion in promotionsToActivate)
+                    foreach (var promoCode in expiredPromoCodes)
                     {
-                        promotion.IsActive = true;
+                        promoCode.IsValid = false;
                     }
 
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(stoppingToken);
                 }
 
                 await Task.Delay(interval, stoppingToken);
