@@ -62,7 +62,6 @@
                 {
                     DiscountPercentage = x.DiscountPercentage,
                     Code = x.Code,
-                    IsValid = x.IsValid
                 })
                 .FirstOrDefaultAsync(x => x.Code == code);
 
@@ -72,14 +71,24 @@
             return promoCode;
         }
 
-        public async Task<List<string>> GetByDescription(string description)
+        public async Task<(List<string>, int)> GetByDescription(string description)
         {
-            var promoCodes = await db.PromoCodes
+            var promoCodes = db.PromoCodes
                 .Where(x => x.Description == description)
-                .Select(x => x.Code)
-                .ToListAsync();
+                .Select(x => new
+                {
+                    x.Code,
+                    x.CreatedOn
+                });
 
-            return promoCodes;
+            if (!await promoCodes.AnyAsync())
+            {
+                return (new List<string>(), 0);
+            }
+
+            var expireIn = (promoCodes.First().CreatedOn - DateTime.Now).Duration().Days;
+
+            return (await promoCodes.Select(x => x.Code).ToListAsync(), expireIn);
         }
     }
 }

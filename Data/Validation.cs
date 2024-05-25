@@ -55,5 +55,13 @@
             public const int MinQuantity = 0;
             public const int MaxQuantity = 2000;
         }
+
+        public class PromoCodes
+        {
+            public const double MinDiscount = 0.1;
+            public const double MaxDiscount = 99.9;
+            public const int MaxDescriptionLength = 50;
+            public const int MinDescriptionLength = 5;
+        }
     }
 }

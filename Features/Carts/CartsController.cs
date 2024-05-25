@@ -177,6 +177,8 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
+                await DisablePromoCode(cart);
+
                 var existingProduct = GetExistingProduct(cart, cartProduct);
 
                 var productFromDb = await GetProductFromDb(cartProduct);
@@ -217,6 +219,8 @@
                     cartProduct,
                     productFromDb);
 
+                await EnablePromoCode(cart);
+
                 await SetSessionCart(cart);
 
                 return Ok(new
@@ -236,6 +240,8 @@
         public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)
         {
             CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
+
+            await DisablePromoCode(cart);
 
             if (cart.CartProducts == null)
                 cart.CartProducts = new List<CartProductServiceModel>();
@@ -264,6 +270,8 @@
                     productToRemove,
                     productFromDb);
 
+                await EnablePromoCode(cart);
+
                 await SetSessionCart(cart);
 
                 return Ok();
@@ -291,11 +299,25 @@
                     });
                 }
 
-                var promoCode = await promoCodeService.GetByCode(promoCodeModel.Code);
+                await DisablePromoCode(cart);
 
-                cart.TotalPrice -= promoCode.DiscountPercentage / 100 * cart.TotalPrice;
+                var promoCode = await db.PromoCodes
+                    .FirstOrDefaultAsync(x => x.Code == promoCodeModel.Code);
 
-                promoCode.IsValid = false;
+                if (promoCode == null)
+                    return BadRequest(new
+                    {
+                        Key = "PromoCode",
+                        Message = "Invalid promo code!"
+                    });
+
+                cart.TotalPrice -= promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalSaved += promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.Code = promoCode.Code;
+
+                //promoCode.IsValid = false;
+
+                await db.SaveChangesAsync();
 
                 await SetSessionCart(cart);
 
@@ -359,10 +381,34 @@
             });
         }
 
+        private async Task DisablePromoCode(CartServiceModel cart)
+        {
+            if (!string.IsNullOrEmpty(cart.Code))
+            {
+                var prevPromoCode = await db.PromoCodes
+                .FirstAsync(x => x.Code == cart.Code);
+
+                cart.TotalPrice += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalSaved -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+            }
+        }
+
+        private async Task EnablePromoCode(CartServiceModel cart)
+        {
+            if (!string.IsNullOrEmpty(cart.Code))
+            {
+                var prevPromoCode = await db.PromoCodes
+                .FirstAsync(x => x.Code == cart.Code);
+
+                cart.TotalPrice -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalSaved += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+            }
+        }
+
         private async Task CalculateTotalAmounts(bool isSubtracting,
-            CartServiceModel cart,
-            CartProductServiceModel cartProduct,
-            Product productFromDb)
+                CartServiceModel cart,
+                CartProductServiceModel cartProduct,
+                Product productFromDb)
         {
             if (isSubtracting)
             {
@@ -374,17 +420,20 @@
                     if (promotion.DiscountPercentage != null)
                     {
                         cart.TotalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.OriginalPrice -= productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountPercentage / 100 * productFromDb.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
                         cart.TotalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.OriginalPrice -= (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }
                 }
                 else
                 {
                     cart.TotalPrice -= productFromDb.Price * cartProduct.Count;
+                    cart.OriginalPrice -= productFromDb.Price * cartProduct.Count;
                 }
             }
             else
@@ -397,11 +446,13 @@
                     if (promotion.DiscountPercentage != null)
                     {
                         cart.TotalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.OriginalPrice += productFromDb.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountPercentage / 100 * productFromDb.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
                         cart.TotalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.OriginalPrice += (productFromDb.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }
                 }

@@ -81,10 +81,14 @@
         {
             try
             {
-                var promoCodes = await promoCodeService.GetByDescription(description);
+                (List<string> promoCodes, int expireIn) = await promoCodeService.GetByDescription(description);
 
-                var result = new Dictionary<string, List<string>>();
-                result[description] = promoCodes;
+                var result = new PromoCodeByDescriptionServiceModel
+                {
+                    Description = description,
+                    PromoCodes = promoCodes,
+                    ExpireIn = expireIn
+                };
 
                 return Ok(result);
             }
