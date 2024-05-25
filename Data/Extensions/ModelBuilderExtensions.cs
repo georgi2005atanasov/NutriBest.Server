@@ -195,5 +195,13 @@ namespace NutriBest.Server.Data.Extensions
             builder.Entity<Package>()
                 .HasQueryFilter(x => !x.IsDeleted);
         }
+
+        public static void ConfigurePromoCodes(this ModelBuilder builder)
+        {
+            builder.Entity<PromoCode>(e =>
+            {
+                e.HasQueryFilter(x => x.IsValid && !x.IsDeleted);
+            });
+        }
     }
 }

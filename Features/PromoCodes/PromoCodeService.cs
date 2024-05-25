@@ -43,13 +43,26 @@
             return codes;
         }
 
+        public async Task<bool> DisableByDescription(string description)
+        {
+            var promoCodes = db.PromoCodes
+                .Where(x => x.Description == description);
+
+            db.PromoCodes.RemoveRange(promoCodes);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<PromoCodeListingModel> GetByCode(string code)
         {
             var promoCode = await db.PromoCodes
                 .Select(x => new PromoCodeListingModel
                 {
                     DiscountPercentage = x.DiscountPercentage,
-                    Code = x.Code
+                    Code = x.Code,
+                    IsValid = x.IsValid
                 })
                 .FirstOrDefaultAsync(x => x.Code == code);
 
@@ -57,6 +70,16 @@
                 throw new ArgumentNullException("Invalid promo code!");
 
             return promoCode;
+        }
+
+        public async Task<List<string>> GetByDescription(string description)
+        {
+            var promoCodes = await db.PromoCodes
+                .Where(x => x.Description == description)
+                .Select(x => x.Code)
+                .ToListAsync();
+
+            return promoCodes;
         }
     }
 }

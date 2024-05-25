@@ -4,6 +4,7 @@
 
     public class PromoCodeCleanupService : BackgroundService
     {
+        //this is background service that ensures the promo codes are valid within 10 days from their creation
         private readonly IServiceProvider serviceProvider;
         private readonly TimeSpan interval = TimeSpan.FromHours(1);
 

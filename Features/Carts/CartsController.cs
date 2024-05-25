@@ -293,7 +293,9 @@
 
                 var promoCode = await promoCodeService.GetByCode(promoCodeModel.Code);
 
-                cart.TotalPrice -= (decimal)promoCode.DiscountPercentage / 100 * cart.TotalPrice;
+                cart.TotalPrice -= promoCode.DiscountPercentage / 100 * cart.TotalPrice;
+
+                promoCode.IsValid = false;
 
                 await SetSessionCart(cart);
 

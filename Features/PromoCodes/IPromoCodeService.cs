@@ -9,5 +9,9 @@
             string description);
 
         Task<PromoCodeListingModel> GetByCode(string code);
+
+        Task<bool> DisableByDescription(string description);
+
+        Task<List<string>> GetByDescription(string description);
     }
 }

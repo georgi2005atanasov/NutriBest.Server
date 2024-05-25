@@ -7,5 +7,7 @@
         public string Description { get; set; } = null!;
 
         public decimal DiscountPercentage { get; set; }
+
+        public bool IsValid { get; set; }
     }
 }
