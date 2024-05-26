@@ -330,6 +330,38 @@
         }
 
         [HttpDelete]
+        [Route("/cart/remove-promo-code")]
+        public async Task<ActionResult<bool>> RemovePromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
+        {
+            try
+            {
+                CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
+
+                if (cart.TotalPrice == 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "You have to add products to the cart!"
+                    });
+                }
+
+
+                await DisablePromoCode(cart);
+                cart.Code = "";
+
+                await db.SaveChangesAsync();
+
+                await SetSessionCart(cart);
+
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return BadRequest(false);
+            }
+        }
+
+        [HttpDelete]
         [Route("/cart/clean")]
         public async Task<ActionResult> CleanSessionCart()
         {
@@ -371,7 +403,7 @@
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true, // this was commented to show the cookie as I type document.cookie
-                    Expires = DateTime.Now.AddDays(7),
+                    Expires = DateTime.UtcNow.AddDays(7),
                     Secure = true,
                     SameSite = SameSiteMode.None
                 };
@@ -459,6 +491,7 @@
                 else
                 {
                     cart.TotalPrice += productFromDb.Price * cartProduct.Count;
+                    cart.OriginalPrice += productFromDb.Price * cartProduct.Count;
                 }
             }
         }
@@ -468,7 +501,6 @@
                     .FirstOrDefault(i => i.ProductId == cartProduct.ProductId &&
                     i.Flavour == cartProduct.Flavour &&
                     i.Grams == cartProduct.Grams);
-
 
         private async Task<Product?> GetProductFromDb(CartProductServiceModel cartProduct)
             => await db.Products

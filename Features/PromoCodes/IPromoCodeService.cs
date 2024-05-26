@@ -13,5 +13,7 @@
         Task<bool> DisableByDescription(string description);
 
         Task<(List<string>, int)> GetByDescription(string description);
+
+        Task<List<PromoCodeByDescriptionServiceModel>> All();
     }
 }

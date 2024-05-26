@@ -23,7 +23,7 @@
                     var now = DateTime.UtcNow;
 
                     var expiredPromoCodes = dbContext.PromoCodes
-                        .Where(p => (p.CreatedOn - DateTime.Now).Duration().Days > 10);
+                        .Where(p => (p.CreatedOn - now).Duration().Days > 10);
 
                     foreach (var promoCode in expiredPromoCodes)
                     {

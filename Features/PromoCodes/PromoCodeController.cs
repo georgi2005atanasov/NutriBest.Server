@@ -18,33 +18,73 @@
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<Dictionary<string, List<string>>>> Create([FromBody] PromoCodeServiceModel promoCodeModel)
         {
-            if (promoCodeModel.DiscountPercentage > (decimal)MaxDiscount ||
-                promoCodeModel.DiscountPercentage < (decimal)MinDiscount)
-            {
-                return BadRequest(new
-                {
-                    Message = "Discount percentage must be betweeen 0% and 100%!"
-                });
-            }
-
-            if (promoCodeModel.Count <= 0)
-            {
-                return BadRequest(new
-                {
-                    Message = "Choose promo codes count!"
-                });
-            }
-
             try
             {
-                var codes = await promoCodeService.Create(promoCodeModel.DiscountPercentage,
-                    promoCodeModel.Count,
+                decimal discountPercentage = 0;
+                int count = 0;
+
+                if (!decimal.TryParse(promoCodeModel.DiscountPercentage, out discountPercentage))
+                    return BadRequest(new
+                    {
+                        Key = "DiscountPercentage",
+                        Message = "Enter valid percentage between 0 and 100!"
+                    });
+
+                if (!int.TryParse(promoCodeModel.Count, out count))
+                    return BadRequest(new
+                    {
+                        Key = "Count",
+                        Message = "Enter some positive number!"
+                    });
+
+                if (discountPercentage > (decimal)MaxDiscount ||
+                    discountPercentage < (decimal)MinDiscount)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Discount percentage must be betweeen 0% and 100%!"
+                    });
+                }
+
+                if (count <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "The count must be a positive number!"
+                    });
+                }
+                var codes = await promoCodeService.Create(discountPercentage,
+                    count,
                     promoCodeModel.Description);
 
                 var result = new Dictionary<string, List<string>>();
                 result[promoCodeModel.Description] = codes;
 
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid request!"
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<PromoCodeByDescriptionServiceModel>>> All()
+        {
+            try
+            {
+                var promoCodes = await promoCodeService.All();
+                return Ok(promoCodes);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {
@@ -106,6 +146,7 @@
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult> DisableByDescription([FromForm] string description)
         {
             try

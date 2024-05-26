@@ -15,7 +15,31 @@
             this.db = db;
         }
 
-        public async Task<List<string>> Create(decimal discountPercentage, 
+        public async Task<List<PromoCodeByDescriptionServiceModel>> All()
+        {
+            var promoCodes = await db.PromoCodes
+                .GroupBy(x => x.Description)
+                .Select(x => new PromoCodeByDescriptionServiceModel
+                {
+                    Description = x.Key,
+                    ExpireIn = 10 - x
+                        .Select(y =>
+                                    (y.CreatedOn - DateTime.UtcNow)
+                                    .Duration()
+                                    .Days)
+                        .FirstOrDefault(),
+                    PromoCodes = db
+                        .PromoCodes
+                        .Where(y => y.Description == x.Key)
+                        .Select(x => x.Code)
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return promoCodes;
+        }
+
+        public async Task<List<string>> Create(decimal discountPercentage,
             int count,
             string description)
         {
@@ -86,7 +110,7 @@
                 return (new List<string>(), 0);
             }
 
-            var expireIn = (promoCodes.First().CreatedOn - DateTime.Now).Duration().Days;
+            var expireIn = (promoCodes.First().CreatedOn - DateTime.UtcNow).Duration().Days;
 
             return (await promoCodes.Select(x => x.Code).ToListAsync(), expireIn);
         }

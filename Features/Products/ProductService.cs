@@ -122,7 +122,7 @@
                 Price = price,
                 ProductImage = productImage,
                 Brand = brand,
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 Quantity = 0
             };
 
@@ -279,7 +279,7 @@
 
                 product.IsDeleted = true;
                 product.DeletedBy = currentUserService.GetUserName();
-                product.DeletedOn = DateTime.Now;
+                product.DeletedOn = DateTime.UtcNow;
 
                 await db.ProductsPackagesFlavours
                     .Where(x => x.ProductId == productId)
@@ -317,7 +317,7 @@
 
                 productImage.IsDeleted = true;
                 productImage.DeletedBy = currentUserService.GetUserName();
-                productImage.DeletedOn = DateTime.Now;
+                productImage.DeletedOn = DateTime.UtcNow;
 
                 await db.SaveChangesAsync();
 

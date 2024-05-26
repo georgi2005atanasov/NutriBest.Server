@@ -62,6 +62,8 @@
         {
             public const double MinDiscount = 0.1;
             public const double MaxDiscount = 99.9;
+            public const int MaxDescriptionLength = 50;
+            public const int MinDescriptionLength = 5;
         }
     }
 }
