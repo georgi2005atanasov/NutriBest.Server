@@ -76,6 +76,7 @@
                                 .Distinct()
                                 .Count()
                 })
+                .OrderBy(x => x.Grams)
                 .ToListAsync();
 
             return products;

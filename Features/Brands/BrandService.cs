@@ -30,6 +30,7 @@
                 BrandLogoId = x.BrandLogoId,
                 Description = x.Description
             })
+            .OrderBy(x => x.Name)
             .ToListAsync();
 
             foreach (var brand in brands)
@@ -81,6 +82,7 @@
                 Name = x.Name,
                 BrandLogoId = x.BrandLogoId
             })
+            .OrderBy(x => x.Name)
             .FirstOrDefaultAsync();
 
         // The deletion of a brand will delete the products
@@ -129,6 +131,7 @@
                     .Where(y => y.BrandId == x.Id)
                     .Count()
                 })
+                .OrderBy(x => x.Name)
                 .ToListAsync();
 
             return result;

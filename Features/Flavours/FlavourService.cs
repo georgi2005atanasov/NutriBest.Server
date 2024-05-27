@@ -81,6 +81,7 @@
                                 .Distinct()
                                 .Count()
                 })
+                .OrderBy(x => x.Name)
                 .ToListAsync();
 
             return products;
