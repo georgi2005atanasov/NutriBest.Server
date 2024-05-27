@@ -62,6 +62,17 @@ namespace NutriBest.Server.Data.Extensions
             });
         }
 
+        public static void ConfigureCities(this ModelBuilder builder)
+        {
+            builder.Entity<City>(e =>
+            {
+                e.HasOne(x => x.Country)
+                .WithMany(x => x.Cities)
+                .HasForeignKey(x => x.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
         public static void ConfigureOrders(this ModelBuilder builder)
         {
             //better owned types but i miss sth

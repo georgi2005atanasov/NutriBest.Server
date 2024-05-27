@@ -12,6 +12,10 @@
         [MaxLength(CountryNameMaxLength)]
         public string CountryName { get; set; } = null!;
 
+        public string? IsoCode { get; set; }
+
         public HashSet<Address> Addresses { get; set; } = new HashSet<Address>();
+
+        public HashSet<City> Cities { get; set; } = new HashSet<City>();
     }
 }

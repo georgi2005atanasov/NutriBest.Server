@@ -2,10 +2,12 @@
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Infrastructure.Middlewares;
     using System;
+    using System.Globalization;
 
     public static class ApplicationBuilderExtensions
     {
@@ -24,6 +26,50 @@
             SeedPackages(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
+            SeedCountries(dbContext);
+            SeedCities(dbContext);
+        }
+
+        private static void SeedCities(NutriBestDbContext db)
+        {
+            if (db.Cities != null && db.Cities.Any())
+                return;
+
+            var cities = new StreamReader("bg-cities.json");
+
+            using (cities)
+            {
+                var fileContent = cities.ReadToEnd();
+                var jsonData = JsonConvert.DeserializeObject<List<JsonCities>>(fileContent)
+                ?? new List<JsonCities>();
+
+                foreach (var data in jsonData)
+                {
+                    db.Cities!.Add(new City
+                    {
+                        CityName = data.City,
+                        Longitude = decimal.Parse(data.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture), //wrong format!!!
+                        Latitude = decimal.Parse(data.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture),
+                        CountryId = 1
+                    });
+                }
+            }
+
+            db.SaveChanges();
+        }
+
+        private static void SeedCountries(NutriBestDbContext db)
+        {
+            if (db.Countries != null && db.Countries.Any())
+                return;
+
+            Task.Run(async () =>
+            {
+                db.Countries!.Add(new Country { CountryName = "Bulgaria", IsoCode = "BG" });
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
         }
 
         private static void SeedPackages(NutriBestDbContext db)
