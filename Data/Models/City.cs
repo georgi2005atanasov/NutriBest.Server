@@ -1,16 +1,16 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
-    using static Validation.Country;
-    public class Country
+    using static Validation.City;
+
+    public class City
     {
-        [Key]
-        [Required]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(CountryNameMaxLength)]
-        public string CountryName { get; set; } = null!;
+        [MaxLength(CityNameMaxLength)]
+        public string CityName { get; set; } = null!;
+
+        public int? PostalCode { get; set; }
 
         public HashSet<Address> Addresses { get; set; } = new HashSet<Address>();
     }

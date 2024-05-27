@@ -48,6 +48,8 @@
 
         public DbSet<Address> Addresses { get; set; } = null!;
 
+        public DbSet<City> Cities { get; set; } = null!;
+
         public DbSet<NutritionFacts> NutritionFacts { get; set; } = null!;
 
         public DbSet<Flavour> Flavours { get; set; } = null!;

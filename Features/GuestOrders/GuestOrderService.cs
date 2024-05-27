@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
-    public class OrderService : IOrderService
+    public class GuestOrderService : IGuestOrderService
     {
         public async Task<int> CreateOrder()
         {

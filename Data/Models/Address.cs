@@ -1,6 +1,7 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Address
     {
@@ -17,11 +18,15 @@
         public int? StreetNumber { get; set; }
 
         [Required]
-        public string Country { get; set; } = null!;
+        public int CountryId { get; set; }
+
+        public Country Country { get; set; } = null!;
 
         [Required]
-        public string City { get; set; } = null!;
+        public int CityId { get; set; }
 
-        public int? PostalCode { get; set; }
+        public City? City { get; set; }
+
+        public bool IsAnonymous { get; set; }
     }
 }

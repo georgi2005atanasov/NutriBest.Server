@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527095442_EditedAdressesTable")]
+    partial class EditedAdressesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,14 +165,18 @@ namespace NutriBest.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("PostalCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProfileId")
                         .IsRequired()
@@ -184,10 +190,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CityId");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("ProfileId")
                         .IsUnique();
@@ -328,43 +330,6 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("CityName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PostalCode")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("CountryName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Flavour", b =>
@@ -1104,18 +1069,6 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
                 {
-                    b.HasOne("NutriBest.Server.Data.Models.City", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NutriBest.Server.Data.Models.Country", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NutriBest.Server.Data.Models.Profile", null)
                         .WithOne("Address")
                         .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
@@ -1196,7 +1149,35 @@ namespace NutriBest.Server.Data.Migrations
                         .HasForeignKey("NutriBest.Server.Data.Models.OrderDetails", "InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.OwnsOne("NutriBest.Server.Data.Models.Country", "Country", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
+
+                            b1.Property<string>("CountryName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("OrderDetailsId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("OrderDetailsId")
+                                .IsUnique();
+
+                            b1.ToTable("Countries");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderDetailsId");
+                        });
+
                     b.Navigation("Address");
+
+                    b.Navigation("Country");
 
                     b.Navigation("Invoice");
                 });
@@ -1334,16 +1315,6 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Category", b =>
                 {
                     b.Navigation("ProductsCategories");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>
-                {
-                    b.Navigation("Addresses");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.Country", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Flavour", b =>

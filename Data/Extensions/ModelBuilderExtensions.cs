@@ -37,9 +37,29 @@ namespace NutriBest.Server.Data.Extensions
                 .WithOne()
                 .HasForeignKey<Address>(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
 
+        public static void ConfigureAddresses(this ModelBuilder builder)
+        {
             builder.Entity<Address>()
                 .Ignore(x => x.Profile);
+
+            builder.Entity<Address>(e =>
+            {
+                e.HasOne(e => e.Country)
+                .WithMany()
+                .HasForeignKey(e => e.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(x => x.Country);
+
+                e.HasOne(e => e.City)
+                .WithMany(x => x.Addresses)
+                .HasForeignKey(e => e.CityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(x => x.City);
+            });
         }
 
         public static void ConfigureOrders(this ModelBuilder builder)
@@ -82,7 +102,12 @@ namespace NutriBest.Server.Data.Extensions
 
                 e.Ignore(e => e.Order);
 
-                e.OwnsOne(x => x.Country);
+                e.HasOne(x => x.Country)
+                .WithMany()
+                .HasForeignKey(x => x.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(x => x.Country);
             });
         }
 

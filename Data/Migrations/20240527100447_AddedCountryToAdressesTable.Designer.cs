@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527100447_AddedCountryToAdressesTable")]
+    partial class AddedCountryToAdressesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,14 +165,18 @@ namespace NutriBest.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("PostalCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProfileId")
                         .IsRequired()
@@ -184,8 +190,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CityId");
 
                     b.HasIndex("CountryId");
 
@@ -328,26 +332,6 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("CityName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PostalCode")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Country", b =>
@@ -1104,12 +1088,6 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Address", b =>
                 {
-                    b.HasOne("NutriBest.Server.Data.Models.City", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NutriBest.Server.Data.Models.Country", null)
                         .WithMany("Addresses")
                         .HasForeignKey("CountryId")
@@ -1334,11 +1312,6 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Category", b =>
                 {
                     b.Navigation("ProductsCategories");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Country", b =>

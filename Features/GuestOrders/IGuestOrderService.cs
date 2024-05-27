@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
-    public interface IOrderService
+    public interface IGuestOrderService
     {
         Task<int> CreateOrder();
     }

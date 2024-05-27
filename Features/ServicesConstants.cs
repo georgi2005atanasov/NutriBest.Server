@@ -65,5 +65,30 @@
             public const int MaxDescriptionLength = 50;
             public const int MinDescriptionLength = 5;
         }
+
+        public class GuestOrder
+        {
+            public const int NameMaxLength = 100;
+            public const int EmailMaxLength = 70;
+        }
+
+        public class Invoice
+        {
+            public const int FirstNameMaxLength = 50;
+            public const int LastNameMaxLength = 50;
+            public const int CompanyNameMaxLength = 50;
+            public const int CompanyNameMinLength = 1;
+            public const int PersonInChargeMaxLength = 100;
+        }
+
+        public class City
+        {
+            public const int CityNameMaxLength = 60;
+        }
+
+        public class Country
+        {
+            public const int CountryNameMaxLength = 60;
+        }
     }
 }

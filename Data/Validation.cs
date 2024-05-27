@@ -78,5 +78,15 @@
             public const int MaxDescriptionLength = 50;
             public const int MinDescriptionLength = 5;
         }
+
+        public class City
+        {
+            public const int CityNameMaxLength = 60;
+        }
+
+        public class Country
+        {
+            public const int CountryNameMaxLength = 60;
+        }
     }
 }

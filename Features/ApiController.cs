@@ -1,5 +1,4 @@
-﻿
-namespace NutriBest.Server.Features
+﻿namespace NutriBest.Server.Features
 {
     using Microsoft.AspNetCore.Mvc;
 
