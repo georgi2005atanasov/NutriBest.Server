@@ -34,6 +34,6 @@
         public string PersonInCharge { get; set; } = null!;
 
         [NotMapped]
-        public OrderDetails OrderDetails { get; set; } = null!;
+        public OrderDetails? OrderDetails { get; set; }
     }
 }

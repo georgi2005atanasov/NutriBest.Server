@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527174320_AddedOrderDbSet")]
+    partial class AddedOrderDbSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,6 +175,7 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfileId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Street")
@@ -189,8 +192,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("CountryId");
 
                     b.HasIndex("ProfileId")
-                        .IsUnique()
-                        .HasFilter("[ProfileId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Addresses");
                 });
@@ -1141,7 +1143,8 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasOne("NutriBest.Server.Data.Models.Profile", null)
                         .WithOne("Address")
                         .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Brand", b =>
@@ -1387,7 +1390,8 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Invoice", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("OrderDetails")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>

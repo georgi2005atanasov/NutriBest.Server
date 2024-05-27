@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Infrastructure.Services
 {
+    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
 
     public class PromoCodeCleanupService : BackgroundService
@@ -20,10 +21,13 @@
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<NutriBestDbContext>();
-                    var now = DateTime.UtcNow;
 
-                    var expiredPromoCodes = dbContext.PromoCodes
-                        .Where(p => (p.CreatedOn - now).Duration().Days > 10);
+                    var tenDaysAgo = DateTime.UtcNow.AddDays(-10);
+
+                    var expiredPromoCodes = await dbContext.PromoCodes
+                        .Where(p => p.IsValid && !p.IsDeleted)
+                        .Where(p => p.CreatedOn <= tenDaysAgo)
+                        .ToListAsync(stoppingToken);
 
                     foreach (var promoCode in expiredPromoCodes)
                     {

@@ -12,5 +12,11 @@
 
         [JsonProperty("lng")]
         public string Longitude { get; set; } = null!;
+
+        [JsonProperty("country")]
+        public string Country { get; set; } = null!;
+
+        [JsonProperty("iso2")]
+        public string IsoCode { get; set; } = null!;
     }
 }

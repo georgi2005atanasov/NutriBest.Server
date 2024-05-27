@@ -14,6 +14,8 @@
     using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.NutritionsFacts;
+    using NutriBest.Server.Features.OrderDetails;
+    using NutriBest.Server.Features.Orders;
     using NutriBest.Server.Features.Packages;
     using NutriBest.Server.Features.Products;
     using NutriBest.Server.Features.ProductsDetails;
@@ -22,13 +24,13 @@
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
-    using System.Reflection;
 
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services
+                .AddHostedService<PromoCodeCleanupService>()
                 .AddHostedService<PromotionCleanupService>()
                 .AddHostedService<PromotionActivationService>()
                 .AddScoped<ICurrentUserService, CurrentUserService>()
@@ -46,7 +48,9 @@
                 .AddTransient<IBrandService, BrandService>()
                 .AddTransient<IFlavourService, FlavourService>()
                 .AddTransient<IPackageService, PackageService>()
-                .AddTransient<IPromoCodeService, PromoCodeService>();
+                .AddTransient<IPromoCodeService, PromoCodeService>()
+                .AddTransient<IOrderDetailsService, OrderDetailsService>()
+                .AddTransient<IGuestOrderService, GuestOrderService>();
 
             return services;
         }

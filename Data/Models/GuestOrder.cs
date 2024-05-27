@@ -15,6 +15,7 @@
         public string Name { get; set; } = null!;
 
         [Required]
+        [EmailAddress]
         [MaxLength(EmailMaxLength)]
         public string Email { get; set; } = null!;
 

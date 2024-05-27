@@ -14,6 +14,7 @@
         public string Name { get; set; } = null!;
 
         [Required]
+        [EmailAddress]
         [MaxLength(EmailMaxLength)]
         public string Email { get; set; } = null!;
 
@@ -34,7 +35,7 @@
 
         public bool HasInvoice { get; set; }
 
-        public PaymentMethod PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } = null!;
 
         public InvoiceServiceModel? Invoice { get; set; }
 

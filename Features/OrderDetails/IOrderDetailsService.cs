@@ -4,13 +4,12 @@ namespace NutriBest.Server.Features.OrderDetails
 {
     public interface IOrderDetailsService
     {
-        Task<int> Create(int orderId, 
-            string address,
+        Task<int> CreateAnonymous(//orderId
             string countryName,
             string city,
             string street,
-            string streetNumber,
-            string postalCode,
+            int? streetNumber,
+            int? postalCode,
             string paymentMethod,
             bool hasInvoice,
             InvoiceServiceModel? invoice,

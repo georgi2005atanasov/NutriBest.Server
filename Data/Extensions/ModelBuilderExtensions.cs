@@ -59,6 +59,8 @@ namespace NutriBest.Server.Data.Extensions
                 .OnDelete(DeleteBehavior.Restrict);
 
                 e.Ignore(x => x.City);
+
+                e.Property(x => x.ProfileId).IsRequired(false);
             });
         }
 
@@ -112,13 +114,6 @@ namespace NutriBest.Server.Data.Extensions
                 .OnDelete(DeleteBehavior.Restrict);
 
                 e.Ignore(e => e.Order);
-
-                e.HasOne(x => x.Country)
-                .WithMany()
-                .HasForeignKey(x => x.CountryId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-                e.Ignore(x => x.Country);
             });
         }
 

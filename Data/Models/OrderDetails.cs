@@ -11,7 +11,7 @@
         public int Id { get; set; }
 
         [NotMapped]
-        public Order Order { get; set; } = null!;
+        public Order? Order { get; set; }
 
         public DateTime MadeOn { get; set; }
 
@@ -28,10 +28,6 @@
         public int AddressId { get; set; }
 
         public Address? Address { get; set; }
-
-        public int CountryId { get; set; }
-
-        public Country? Country { get; set; }
 
         public int? InvoiceId { get; set; }
 

@@ -8,7 +8,7 @@
         public int Id { get; set; }
 
         [Required]
-        public string ProfileId { get; set; } = null!;
+        public string? ProfileId { get; set; }
 
         public Profile? Profile { get; set; }
 

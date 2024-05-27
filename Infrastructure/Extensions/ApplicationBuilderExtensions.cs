@@ -26,7 +26,6 @@
             SeedPackages(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
-            SeedCountries(dbContext);
             SeedCities(dbContext);
         }
 
@@ -37,35 +36,41 @@
 
             var cities = new StreamReader("bg-cities.json");
 
-            using (cities)
-            {
-                var fileContent = cities.ReadToEnd();
-                var jsonData = JsonConvert.DeserializeObject<List<JsonCities>>(fileContent)
-                ?? new List<JsonCities>();
-
-                foreach (var data in jsonData)
-                {
-                    db.Cities!.Add(new City
-                    {
-                        CityName = data.City,
-                        Longitude = decimal.Parse(data.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture), //wrong format!!!
-                        Latitude = decimal.Parse(data.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture),
-                        CountryId = 1
-                    });
-                }
-            }
-
-            db.SaveChanges();
-        }
-
-        private static void SeedCountries(NutriBestDbContext db)
-        {
-            if (db.Countries != null && db.Countries.Any())
-                return;
-
             Task.Run(async () =>
             {
-                db.Countries!.Add(new Country { CountryName = "Bulgaria", IsoCode = "BG" });
+                using (cities)
+                {
+                    var fileContent = await cities.ReadToEndAsync();
+                    var jsonData = JsonConvert.DeserializeObject<List<JsonCities>>(fileContent)
+                    ?? new List<JsonCities>();
+
+                    foreach (var data in jsonData)
+                    {
+                        var country = await db.Countries.FirstOrDefaultAsync(x => x.CountryName == data.Country);
+
+                        if (country == null)
+                        {
+                            country = new Country
+                            {
+                                CountryName = data.Country,
+                                IsoCode = data.IsoCode
+                            };
+
+                            db.Countries.Add(country);
+
+                            await db.SaveChangesAsync();
+                        }
+
+                        db.Cities!.Add(new City
+                        {
+                            CityName = data.City,
+                            Longitude = decimal.Parse(data.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture), //wrong format!!!
+                            Latitude = decimal.Parse(data.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture),
+                            Country = country
+                        });
+                    }
+                }
+
                 await db.SaveChangesAsync();
             })
                 .GetAwaiter()
