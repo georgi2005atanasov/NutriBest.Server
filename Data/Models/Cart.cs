@@ -15,6 +15,8 @@
         [Required]
         public List<CartProduct> CartProducts { get; set; } = new List<CartProduct>();
 
+        public string? Code { get; set; }
+
         [Required]
         public decimal TotalPrice { get; set; }
 

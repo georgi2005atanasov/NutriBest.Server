@@ -20,6 +20,18 @@
         [NotMapped]
         public Product? Product { get; set; }
 
+        [Required]
+        public int FlavourId { get; set; }
+
+        [NotMapped]
+        public Flavour? Flavour { get; set; }
+
+        [Required]
+        public int PackageId { get; set; }
+
+        [NotMapped]
+        public Package? Package { get; set; }
+
         public int Count { get; set; }
     }
 }

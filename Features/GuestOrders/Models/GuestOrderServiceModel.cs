@@ -5,6 +5,7 @@
     using static ServicesConstants.GuestOrder;
     using static ServicesConstants.City;
     using static ServicesConstants.Country;
+    using NutriBest.Server.Data.Enums;
 
     public class GuestOrderServiceModel
     {
@@ -24,11 +25,16 @@
         [MaxLength(CityNameMaxLength)]
         public string City { get; set; } = null!;
 
-        public string Address { get; set; } = null!;
+        [Required]
+        public string Street { get; set; } = null!;
+
+        public int? StreetNumber { get; set; }
 
         public int? PostalCode { get; set; }
 
         public bool HasInvoice { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
 
         public InvoiceServiceModel? Invoice { get; set; }
 
