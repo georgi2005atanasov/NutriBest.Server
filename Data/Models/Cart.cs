@@ -17,5 +17,11 @@
 
         [Required]
         public decimal TotalPrice { get; set; }
+
+        [Required]
+        public decimal TotalSaved { get; set; }
+
+        [Required]
+        public decimal OriginalPrice { get; set; }
     }
 }

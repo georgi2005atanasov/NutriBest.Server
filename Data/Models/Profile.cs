@@ -27,6 +27,6 @@
         [NotMapped]
         public Cart? Cart { get; set; } = new Cart();
 
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<UserOrder> UsersOrders { get; set; } = new List<UserOrder>();
     }
 }

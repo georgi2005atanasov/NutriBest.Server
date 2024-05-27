@@ -21,6 +21,21 @@
             public const int MinAge = 12;
         }
 
+        public class GuestOrder
+        {
+            public const int NameMaxLength = 100;
+            public const int EmailMaxLength = 70;
+        }
+
+        public class Invoice
+        {
+            public const int FirstNameMaxLength = 50;
+            public const int LastNameMaxLength = 50;
+            public const int CompanyNameMaxLength = 50;
+            public const int CompanyNameMinLength = 1;
+            public const int PersonInChargeMaxLength = 100;
+        }
+
         public class NutritionFacts
         {
             public const int MinAmount = 0;

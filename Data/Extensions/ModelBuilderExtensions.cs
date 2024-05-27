@@ -22,7 +22,7 @@ namespace NutriBest.Server.Data.Extensions
 
             builder
                 .Entity<Profile>()
-                .HasMany(x => x.Orders)
+                .HasMany(x => x.UsersOrders)
                 .WithOne(x => x.Profile)
                 .HasForeignKey(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -38,20 +38,52 @@ namespace NutriBest.Server.Data.Extensions
                 .HasForeignKey<Address>(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Address>()
+                .Ignore(x => x.Profile);
         }
 
-        public static void ConfigureOrder(this ModelBuilder builder)
+        public static void ConfigureOrders(this ModelBuilder builder)
         {
-            builder.Entity<Order>()
-                .HasOne(x => x.Cart)
+            //better owned types but i miss sth
+            builder.Entity<Order>(e =>
+            {
+                e.HasOne(x => x.OrderDetails)
                 .WithOne()
-                .HasForeignKey<Order>(x => x.CartId);
-
-            builder.Entity<Order>()
-                .HasOne(x => x.OrderDetails)
-                .WithOne(x => x.Order)
-                .HasForeignKey<OrderDetails>(x => x.OrderId)
+                .HasForeignKey<Order>(x => x.OrderDetailsId)
                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<GuestOrder>(e =>
+            {
+                e.HasOne(x => x.Order)
+                .WithOne()
+                .HasForeignKey<GuestOrder>(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(e => e.Order);
+            });
+
+            builder.Entity<UserOrder>(e =>
+            {
+                e.HasOne(x => x.Order)
+                .WithOne()
+                .HasForeignKey<UserOrder>(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(e => e.Order);
+            });
+
+            builder.Entity<OrderDetails>(e =>
+            {
+                e.HasOne(x => x.Invoice)
+                .WithOne(x => x.OrderDetails)
+                .HasForeignKey<OrderDetails>(x => x.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(e => e.Order);
+
+                e.OwnsOne(x => x.Country);
+            });
         }
 
         public static void ConfigureProduct(this ModelBuilder builder)

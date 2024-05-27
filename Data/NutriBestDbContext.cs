@@ -36,9 +36,15 @@
 
         public DbSet<CartProduct> CartProducts { get; set; } = null!;
 
-        public DbSet<Order> Orders { get; set; } = null!;
+        public DbSet<UserOrder> UsersOrders { get; set; } = null!;
+
+        public DbSet<GuestOrder> GuestsOrders { get; set; } = null!;
 
         public DbSet<OrderDetails> OrdersDetails { get; set; } = null!;
+
+        public DbSet<Invoice> Invoices { get; set; } = null!;
+
+        public DbSet<Country> Countries { get; set; } = null!;
 
         public DbSet<Address> Addresses { get; set; } = null!;
 
