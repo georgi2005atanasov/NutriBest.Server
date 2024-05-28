@@ -120,5 +120,43 @@
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("address")]
+        [Authorize(Roles = "Administrator,Employee,User")]
+        public async Task<ActionResult<ProfileAddressServiceModel>> GetAddress()
+        {
+            try
+            {
+                var address = await profileService.GetAddress();
+
+                return Ok(address);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route("address")]
+        [Authorize(Roles = "Administrator,Employee,User")]
+        public async Task<ActionResult<ProfileAddressServiceModel>> GetAddress([FromBody] ProfileAddressServiceModel addressModel)
+        {
+            try
+            {
+                var addressId = await profileService.SetAddress(addressModel.Street,
+                    addressModel.StreetNumber,
+                    addressModel.City,
+                    addressModel.Country,
+                    addressModel.PostalCode);
+
+                return Ok(addressId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

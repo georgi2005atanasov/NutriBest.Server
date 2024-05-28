@@ -5,7 +5,6 @@
     using static ServicesConstants.GuestOrder;
     using static ServicesConstants.City;
     using static ServicesConstants.Country;
-    using NutriBest.Server.Data.Enums;
 
     public class GuestOrderServiceModel
     {

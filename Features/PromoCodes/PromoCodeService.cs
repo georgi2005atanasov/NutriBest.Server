@@ -49,6 +49,12 @@
             {
                 string code = PromoCodeGenerator.GeneratePromoCode(7);
 
+                if (await db.PromoCodes.AnyAsync(x => x.Code == code))
+                {
+                    i--; // low chance
+                    continue;
+                }
+
                 var promoCode = new PromoCode
                 {
                     Code = code,

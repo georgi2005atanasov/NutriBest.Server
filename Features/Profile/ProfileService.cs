@@ -3,6 +3,8 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
 
     public class ProfileService : IProfileService
@@ -14,6 +16,74 @@
         {
             this.currentUser = currentUser;
             this.db = db;
+        }
+
+        public async Task<ProfileAddressServiceModel> GetAddress()
+        {
+            var userId = currentUser.GetUserId();
+
+            var address = await db.Addresses
+                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+
+            if (address == null)
+                return new ProfileAddressServiceModel();
+
+            var city = await db.Cities
+                .FirstAsync(x => x.Id == address.CityId);
+            var country = await db.Countries
+                .FirstAsync(x => x.Id == address.CountryId);
+
+            var result = new ProfileAddressServiceModel
+            {
+                City = city.CityName,
+                Country = country.CountryName,
+                PostalCode = city.PostalCode,
+                Street = address.Street,
+                StreetNumber = address.StreetNumber
+            };
+
+            return result;
+        }
+
+        public async Task<int> SetAddress(string street, int? streetNumber, string cityName, string countryName, int? postalCode)
+        {
+            var userId = currentUser.GetUserId();
+
+            var city = await db.Cities
+                .FirstOrDefaultAsync(x => x.CityName == cityName);
+            var country = await db.Countries
+                .FirstOrDefaultAsync(x => x.CountryName == countryName);
+
+            if (city == null || country == null)
+                throw new InvalidOperationException("Invalid city/country!");
+
+            var address = await db.Addresses
+                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+
+            if (address == null)
+            {
+                address = new Address();
+                city.PostalCode = postalCode;
+                address.Street = street;
+                address.StreetNumber = streetNumber;
+                address.CityId = city.Id;
+                address.CountryId = country.Id;
+                address.ProfileId = userId;
+                db.Addresses.Add(address);
+            }
+            else
+            {
+                city.PostalCode = postalCode;
+                address.Street = street;
+                address.StreetNumber = streetNumber;
+                address.CityId = city.Id;
+                address.ProfileId = userId;
+                address.CountryId = country.Id;
+            }
+
+            await db.SaveChangesAsync();
+
+            return address.Id;
         }
 
         public async Task<string> UpdateProfile(string? name,

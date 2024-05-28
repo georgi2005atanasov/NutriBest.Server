@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Admin
+﻿using NutriBest.Server.Features.Profile.Models;
+
+namespace NutriBest.Server.Features.Admin
 {
     public interface IProfileService
     {
@@ -7,5 +9,13 @@
             string? email,
             int? age,
             string? gender);
+
+        Task<ProfileAddressServiceModel> GetAddress();
+
+        Task<int> SetAddress(string street,
+            int? streetNumber,
+            string city,
+            string country,
+            int? postalCode);
     }
 }
