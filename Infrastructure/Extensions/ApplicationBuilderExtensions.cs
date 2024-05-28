@@ -26,12 +26,61 @@
             SeedPackages(dbContext);
             SeedEmployeeRole(services.ServiceProvider);
             SeedUserRole(services.ServiceProvider);
-            SeedCities(dbContext);
+            SeedBgCities(dbContext);
+            SeedDeCities(dbContext);
         }
 
-        private static void SeedCities(NutriBestDbContext db)
+        private static void SeedDeCities(NutriBestDbContext db)
         {
-            if (db.Cities != null && db.Cities.Any())
+            if (db.Cities != null && db.Cities.Any(x => x.Country.CountryName == "Germany"))
+                return;
+
+            var cities = new StreamReader("de-cities.json");
+
+            Task.Run(async () =>
+            {
+                using (cities)
+                {
+                    var fileContent = await cities.ReadToEndAsync();
+                    var jsonData = JsonConvert.DeserializeObject<List<JsonCities>>(fileContent)
+                    ?? new List<JsonCities>();
+
+                    foreach (var data in jsonData)
+                    {
+                        var country = await db.Countries.FirstOrDefaultAsync(x => x.CountryName == data.Country);
+
+                        if (country == null)
+                        {
+                            country = new Country
+                            {
+                                CountryName = data.Country,
+                                IsoCode = data.IsoCode
+                            };
+
+                            db.Countries.Add(country);
+
+                            await db.SaveChangesAsync();
+                        }
+
+                        db.Cities!.Add(new City
+                        {
+                            CityName = data.City,
+                            Longitude = decimal.Parse(data.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture), //wrong format!!!
+                            Latitude = decimal.Parse(data.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture),
+                            Country = country
+                        });
+                    }
+                }
+
+                await db.SaveChangesAsync();
+            })
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        private static void SeedBgCities(NutriBestDbContext db)
+        {
+            if (db.Cities != null && db.Cities.Any(x => x.Country.CountryName == "Bulgaria"))
                 return;
 
             var cities = new StreamReader("bg-cities.json");
