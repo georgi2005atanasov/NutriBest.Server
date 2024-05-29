@@ -17,6 +17,8 @@
 
         public bool IsFinished { get; set; }
 
+        public bool IsConfirmed { get; set; }
+
         public OrderDetails? OrderDetails { get; set; }
 
         public GuestOrder? GuestOrder { get; set; }

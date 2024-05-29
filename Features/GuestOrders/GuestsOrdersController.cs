@@ -75,10 +75,11 @@
 
                 var order = new Order
                 {
-                    CartId = cartId
+                    CartId = cartId,
+                    IsFinished = false,
+                    IsConfirmed = false
                 };
-
-
+                
                 order.OrderDetailsId = await orderDetailsService.CreateAnonymous(orderModel.CountryName,
                     orderModel.City,
                     orderModel.Street,

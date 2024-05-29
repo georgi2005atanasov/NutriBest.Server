@@ -19,9 +19,11 @@
 
         public string? PhoneNumber { get; set; }
 
+        [Required]
         [MaxLength(CountryNameMaxLength)]
         public string CountryName { get; set; } = null!;
 
+        [Required]
         [MaxLength(CityNameMaxLength)]
         public string City { get; set; } = null!;
 
@@ -34,6 +36,7 @@
 
         public bool HasInvoice { get; set; }
 
+        [Required]
         public string PaymentMethod { get; set; } = null!;
 
         public InvoiceServiceModel? Invoice { get; set; }
