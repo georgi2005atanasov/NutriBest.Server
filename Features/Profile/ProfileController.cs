@@ -141,7 +141,7 @@
         [HttpPost]
         [Route("address")]
         [Authorize(Roles = "Administrator,Employee,User")]
-        public async Task<ActionResult<ProfileAddressServiceModel>> GetAddress([FromBody] ProfileAddressServiceModel addressModel)
+        public async Task<ActionResult<ProfileAddressServiceModel>> SetAddress([FromBody] ProfileAddressServiceModel addressModel)
         {
             try
             {

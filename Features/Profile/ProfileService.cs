@@ -45,7 +45,7 @@
             return result;
         }
 
-        public async Task<int> SetAddress(string street, int? streetNumber, string cityName, string countryName, int? postalCode)
+        public async Task<int> SetAddress(string street, string? streetNumber, string cityName, string countryName, int? postalCode)
         {
             var userId = currentUser.GetUserId();
 

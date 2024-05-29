@@ -15,7 +15,7 @@
         [Required]
         public string Street { get; set; } = null!;
 
-        public int? StreetNumber { get; set; }
+        public string? StreetNumber { get; set; }
 
         [Required]
         public int CountryId { get; set; }

@@ -28,7 +28,7 @@
         [Required]
         public string Street { get; set; } = null!;
 
-        public int? StreetNumber { get; set; }
+        public string? StreetNumber { get; set; }
 
         public int? PostalCode { get; set; }
 

@@ -169,9 +169,9 @@
             if (product == null)
                 throw new ArgumentNullException("Invalid product!");
 
-            var productPackageFlavours = db.ProductsPackagesFlavours
+            var productPackageFlavours = await db.ProductsPackagesFlavours
                 .Where(x => x.ProductId == id)
-                .AsQueryable();
+                .ToListAsync();
 
             if (!productPackageFlavours.Any())
                 throw new InvalidOperationException("Product could not be found!");

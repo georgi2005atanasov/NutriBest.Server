@@ -13,7 +13,7 @@ namespace NutriBest.Server.Features.Admin
         Task<ProfileAddressServiceModel> GetAddress();
 
         Task<int> SetAddress(string street,
-            int? streetNumber,
+            string? streetNumber,
             string city,
             string country,
             int? postalCode);

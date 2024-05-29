@@ -8,7 +8,7 @@ namespace NutriBest.Server.Features.OrderDetails
             string countryName,
             string city,
             string street,
-            int? streetNumber,
+            string? streetNumber,
             int? postalCode,
             string paymentMethod,
             bool hasInvoice,

@@ -4,7 +4,7 @@
     {
         public string Street { get; set; } = null!;
 
-        public int? StreetNumber { get; set; }
+        public string? StreetNumber { get; set; }
 
         public string Country { get; set; } = null!;
 

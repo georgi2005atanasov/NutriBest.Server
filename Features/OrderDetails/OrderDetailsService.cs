@@ -18,7 +18,7 @@
         public async Task<int> CreateAnonymous(string countryName,
             string cityName,
             string street,
-            int? streetNumber,
+            string? streetNumber,
             int? postalCode,
             string paymentMethod,
             bool hasInvoice,
