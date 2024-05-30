@@ -15,7 +15,7 @@
             this.db = db;
         }
 
-        public async Task<int> CreateAnonymous(string countryName,
+        public async Task<int> Create(string countryName,
             string cityName,
             string street,
             string? streetNumber,
@@ -23,7 +23,8 @@
             string paymentMethod,
             bool hasInvoice,
             InvoiceServiceModel? invoice,
-            string? comment)
+            string? comment,
+            string? profileId)
         {
             var country = await db.Countries
                 .FirstOrDefaultAsync(x => x.CountryName == countryName);
@@ -46,7 +47,8 @@
                 CityId = city.Id,
                 Country = country,
                 CountryId = country.Id,
-                IsAnonymous = true,
+                IsAnonymous = profileId == null,
+                ProfileId = profileId,
                 Street = street,
                 StreetNumber = streetNumber
             };
@@ -77,5 +79,6 @@
 
             return orderDetails.Id;
         }
+
     }
 }

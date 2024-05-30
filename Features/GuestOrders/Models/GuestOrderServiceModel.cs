@@ -21,7 +21,7 @@
 
         [Required]
         [MaxLength(CountryNameMaxLength)]
-        public string CountryName { get; set; } = null!;
+        public string Country { get; set; } = null!;
 
         [Required]
         [MaxLength(CityNameMaxLength)]
@@ -32,7 +32,7 @@
 
         public string? StreetNumber { get; set; }
 
-        public int? PostalCode { get; set; }
+        public string? PostalCode { get; set; }
 
         public bool HasInvoice { get; set; }
 
@@ -41,6 +41,7 @@
 
         public InvoiceServiceModel? Invoice { get; set; }
 
+        [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }
     }
 }

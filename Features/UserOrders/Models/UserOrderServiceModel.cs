@@ -19,25 +19,29 @@
 
         public string? PhoneNumber { get; set; }
 
+        [Required]
         [MaxLength(CountryNameMaxLength)]
-        public string CountryName { get; set; } = null!;
+        public string Country { get; set; } = null!;
 
+        [Required]
         [MaxLength(CityNameMaxLength)]
         public string City { get; set; } = null!;
 
         [Required]
         public string Street { get; set; } = null!;
 
-        public int? StreetNumber { get; set; }
+        public string? StreetNumber { get; set; }
 
-        public int? PostalCode { get; set; }
+        public string? PostalCode { get; set; }
 
         public bool HasInvoice { get; set; }
 
+        [Required]
         public string PaymentMethod { get; set; } = null!;
 
         public InvoiceServiceModel? Invoice { get; set; }
 
+        [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }
     }
 }

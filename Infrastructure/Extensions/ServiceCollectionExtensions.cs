@@ -50,7 +50,8 @@
                 .AddTransient<IPackageService, PackageService>()
                 .AddTransient<IPromoCodeService, PromoCodeService>()
                 .AddTransient<IOrderDetailsService, OrderDetailsService>()
-                .AddTransient<IGuestOrderService, GuestOrderService>();
+                .AddTransient<IGuestOrderService, GuestOrderService>()
+                .AddTransient<IOrderService, OrderService>();
 
             return services;
         }

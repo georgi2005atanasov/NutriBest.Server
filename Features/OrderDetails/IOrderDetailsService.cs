@@ -4,8 +4,7 @@ namespace NutriBest.Server.Features.OrderDetails
 {
     public interface IOrderDetailsService
     {
-        Task<int> CreateAnonymous(//orderId
-            string countryName,
+        Task<int> Create(string countryName,
             string city,
             string street,
             string? streetNumber,
@@ -13,6 +12,7 @@ namespace NutriBest.Server.Features.OrderDetails
             string paymentMethod,
             bool hasInvoice,
             InvoiceServiceModel? invoice,
-            string? comment);
+            string? comment,
+            string profileId = null);
     }
 }

@@ -1,6 +1,13 @@
 ﻿namespace NutriBest.Server.Features.UserOrders
 {
-    public interface IUserOrderService
+    using NutriBest.Server.Features.Orders;
+
+    public interface IUserOrderService : IOrderService
     {
+        Task<int> CreateUserOrder(string userId,
+            int orderId,
+            string name,
+            string email,
+            string? phoneNumber);
     }
 }

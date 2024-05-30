@@ -25,6 +25,7 @@
         {
             public const int NameMaxLength = 100;
             public const int EmailMaxLength = 70;
+            public const int CommentMaxLength = 100;
         }
 
         public class Invoice

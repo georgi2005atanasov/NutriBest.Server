@@ -1,35 +1,38 @@
-﻿namespace NutriBest.Server.Features.Orders
+﻿namespace NutriBest.Server.Features.UserOrders
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
-    using NutriBest.Server.Features.GuestOrders.Models;
     using NutriBest.Server.Features.OrderDetails;
+    using NutriBest.Server.Features.UserOrders.Models;
+    using NutriBest.Server.Infrastructure.Services;
 
-    public class GuestsOrdersController : ApiController
+    public class UsersOrdersController : ApiController
     {
         private const string CartCookieName = "ShoppingCart";
         private readonly NutriBestDbContext db;
-        private readonly IGuestOrderService guestOrderService;
+        private readonly IUserOrderService userOrderService;
         private readonly IOrderDetailsService orderDetailsService;
+        private readonly ICurrentUserService currentUserService;
 
-        public GuestsOrdersController(NutriBestDbContext db,
-            IGuestOrderService guestOrderService,
-            IOrderDetailsService orderDetailsService)
+        public UsersOrdersController(NutriBestDbContext db,
+            IUserOrderService userOrderService,
+            IOrderDetailsService orderDetailsService,
+            ICurrentUserService currentUserService)
         {
             this.db = db;
-            this.guestOrderService = guestOrderService;
+            this.userOrderService = userOrderService;
             this.orderDetailsService = orderDetailsService;
+            this.currentUserService = currentUserService;
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult<int>> Create([FromBody] GuestOrderServiceModel orderModel)
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<int>> Create([FromBody] UserOrderServiceModel orderModel)
         {
             if (orderModel.HasInvoice &&
                 (orderModel.Invoice == null ||
@@ -70,7 +73,7 @@
                     });
                 }
 
-                var cartId = await guestOrderService.PrepareCart(cookieCart.TotalPrice,
+                var cartId = await userOrderService.PrepareCart(cookieCart.TotalPrice,
                     cookieCart.OriginalPrice,
                     cookieCart.TotalSaved,
                     cookieCart.Code,
@@ -84,6 +87,14 @@
                     Comment = orderModel.Comment
                 };
 
+                var userId = currentUserService.GetUserId();
+
+                if (userId == null)
+                    return BadRequest(new
+                    {
+                        Message = "Invalid user!"
+                    });
+
                 order.OrderDetailsId = await orderDetailsService.Create(orderModel.Country,
                     orderModel.City,
                     orderModel.Street,
@@ -92,20 +103,22 @@
                     orderModel.PaymentMethod,
                     orderModel.HasInvoice,
                     orderModel.Invoice,
-                    orderModel.Comment);
+                    orderModel.Comment,
+                    userId); // mandatory
 
                 db.Orders.Add(order);
 
                 await db.SaveChangesAsync();
 
-                var guestOrderId = await guestOrderService.CreateGuestOrder(order.Id,
+                var userOrderId = await userOrderService.CreateUserOrder(userId, // mandatory
+                    order.Id,
                     orderModel.Email,
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
                 return Ok(new
                 {
-                    Id = guestOrderId
+                    Id = userOrderId
                 });
             }
             catch (ArgumentNullException err)
