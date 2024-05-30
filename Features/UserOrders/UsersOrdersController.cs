@@ -8,6 +8,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.OrderDetails;
+    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.UserOrders.Models;
     using NutriBest.Server.Infrastructure.Services;
 
@@ -18,16 +19,19 @@
         private readonly IUserOrderService userOrderService;
         private readonly IOrderDetailsService orderDetailsService;
         private readonly ICurrentUserService currentUserService;
+        private readonly IPromoCodeService promoCodeService;
 
         public UsersOrdersController(NutriBestDbContext db,
             IUserOrderService userOrderService,
             IOrderDetailsService orderDetailsService,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IPromoCodeService promoCodeService)
         {
             this.db = db;
             this.userOrderService = userOrderService;
             this.orderDetailsService = orderDetailsService;
             this.currentUserService = currentUserService;
+            this.promoCodeService = promoCodeService;
         }
 
         [HttpPost]
@@ -116,6 +120,11 @@
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
+                if (!string.IsNullOrEmpty(cookieCart.Code))
+                    await promoCodeService.DisableByCode(cookieCart.Code);
+
+                await SetSessionCart(new CartServiceModel());
+
                 return Ok(new
                 {
                     Id = userOrderId
@@ -143,6 +152,23 @@
 
             var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
             return cart;
+        }
+
+        private async Task SetSessionCart(CartServiceModel cart)
+        {
+            await Task.Run(() =>
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // this was commented to show the cookie as I type document.cookie
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                };
+
+                string serializedCart = JsonConvert.SerializeObject(cart);
+                Response.Cookies.Append(CartCookieName, serializedCart, cookieOptions);
+            });
         }
     }
 }

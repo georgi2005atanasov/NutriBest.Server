@@ -10,6 +10,7 @@
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.GuestOrders.Models;
     using NutriBest.Server.Features.OrderDetails;
+    using NutriBest.Server.Features.PromoCodes;
 
     public class GuestsOrdersController : ApiController
     {
@@ -17,14 +18,17 @@
         private readonly NutriBestDbContext db;
         private readonly IGuestOrderService guestOrderService;
         private readonly IOrderDetailsService orderDetailsService;
+        private readonly IPromoCodeService promoCodeService;
 
         public GuestsOrdersController(NutriBestDbContext db,
             IGuestOrderService guestOrderService,
-            IOrderDetailsService orderDetailsService)
+            IOrderDetailsService orderDetailsService,
+            IPromoCodeService promoCodeService)
         {
             this.db = db;
             this.guestOrderService = guestOrderService;
             this.orderDetailsService = orderDetailsService;
+            this.promoCodeService = promoCodeService;
         }
 
         [HttpPost]
@@ -57,19 +61,18 @@
                     Message = "Invalid postal code!"
                 });
 
+            var cookieCart = GetSessionCart() ?? new CartServiceModel();
+
+            if (cookieCart.OriginalPrice == 0)
+            {
+                return BadRequest(new
+                {
+                    Message = "You have to purchase something!"
+                });
+            }
+
             try
             {
-
-                var cookieCart = GetSessionCart() ?? new CartServiceModel();
-
-                if (cookieCart.OriginalPrice == 0)
-                {
-                    return BadRequest(new
-                    {
-                        Message = "You have to purchase something!"
-                    });
-                }
-
                 var cartId = await guestOrderService.PrepareCart(cookieCart.TotalPrice,
                     cookieCart.OriginalPrice,
                     cookieCart.TotalSaved,
@@ -81,7 +84,7 @@
                     CartId = cartId,
                     IsFinished = false,
                     IsConfirmed = false,
-                    Comment = orderModel.Comment
+                    Comment = orderModel.Comment,
                 };
 
                 order.OrderDetailsId = await orderDetailsService.Create(orderModel.Country,
@@ -103,6 +106,11 @@
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
+                if (!string.IsNullOrEmpty(cookieCart.Code))
+                    await promoCodeService.DisableByCode(cookieCart.Code);
+
+                await SetSessionCart(new CartServiceModel());
+                
                 return Ok(new
                 {
                     Id = guestOrderId
@@ -130,6 +138,22 @@
 
             var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
             return cart;
+        }
+        private async Task SetSessionCart(CartServiceModel cart)
+        {
+            await Task.Run(() =>
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // this was commented to show the cookie as I type document.cookie
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                };
+
+                string serializedCart = JsonConvert.SerializeObject(cart);
+                Response.Cookies.Append(CartCookieName, serializedCart, cookieOptions);
+            });
         }
     }
 }

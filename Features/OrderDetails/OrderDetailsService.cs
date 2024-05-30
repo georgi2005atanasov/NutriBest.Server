@@ -41,43 +41,91 @@
             if (city.CountryId != country.Id)
                 throw new InvalidOperationException("Invalid country/city!");
 
-            var address = new Address
+            if (profileId != null)
             {
-                City = city,
-                CityId = city.Id,
-                Country = country,
-                CountryId = country.Id,
-                IsAnonymous = profileId == null,
-                ProfileId = profileId,
-                Street = street,
-                StreetNumber = streetNumber
-            };
+                var address = await db.Addresses
+                    .FirstOrDefaultAsync(x => x.ProfileId == profileId);
 
-            var orderDetails = new OrderDetails
-            {
-                Address = address,
-                IsShipped = false,
-                IsPaid = false,
-                MadeOn = DateTime.UtcNow,
-                Invoice = hasInvoice && invoice != null ? 
-                new Invoice
+                if (address == null)
                 {
-                    CompanyName = invoice.CompanyName,
-                    FirstName = invoice.FirstName,
-                    LastName = invoice.LastName,
-                    PersonInCharge = invoice.PersonInCharge,
-                    PhoneNumber = invoice.PhoneNumber,
-                    VAT = invoice.VAT,
-                    Bullstat = invoice.Bullstat
-                } : null,
-                PaymentMethod = Enum.Parse<PaymentMethod>(paymentMethod)
-            };
+                    address = new Address
+                    {
+                        City = city,
+                        CityId = city.Id,
+                        Country = country,
+                        CountryId = country.Id,
+                        IsAnonymous = profileId == null,
+                        ProfileId = profileId,
+                        Street = street,
+                        StreetNumber = streetNumber
+                    };
+                }
 
-            db.OrdersDetails.Add(orderDetails);
+                var orderDetails = new OrderDetails
+                {
+                    Address = address,
+                    IsShipped = false,
+                    IsPaid = false,
+                    MadeOn = DateTime.UtcNow,
+                    Invoice = hasInvoice && invoice != null ?
+                    new Invoice
+                    {
+                        CompanyName = invoice.CompanyName,
+                        FirstName = invoice.FirstName,
+                        LastName = invoice.LastName,
+                        PersonInCharge = invoice.PersonInCharge,
+                        PhoneNumber = invoice.PhoneNumber,
+                        VAT = invoice.VAT,
+                        Bullstat = invoice.Bullstat
+                    } : null,
+                    PaymentMethod = Enum.Parse<PaymentMethod>(paymentMethod)
+                };
 
-            await db.SaveChangesAsync();
+                db.OrdersDetails.Add(orderDetails);
 
-            return orderDetails.Id;
+                await db.SaveChangesAsync();
+
+                return orderDetails.Id;
+            }
+            else
+            {
+                var address = new Address
+                {
+                    City = city,
+                    CityId = city.Id,
+                    Country = country,
+                    CountryId = country.Id,
+                    IsAnonymous = true,
+                    Street = street,
+                    StreetNumber = streetNumber
+                };
+
+                var orderDetails = new OrderDetails
+                {
+                    Address = address,
+                    IsShipped = false,
+                    IsPaid = false,
+                    MadeOn = DateTime.UtcNow,
+                    Invoice = hasInvoice && invoice != null ?
+                    new Invoice
+                    {
+                        CompanyName = invoice.CompanyName,
+                        FirstName = invoice.FirstName,
+                        LastName = invoice.LastName,
+                        PersonInCharge = invoice.PersonInCharge,
+                        PhoneNumber = invoice.PhoneNumber,
+                        VAT = invoice.VAT,
+                        Bullstat = invoice.Bullstat
+                    } : null,
+                    PaymentMethod = Enum.Parse<PaymentMethod>(paymentMethod)
+                };
+
+                db.OrdersDetails.Add(orderDetails);
+
+                await db.SaveChangesAsync();
+
+                return orderDetails.Id;
+            }
         }
 
     }

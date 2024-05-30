@@ -177,7 +177,7 @@
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
-                await DisablePromoCode(cart);
+                await DisablePromoCode(cart, cart.Code ?? "");
 
                 var existingProduct = GetExistingProduct(cart, cartProduct);
 
@@ -241,7 +241,7 @@
         {
             CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
-            await DisablePromoCode(cart);
+            await DisablePromoCode(cart, cart.Code ?? "");
 
             if (cart.CartProducts == null)
                 cart.CartProducts = new List<CartProductServiceModel>();
@@ -299,8 +299,6 @@
                     });
                 }
 
-                await DisablePromoCode(cart);
-
                 var promoCode = await db.PromoCodes
                     .FirstOrDefaultAsync(x => x.Code == promoCodeModel.Code);
 
@@ -310,6 +308,8 @@
                         Key = "PromoCode",
                         Message = "Invalid promo code!"
                     });
+
+                await DisablePromoCode(cart);
 
                 cart.TotalPrice -= promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved += promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
@@ -344,7 +344,6 @@
                         Message = "You have to add products to the cart!"
                     });
                 }
-
 
                 await DisablePromoCode(cart);
                 cart.Code = "";
@@ -413,8 +412,17 @@
             });
         }
 
-        private async Task DisablePromoCode(CartServiceModel cart)
+        private async Task DisablePromoCode(CartServiceModel cart, string code = "")
         {
+            if (!string.IsNullOrEmpty(code))
+            {
+                var prevPromoCode = await db.PromoCodes
+                .FirstAsync(x => x.Code == code);
+
+                cart.TotalPrice += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalSaved -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+            }
+
             if (!string.IsNullOrEmpty(cart.Code))
             {
                 var prevPromoCode = await db.PromoCodes

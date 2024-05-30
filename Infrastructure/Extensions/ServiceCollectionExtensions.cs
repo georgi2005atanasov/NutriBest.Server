@@ -22,6 +22,7 @@
     using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Features.UserOrders;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
 
@@ -51,6 +52,7 @@
                 .AddTransient<IPromoCodeService, PromoCodeService>()
                 .AddTransient<IOrderDetailsService, OrderDetailsService>()
                 .AddTransient<IGuestOrderService, GuestOrderService>()
+                .AddTransient<IUserOrderService, UserOrderService>()
                 .AddTransient<IOrderService, OrderService>();
 
             return services;

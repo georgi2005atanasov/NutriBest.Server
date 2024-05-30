@@ -73,6 +73,21 @@
             return codes;
         }
 
+        public async Task<bool> DisableByCode(string code)
+        {
+            var promoCode = await db.PromoCodes
+                .FirstOrDefaultAsync(x => x.Code == code);
+
+            if (promoCode == null)
+                throw new InvalidOperationException("Invalid Promo Code!");
+
+            db.PromoCodes.Remove(promoCode);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> DisableByDescription(string description)
         {
             var promoCodes = db.PromoCodes

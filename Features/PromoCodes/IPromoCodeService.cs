@@ -10,6 +10,8 @@
 
         Task<PromoCodeListingModel> GetByCode(string code);
 
+        Task<bool> DisableByCode(string code);
+
         Task<bool> DisableByDescription(string description);
 
         Task<(List<string>, int)> GetByDescription(string description);
