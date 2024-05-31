@@ -59,7 +59,7 @@ namespace NutriBest.Server.Features.Orders
             return cart.Id;
         }
 
-        public async Task<CartServiceModel?> GetFinishedOrder(int orderId)
+        public async Task<OrderServiceModel?> GetFinishedOrder(int orderId)
         {
             var orderFromDb = await db.Orders
                 .FirstOrDefaultAsync(x => x.Id == orderId);
@@ -88,10 +88,30 @@ namespace NutriBest.Server.Features.Orders
                              .ToList(),
                         Quantity = x.Product.Quantity,
                         PromotionId = x.Product.PromotionId,
-                        Brand = x.Product.Brand!.Name // be aware
+                        Brand = x.Product.Brand!.Name, // be aware,
                     }
                 })
                 .ToListAsync();
+
+            foreach (var product in cartProducts)
+            {
+                if (product.Product!.PromotionId != null)
+                {
+                    var promotion = await db.Promotions
+                        .FirstAsync(x => x.PromotionId == product.Product.PromotionId);
+
+                    if (promotion.DiscountPercentage != null)
+                    {
+                        product.Product.DiscountPercentage = promotion.DiscountPercentage;
+                    }
+
+                    if (promotion.DiscountAmount != null)
+                    {
+                        //productFromDb.Price * ((100 - (decimal)promotion.DiscountAmount) / 100) * cartProduct.Count
+                        product.Product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Product.Price;
+                    }
+                }
+            }
 
             var cartModel = new CartServiceModel
             {
@@ -102,12 +122,19 @@ namespace NutriBest.Server.Features.Orders
                 CartProducts = cartProducts
             };
 
+            var orderDetails = await db.OrdersDetails
+                .FirstAsync(x => x.Id == orderFromDb.OrderDetailsId);
+
             var order = new OrderServiceModel
             {
-                Cart = cartModel
+                Cart = cartModel,
+                IsConfirmed = orderFromDb.IsConfirmed,
+                IsFinished = orderFromDb.IsFinished,
+                MadeOn = orderDetails.MadeOn,
+                PaymentMethod = orderDetails.PaymentMethod.ToString()
             };
 
-            return cartModel;
+            return order;
         }
 
     }

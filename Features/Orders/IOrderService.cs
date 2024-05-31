@@ -1,6 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
     using NutriBest.Server.Features.Carts.Models;
+    using NutriBest.Server.Features.Orders.Models;
 
     public interface IOrderService
     {
@@ -10,6 +11,6 @@
             string? code,
             List<CartProductServiceModel> cartProducts);
 
-        Task<CartServiceModel?> GetFinishedOrder(int orderId);
+        Task<OrderServiceModel?> GetFinishedOrder(int orderId);
     }
 }
