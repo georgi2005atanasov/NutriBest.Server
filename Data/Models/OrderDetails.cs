@@ -10,7 +10,6 @@
         [Required]
         public int Id { get; set; }
 
-        [NotMapped]
         public Order? Order { get; set; }
 
         public DateTime MadeOn { get; set; }

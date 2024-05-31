@@ -61,9 +61,15 @@
                     Message = "Invalid postal code!"
                 });
 
+            if (await db.Users.AnyAsync(x => x.Email == orderModel.Email))
+                return BadRequest(new
+                {
+                    Message = "User with this email already exists!"
+                });
+
             var cookieCart = GetSessionCart() ?? new CartServiceModel();
 
-            if (cookieCart.OriginalPrice == 0)
+            if (cookieCart.OriginalPrice == 0 || !cookieCart.CartProducts.Any())
             {
                 return BadRequest(new
                 {

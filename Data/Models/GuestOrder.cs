@@ -23,7 +23,6 @@
 
         public int OrderId { get; set; }
 
-        [NotMapped]
         public Order? Order { get; set; }
     }
 }

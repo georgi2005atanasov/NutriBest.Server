@@ -9,7 +9,6 @@
         [Required]
         public int Id { get; set; }
 
-        [NotMapped]
         public Profile? Profile { get; set; }
 
         [Required]

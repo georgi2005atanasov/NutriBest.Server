@@ -318,6 +318,12 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CartId");
 
+                    b.HasIndex("FlavourId");
+
+                    b.HasIndex("PackageId");
+
+                    b.HasIndex("ProductId");
+
                     b.ToTable("CartProducts");
                 });
 
@@ -1172,7 +1178,31 @@ namespace NutriBest.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("NutriBest.Server.Data.Models.Flavour", "Flavour")
+                        .WithMany()
+                        .HasForeignKey("FlavourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Package", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Cart");
+
+                    b.Navigation("Flavour");
+
+                    b.Navigation("Package");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>

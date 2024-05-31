@@ -18,7 +18,6 @@
 
         public int? BrandLogoId { get; set; }
 
-        [NotMapped]
         public BrandLogo? BrandLogo { get; set; }
 
         public List<Product> Products { get; set; } = new List<Product>();

@@ -9,7 +9,6 @@
         [Required]
         public int ProductId { get; set; }
 
-        [NotMapped]
         public Product? Product { get; set; }
 
         [Required]

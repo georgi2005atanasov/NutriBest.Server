@@ -33,7 +33,6 @@
         [MaxLength(PersonInChargeMaxLength)]
         public string PersonInCharge { get; set; } = null!;
 
-        [NotMapped]
         public OrderDetails? OrderDetails { get; set; }
     }
 }
