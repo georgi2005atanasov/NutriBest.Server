@@ -2,11 +2,13 @@
 {
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Infrastructure.Services;
 
     public class GuestOrderService :  OrderService, IGuestOrderService
     {
-        public GuestOrderService(NutriBestDbContext db)
-            :base(db)
+        public GuestOrderService(NutriBestDbContext db,
+            ICurrentUserService currentUserService)
+            :base(db, currentUserService)
         {
         }
 

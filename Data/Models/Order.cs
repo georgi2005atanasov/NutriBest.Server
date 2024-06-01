@@ -22,11 +22,17 @@
 
         public OrderDetails? OrderDetails { get; set; }
 
+        public int? GuestOrderId { get; set; }
+
         public GuestOrder? GuestOrder { get; set; }
+
+        public int? UserOrderId { get; set; }
 
         public UserOrder? UserOrder { get; set; }
 
         [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }
+
+        public string SessionToken { get; set; } = null!;
     }
 }

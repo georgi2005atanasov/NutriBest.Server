@@ -11,6 +11,8 @@
             string? code,
             List<CartProductServiceModel> cartProducts);
 
-        Task<OrderServiceModel?> GetFinishedOrder(int orderId);
+        Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token);
+
+        Task<bool> ConfirmOrder(int orderId);
     }
 }

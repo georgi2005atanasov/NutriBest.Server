@@ -8,8 +8,9 @@
 
     public class UserOrderService : OrderService, IUserOrderService
     {
-        public UserOrderService(NutriBestDbContext db)
-            :base(db)
+        public UserOrderService(NutriBestDbContext db,
+            ICurrentUserService currentUserService)
+            :base(db, currentUserService)
         {
         }
 

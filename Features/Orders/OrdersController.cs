@@ -5,6 +5,7 @@
 
     public class OrdersController : ApiController
     {
+        private const string OrderCookie = "OrderCookie";
         private readonly IOrderService orderService;
 
         public OrdersController(IOrderService orderService)
@@ -18,7 +19,9 @@
         {
             try
             {
-                var order = await orderService.GetFinishedOrder(orderId);
+                var token = GetSessionOrder();
+
+                var order = await orderService.GetFinishedOrder(orderId, token);
 
                 return Ok(order);
             }
@@ -26,6 +29,32 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPost]
+        [Route("confirm")]
+        public async Task<ActionResult<bool>> ConfirmOrder([FromQuery] int orderId)
+        {
+            try
+            {
+                var result = await orderService.ConfirmOrder(orderId);
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        private string? GetSessionOrder()
+        {
+            string cookieValue = Request.Cookies[OrderCookie]!; // be aware
+
+            if (string.IsNullOrEmpty(cookieValue))
+                return null;
+
+            return cookieValue;
         }
     }
 }

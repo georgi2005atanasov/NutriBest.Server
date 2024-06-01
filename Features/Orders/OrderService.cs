@@ -5,15 +5,21 @@ using NutriBest.Server.Features.Carts.Models;
 using NutriBest.Server.Features.Invoices.Models;
 using NutriBest.Server.Features.Orders.Models;
 using NutriBest.Server.Features.Products.Models;
+using NutriBest.Server.Infrastructure.Services;
 
 namespace NutriBest.Server.Features.Orders
 {
     public class OrderService : IOrderService
     {
         protected readonly NutriBestDbContext db;
+        private readonly ICurrentUserService currentUserService;
 
-        public OrderService(NutriBestDbContext db)
-            => this.db = db;
+        public OrderService(NutriBestDbContext db,
+            ICurrentUserService currentUserService)
+        {
+            this.db = db;
+            this.currentUserService = currentUserService;
+        }
 
         public async Task<int> PrepareCart(decimal totalPrice,
            decimal originalPrice,
@@ -60,13 +66,33 @@ namespace NutriBest.Server.Features.Orders
             return cart.Id;
         }
 
-        public async Task<OrderServiceModel?> GetFinishedOrder(int orderId)
+        public async Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token)
         {
             var orderFromDb = await db.Orders
                 .FirstOrDefaultAsync(x => x.Id == orderId);
 
             if (orderFromDb == null)
                 return null;
+
+            if (orderFromDb.UserOrderId != null)
+            {
+                var userOrder = await db.UsersOrders
+                    .FirstAsync(x => x.OrderId == orderFromDb.Id);
+
+                if (userOrder.ProfileId != currentUserService.GetUserId())
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+
+            if (orderFromDb.GuestOrderId != null)
+            {
+                if (orderFromDb.SessionToken != token)
+                    throw new InvalidOperationException();
+
+                if (currentUserService.GetUserId() != null)
+                    throw new InvalidOperationException();
+            }
 
             var cart = await db.Carts
                 .FirstAsync(x => x.Id == orderFromDb.CartId);
@@ -155,5 +181,19 @@ namespace NutriBest.Server.Features.Orders
             return order;
         }
 
+        public async Task<bool> ConfirmOrder(int orderId)
+        {
+            var order = await db.Orders
+                .FirstOrDefaultAsync(x => x.Id == orderId);
+
+            if (order == null)
+                return false;
+
+            order.IsConfirmed = true;
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

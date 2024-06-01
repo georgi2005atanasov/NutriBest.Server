@@ -120,10 +120,14 @@
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
+                order.UserOrderId = userOrderId;
+
                 if (!string.IsNullOrEmpty(cookieCart.Code))
                     await promoCodeService.DisableByCode(cookieCart.Code);
 
                 await SetSessionCart(new CartServiceModel());
+
+                await db.SaveChangesAsync();
 
                 return Ok(new
                 {

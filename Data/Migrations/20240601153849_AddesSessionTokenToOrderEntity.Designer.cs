@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240601153849_AddesSessionTokenToOrderEntity")]
+    partial class AddesSessionTokenToOrderEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,6 +446,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
                     b.ToTable("GuestsOrders");
                 });
 
@@ -539,12 +544,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("GuestOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GuestOrderId1")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("bit");
 
@@ -558,22 +557,12 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserOrderId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
 
-                    b.HasIndex("GuestOrderId1");
-
                     b.HasIndex("OrderDetailsId")
                         .IsUnique();
-
-                    b.HasIndex("UserOrderId1");
 
                     b.ToTable("Orders");
                 });
@@ -1098,6 +1087,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
                     b.HasIndex("ProfileId");
 
                     b.ToTable("UsersOrders");
@@ -1230,6 +1222,15 @@ namespace NutriBest.Server.Data.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.GuestOrder", b =>
+                {
+                    b.HasOne("NutriBest.Server.Data.Models.Order", null)
+                        .WithOne("GuestOrder")
+                        .HasForeignKey("NutriBest.Server.Data.Models.GuestOrder", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
                 {
                     b.HasOne("NutriBest.Server.Data.Models.Product", "Product")
@@ -1249,27 +1250,15 @@ namespace NutriBest.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NutriBest.Server.Data.Models.GuestOrder", "GuestOrder")
-                        .WithMany()
-                        .HasForeignKey("GuestOrderId1");
-
                     b.HasOne("NutriBest.Server.Data.Models.OrderDetails", "OrderDetails")
                         .WithOne()
                         .HasForeignKey("NutriBest.Server.Data.Models.Order", "OrderDetailsId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NutriBest.Server.Data.Models.UserOrder", "UserOrder")
-                        .WithMany()
-                        .HasForeignKey("UserOrderId1");
-
                     b.Navigation("Cart");
 
-                    b.Navigation("GuestOrder");
-
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("UserOrder");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
@@ -1388,6 +1377,12 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.UserOrder", b =>
                 {
+                    b.HasOne("NutriBest.Server.Data.Models.Order", null)
+                        .WithOne("UserOrder")
+                        .HasForeignKey("NutriBest.Server.Data.Models.UserOrder", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
                         .WithMany("UsersOrders")
                         .HasForeignKey("ProfileId")
@@ -1439,6 +1434,13 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Invoice", b =>
                 {
                     b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
+                {
+                    b.Navigation("GuestOrder");
+
+                    b.Navigation("UserOrder");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Package", b =>

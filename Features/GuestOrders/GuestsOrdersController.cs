@@ -10,11 +10,13 @@
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.GuestOrders.Models;
     using NutriBest.Server.Features.OrderDetails;
+    using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.PromoCodes;
 
     public class GuestsOrdersController : ApiController
     {
         private const string CartCookieName = "ShoppingCart";
+        private const string OrderCookie = "OrderCookie";
         private readonly NutriBestDbContext db;
         private readonly IGuestOrderService guestOrderService;
         private readonly IOrderDetailsService orderDetailsService;
@@ -85,12 +87,14 @@
                     cookieCart.Code,
                     cookieCart.CartProducts);
 
+                var token = TokenGenerator.GenerateToken();
                 var order = new Order
                 {
                     CartId = cartId,
                     IsFinished = false,
                     IsConfirmed = false,
                     Comment = orderModel.Comment,
+                    SessionToken = token
                 };
 
                 order.OrderDetailsId = await orderDetailsService.Create(orderModel.Country,
@@ -112,11 +116,16 @@
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
+                order.GuestOrderId = guestOrderId;
+
                 if (!string.IsNullOrEmpty(cookieCart.Code))
                     await promoCodeService.DisableByCode(cookieCart.Code);
 
+                await SetSessionOrder(token);
                 await SetSessionCart(new CartServiceModel());
-                
+
+                await db.SaveChangesAsync();
+
                 return Ok(new
                 {
                     Id = order.Id
@@ -145,6 +154,23 @@
             var cart = JsonConvert.DeserializeObject<CartServiceModel>(cookieValue);
             return cart;
         }
+
+        private async Task SetSessionOrder(string sessionToken)
+        {
+            await Task.Run(() =>
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // this was commented to show the cookie as I type document.cookie
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                };
+
+                Response.Cookies.Append(OrderCookie, sessionToken, cookieOptions);
+            });
+        }
+
         private async Task SetSessionCart(CartServiceModel cart)
         {
             await Task.Run(() =>
