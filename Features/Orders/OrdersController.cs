@@ -22,7 +22,7 @@
 
                 return Ok(order);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

@@ -2,6 +2,7 @@
 using NutriBest.Server.Data;
 using NutriBest.Server.Data.Models;
 using NutriBest.Server.Features.Carts.Models;
+using NutriBest.Server.Features.Invoices.Models;
 using NutriBest.Server.Features.Orders.Models;
 using NutriBest.Server.Features.Products.Models;
 
@@ -133,6 +134,23 @@ namespace NutriBest.Server.Features.Orders
                 MadeOn = orderDetails.MadeOn,
                 PaymentMethod = orderDetails.PaymentMethod.ToString()
             };
+
+            if (orderDetails.InvoiceId != null)
+            {
+                var invoice = await db.Invoices
+                    .FirstAsync(x => x.Id == orderDetails.InvoiceId);
+
+                order.Invoice = new InvoiceServiceModel
+                {
+                    FirstName = invoice.FirstName,
+                    LastName = invoice.LastName,
+                    CompanyName = invoice.CompanyName,
+                    Bullstat = invoice.Bullstat,
+                    PersonInCharge = invoice.PersonInCharge,
+                    PhoneNumber = invoice.PhoneNumber,
+                    VAT = invoice.VAT
+                };
+            }
 
             return order;
         }

@@ -127,7 +127,7 @@
 
                 return Ok(new
                 {
-                    Id = userOrderId
+                    Id = order.Id
                 });
             }
             catch (ArgumentNullException err)

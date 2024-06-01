@@ -119,7 +119,7 @@
                 
                 return Ok(new
                 {
-                    Id = guestOrderId
+                    Id = order.Id
                 });
             }
             catch (ArgumentNullException err)

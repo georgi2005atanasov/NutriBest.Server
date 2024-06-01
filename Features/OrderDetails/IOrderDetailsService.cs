@@ -13,6 +13,6 @@ namespace NutriBest.Server.Features.OrderDetails
             bool hasInvoice,
             InvoiceServiceModel? invoice,
             string? comment,
-            string profileId = null);
+            string profileId = "");
     }
 }

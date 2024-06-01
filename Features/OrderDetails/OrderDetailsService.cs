@@ -41,7 +41,7 @@
             if (city.CountryId != country.Id)
                 throw new InvalidOperationException("Invalid country/city!");
 
-            if (profileId != null)
+            if (!string.IsNullOrEmpty(profileId))
             {
                 var address = await db.Addresses
                     .FirstOrDefaultAsync(x => x.ProfileId == profileId);

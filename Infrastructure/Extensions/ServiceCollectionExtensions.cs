@@ -25,6 +25,7 @@
     using NutriBest.Server.Features.UserOrders;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Features.Email;
 
     public static class ServiceCollectionExtensions
     {
@@ -34,6 +35,7 @@
                 .AddHostedService<PromoCodeCleanupService>()
                 .AddHostedService<PromotionCleanupService>()
                 .AddHostedService<PromotionActivationService>()
+                .AddScoped<IEmailService, EmailService>()
                 .AddScoped<ICurrentUserService, CurrentUserService>()
                 .AddTransient<IAdminService, AdminService>()
                 .AddTransient<IIdentityService, IdentityService>()
