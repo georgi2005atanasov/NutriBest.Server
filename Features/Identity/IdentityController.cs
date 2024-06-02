@@ -86,9 +86,7 @@
 
         [HttpPut]
         [Route(nameof(ResetPassword))]
-        public async Task<ActionResult<bool>> ResetPassword([FromQuery] string token,
-            [FromQuery] string email,
-            [FromBody] ResetPasswordServiceModel resetModel)
+        public async Task<ActionResult<bool>> ResetPassword([FromBody] ResetPasswordServiceModel resetModel)
         {
             try
             {
@@ -99,13 +97,13 @@
                         Message = "Both passwords should match!"
                     });
 
-                var user = await userManager.FindByEmailAsync(email);
+                var user = await userManager.FindByEmailAsync(resetModel.Email);
                 if (user == null)
                 {
                     return Ok(new { Message = "Password reset successful." });
                 }
 
-                var result = await userManager.ResetPasswordAsync(user, token, resetModel.NewPassword);
+                var result = await userManager.ResetPasswordAsync(user, resetModel.Token, resetModel.NewPassword);
                 if (result.Succeeded)
                 {
                     return Ok(new { Message = "Password reset successful." });

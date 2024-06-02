@@ -18,6 +18,7 @@
         }
 
         [HttpPost]
+        [Route(nameof(SendConfirmOrderEmail))]
         public IActionResult SendConfirmOrderEmail([FromBody] EmailConfirmOrderModel request)
         {
             try
@@ -35,6 +36,12 @@
         [Route(nameof(ForgottenPassword))]
         public async Task<ActionResult> ForgottenPassword([FromBody] EmailModel request)
         {
+            if (string.IsNullOrEmpty(request.To))
+                return BadRequest(new
+                {
+                    Error = "Email is Required!"
+                });
+
             try
             {
                 var user = await userManager.FindByEmailAsync(request.To);
@@ -46,12 +53,16 @@
                         Message = "If the email is valid, a password reset link has been sent."
                     });
 
-
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: HttpContext.Request.Scheme);
+                //ENSURE WHEN IT GOES TO PRODUCTION TO CHANGE TO HTTPS
+                var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: "http", host: "localhost:5173");
 
                 emailService.SendForgottenPassword(request, callbackUrl ?? "");
-                return Ok();
+                return Ok(new
+                {
+                    IsSuccess = true,
+                    Message = "If the email is valid, a password reset link has been sent."
+                });
             }
             catch (Exception)
             {
