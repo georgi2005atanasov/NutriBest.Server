@@ -4,6 +4,8 @@
 
     public interface IEmailService
     {
-        void SendConfirmOrderEmail(EmailConfirmOrderModel emailModel);
+        void SendConfirmOrder(EmailConfirmOrderModel emailModel);
+
+        void SendForgottenPassword(EmailModel request, string callbackUrl);
     }
 }

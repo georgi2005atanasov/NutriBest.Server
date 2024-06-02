@@ -6,6 +6,7 @@
     using Microsoft.IdentityModel.Tokens;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
     using System.IdentityModel.Tokens.Jwt;
@@ -17,15 +18,18 @@
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
         private readonly ApplicationSettings appSettings;
+        private readonly IEmailService emailService;
 
         public IdentityService(UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
             NutriBestDbContext db,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IEmailService emailService)
         {
             this.db = db;
             this.userManager = userManager;
             this.appSettings = appSettings.Value;
+            this.emailService = emailService;
         }
 
         public async Task<bool> CheckUserPassword(User user, string password)
@@ -38,7 +42,8 @@
             var user = new User
             {
                 UserName = userName,
-                Email = email
+                Email = email,
+                EmailConfirmed = true, // gotta make this through email confirmation
             };
 
             var result = await userManager.CreateAsync(user, password);

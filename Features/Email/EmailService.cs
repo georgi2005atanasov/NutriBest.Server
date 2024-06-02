@@ -15,7 +15,7 @@
             this.config = config;
         }
 
-        public void SendConfirmOrderEmail(EmailConfirmOrderModel request)
+        public void SendConfirmOrder(EmailConfirmOrderModel request)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
@@ -71,6 +71,104 @@ NutriBest
                 .Replace("{OrderNumber}", $"000000{request.OrderId}")
                 .Replace("{ConfirmationUrl}", request.ConfirmationUrl)
                 .Replace("{Date}", $"{DateTime.UtcNow.Year}");
+
+            email.Body = new TextPart(TextFormat.Html) { Text = body };
+
+            using var smtp = new SmtpClient();
+            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+            smtp.Send(email);
+            smtp.Disconnect(true);
+        }
+
+        public void SendForgottenPassword(EmailModel request, string callbackUrl)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.To.Add(MailboxAddress.Parse(request.To));
+            email.Subject = request.Subject;
+
+            var htmlTemplate = @"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Reset Your Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .content a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .content a:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #e5e5e5;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>Password Reset Request</h1>
+        </div>
+        <div class='content'>
+            <p>Hi there,</p>
+            <p>We received a request to reset your password. Click the button below to reset it.</p>
+            <a href='{callbackUrl}'>Reset Password</a>
+            <p>If you did not request a password reset, please ignore this email.</p>
+            <p>Thank you,<br>Your Company Name</p>
+        </div>
+        <div class='footer'>
+            <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            var body = htmlTemplate.Replace("{callbackUrl}", callbackUrl);
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 

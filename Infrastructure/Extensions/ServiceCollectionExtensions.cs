@@ -71,7 +71,8 @@
                  options.Password.RequireUppercase = false;
                  options.User.RequireUniqueEmail = true;
              })
-            .AddEntityFrameworkStores<NutriBestDbContext>();
+            .AddEntityFrameworkStores<NutriBestDbContext>()
+            .AddDefaultTokenProviders();
 
             return services;
         }

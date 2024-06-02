@@ -28,7 +28,8 @@
             try
             {
                 if (userModel.ConfirmPassword != userModel.Password)
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         Key = "Password",
                         Message = "Both passwords should match!"
                     });
@@ -76,6 +77,41 @@
 
                 var encryptedToken = await identityService.GetEncryptedToken(user);
                 return encryptedToken;
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Route(nameof(ResetPassword))]
+        public async Task<ActionResult<bool>> ResetPassword([FromQuery] string token,
+            [FromQuery] string email,
+            [FromBody] ResetPasswordServiceModel resetModel)
+        {
+            try
+            {
+                if (resetModel.NewPassword != resetModel.ConfirmPassword)
+                    return BadRequest(new
+                    {
+                        Key = "NewPassword",
+                        Message = "Both passwords should match!"
+                    });
+
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return Ok(new { Message = "Password reset successful." });
+                }
+
+                var result = await userManager.ResetPasswordAsync(user, token, resetModel.NewPassword);
+                if (result.Succeeded)
+                {
+                    return Ok(new { Message = "Password reset successful." });
+                }
+
+                return BadRequest(new { Message = "Error resetting password." });
             }
             catch (Exception)
             {
