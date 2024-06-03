@@ -28,8 +28,6 @@
 
         public List<Product> Products { get; set; } = new List<Product>();
 
-        public decimal? MinimumPrice { get; set; }
-
         public string? Category { get; set; }
 
         public string? Brand { get; set; }

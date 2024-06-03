@@ -7,7 +7,6 @@
         Task<int> Create(string name,
             string description,
             string brand,
-            decimal price,
             List<int> categoriesIds,
             List<ProductSpecsServiceModel> productSpecs,
             string imageData,
@@ -32,11 +31,12 @@
 
         Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId);
 
+        Task<decimal?> GetCurrentPrice(int productId, string flavour, int grams);
+
         Task<int> Update(int id,
             string name,
             string description,
             string brand,
-            decimal price,
             List<int> categoriesIds,
             List<ProductSpecsServiceModel> productSpecs,
             string imageData,

@@ -1,8 +1,7 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using static Validation.Package;
+    using static Validation.Product;
 
     public class ProductPackageFlavour
     {
@@ -22,8 +21,12 @@
         public Flavour? Flavour { get; set; }
 
         [Required]
-        [Range(MinQuantity, MaxQuantity)]
+        [Range(Validation.Package.MinQuantity, Validation.Package.MaxQuantity)]
         public int Quantity { get; set; }
+
+        [Required]
+        [Range(MinPrice, MaxPrice)]
+        public decimal Price { get; set; }
 
         public bool IsDeleted { get; set; }
     }

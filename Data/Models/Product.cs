@@ -16,7 +16,11 @@
 
         [Required]
         [Range(MinPrice, MaxPrice)]
-        public decimal Price { get; set; }
+        public decimal StartingPrice { get; set; }
+
+        [Required]
+        [Range(MinPrice, MaxPrice)]
+        public decimal MaximumPrice { get; set; }
 
         [Range(MinQuantity, MaxQuantity)]
         public int? Quantity { get; set; }

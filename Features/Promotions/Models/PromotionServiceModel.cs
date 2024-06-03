@@ -16,8 +16,6 @@
 
         public bool IsActive { get; set; }
 
-        public decimal? MinimumPrice { get; set; }
-
         public string? Category { get; set; }
 
         public string? Brand { get; set; }

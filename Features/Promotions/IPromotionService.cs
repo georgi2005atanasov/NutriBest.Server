@@ -18,7 +18,6 @@
             decimal? discountPercentage,
             DateTime startDate,
             DateTime? endDate,
-            decimal? minimumPrice,
             string? category,
             string? brand);
 
@@ -26,7 +25,6 @@
             string? description,
             decimal? discountAmount,
             decimal? discountPercentage,
-            decimal? minPrice,
             string? category,
             string? brand,
             DateTime? startDate,

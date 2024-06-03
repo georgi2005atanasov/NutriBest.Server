@@ -34,15 +34,9 @@
             decimal? discountPercentage,
             DateTime startDate,
             DateTime? endDate,
-            decimal? minPrice,
             string? category,
             string? brandName)
         {
-            if (minPrice <= discountAmount)
-            {
-                throw new ArgumentException("The minimum price must be bigger that the discount amount!");
-            }
-
             if (await db.Promotions.AnyAsync(x => x.Description == description))
             {
                 throw new ArgumentException("Promotion with this description already exists!");
@@ -58,7 +52,6 @@
                 Description = description,
                 DiscountAmount = discountAmount,
                 DiscountPercentage = discountPercentage,
-                MinimumPrice = minPrice,
                 Category = category
             };
 
@@ -102,17 +95,11 @@
             string? description,
             decimal? discountAmount,
             decimal? discountPercentage,
-            decimal? minPrice,
             string? category,
             string? brandName,
             DateTime? startDate,
             DateTime? endDate)
         {
-            if (minPrice <= discountAmount)
-            {
-                throw new ArgumentException("The minimum price must be bigger that the discount amount!");
-            }
-
             if (await db.Promotions.AnyAsync(x => x.Description == description && x.PromotionId != promotionId))
             {
                 throw new ArgumentException("Promotion with this description already exists!");
@@ -124,13 +111,8 @@
             if (promotion == null)
                 throw new InvalidOperationException("Promotion does not exist!");
 
-            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.Price <= discountAmount || (minPrice != null && x.Price < minPrice)))
+            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.StartingPrice <= discountAmount))
             {
-                var possiblePrice = await db.Products
-                    .Where(x => x.PromotionId == promotionId && x.Price <= discountAmount || x.Price < minPrice)
-                    .OrderBy(x => x.Price)
-                    .FirstOrDefaultAsync();
-
                 throw new ArgumentException($"The discount cannot be applied to all the products!");
             }
 
@@ -152,9 +134,6 @@
 
             if (discountPercentage != null)
                 promotion.DiscountPercentage = discountPercentage;
-
-            if (minPrice != null)
-                promotion.MinimumPrice = minPrice;
 
             if (category != null)
                 promotion.Category = category;
@@ -262,10 +241,6 @@
             var productsToApplyPromotion = db.Products
                 .AsQueryable();
 
-            if (promotion.MinimumPrice != null)
-                productsToApplyPromotion = productsToApplyPromotion
-                    .Where(x => x.Price >= promotion.MinimumPrice);
-
             if (promotion.Brand != null)
             {
                 var brand = await db.Brands
@@ -281,18 +256,18 @@
 
                 foreach (var product in productsToApplyPromotion.ToList()) //idk i make this to be a list
                 {
-                    if ((promotion.MinimumPrice != null &&
-                        product.Price >= promotion.MinimumPrice) ||
-                        promotion.MinimumPrice == null)
+                    var categoriesOfProduct = await db.ProductsCategories
+                        .Where(x => x.ProductId == product.ProductId)
+                        .Select(x => x.CategoryId)
+                        .ToListAsync();
+
+                    if (!categoriesOfProduct.Contains(categoriesIds[0]))
+                        continue;
+
+                    if ((promotion.DiscountAmount != null
+                        && promotion.DiscountAmount < product.StartingPrice) ||
+                        promotion.DiscountAmount == null)
                     {
-                        var categoriesOfProduct = await db.ProductsCategories
-                            .Where(x => x.ProductId == product.ProductId)
-                            .Select(x => x.CategoryId)
-                            .ToListAsync();
-
-                        if (!categoriesOfProduct.Contains(categoriesIds[0]))
-                            continue;
-
                         product.PromotionId = promotion.PromotionId;
 
                         if (!await db.ProductsCategories
@@ -306,24 +281,30 @@
                             });
                         }
                     }
+
                 }
             }
             else
             {
                 foreach (var product in productsToApplyPromotion)
                 {
-                    if (!await db.ProductsCategories
+                    if ((promotion.DiscountAmount != null && 
+                        promotion.DiscountAmount < product.StartingPrice) ||
+                        promotion.DiscountAmount == null)
+                    {
+                        if (!await db.ProductsCategories
                             .AnyAsync(x => x.ProductId == product.ProductId &&
                             x.CategoryId == (int)Data.Enums.Categories.Promotions + 1))
-                    {
-                        db.ProductsCategories.Add(new Data.Models.ProductCategory
                         {
-                            ProductId = product.ProductId,
-                            CategoryId = (int)Data.Enums.Categories.Promotions + 1
-                        });
-                    }
+                            db.ProductsCategories.Add(new Data.Models.ProductCategory
+                            {
+                                ProductId = product.ProductId,
+                                CategoryId = (int)Data.Enums.Categories.Promotions + 1
+                            });
+                        }
 
-                    product.PromotionId = promotion.PromotionId;
+                        product.PromotionId = promotion.PromotionId;
+                    }
                 }
             }
 

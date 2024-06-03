@@ -542,9 +542,6 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<int?>("GuestOrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GuestOrderId1")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("bit");
 
@@ -561,19 +558,12 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<int?>("UserOrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserOrderId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
 
-                    b.HasIndex("GuestOrderId1");
-
                     b.HasIndex("OrderDetailsId")
                         .IsUnique();
-
-                    b.HasIndex("UserOrderId1");
 
                     b.ToTable("Orders");
                 });
@@ -668,6 +658,9 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("MaximumPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -679,9 +672,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasMaxLength(60)
                         .HasColumnType("nvarchar(60)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("ProductImageId")
                         .HasColumnType("int");
 
@@ -690,6 +680,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("StartingPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ProductId");
 
@@ -801,6 +794,12 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PromotionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -956,9 +955,6 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<decimal?>("MinimumPrice")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1249,27 +1245,15 @@ namespace NutriBest.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NutriBest.Server.Data.Models.GuestOrder", "GuestOrder")
-                        .WithMany()
-                        .HasForeignKey("GuestOrderId1");
-
                     b.HasOne("NutriBest.Server.Data.Models.OrderDetails", "OrderDetails")
                         .WithOne()
                         .HasForeignKey("NutriBest.Server.Data.Models.Order", "OrderDetailsId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NutriBest.Server.Data.Models.UserOrder", "UserOrder")
-                        .WithMany()
-                        .HasForeignKey("UserOrderId1");
-
                     b.Navigation("Cart");
 
-                    b.Navigation("GuestOrder");
-
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("UserOrder");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>

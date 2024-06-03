@@ -92,10 +92,10 @@
                 throw new ArgumentException("The promotion is not active!");
             }
 
-            if (product.Price < promotion.MinimumPrice)
-            {
-                throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
-            }
+            //if (product.Price < promotion.MinimumPrice)
+            //{
+            //    throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
+            //}
 
             return (product, promotion);
         }
@@ -114,7 +114,7 @@
 
         private void ValidatePromotionPrice(Product product, decimal? discountAmount)
         {
-            if (discountAmount != null && product.Price <= discountAmount)
+            if (discountAmount != null && product.StartingPrice <= discountAmount)
                 throw new InvalidOperationException("The price of the product must be bigger than the discount!");
         }
     }

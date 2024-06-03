@@ -19,5 +19,9 @@
         [Range(MinQuantity, MaxQuantity)]
         [JsonPropertyName("quantity")]
         public int Quantity{ get; set; }
+
+        [Required]
+        [JsonPropertyName("price")]
+        public string Price { get; set; } = null!;
     }
 }

@@ -126,24 +126,24 @@
                     });
                 }
 
-                decimal price;
-
-                if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
+                foreach (var productSpec in productSpecs)
                 {
-                    return BadRequest(new
+                    if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out var price))
                     {
-                        Key = "Price",
-                        Message = "Product price must be a number!"
-                    });
-                }
+                        return BadRequest(new
+                        {
+                            Key = "Price",
+                            Message = "Prices must be numbers!"
+                        });
+                    }
 
-                if (price <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        Key = "Price",
-                        Message = "Price must be bigger than zero!"
-                    });
+
+                    if (price <= 0 || price > 4000)
+                        return BadRequest(new
+                        {
+                            Key = "ProductSpecs",
+                            Message = "Price must be bigger than zero and less than 4000!"
+                        });
                 }
 
                 var categoriesIds = await categoryService
@@ -165,7 +165,6 @@
                     .Create(productModel.Name,
                     productModel.Description,
                     productModel.Brand,
-                    price,
                     categoriesIds,
                     productSpecs,
                     productImage.ImageData,
@@ -256,14 +255,25 @@
                         Message = "You must add some product specifications!"
                     });
 
-                decimal price;
-
-                if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out price))
-                    return BadRequest(new
+                foreach (var productSpec in productSpecs)
+                {
+                    string currentPrice = productSpec.Price.Replace(',', '.');
+                    if (!decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
                     {
-                        Key = "Price",
-                        Message = "Product price must be a number!"
-                    });
+                        return BadRequest(new
+                        {
+                            Key = "Price",
+                            Message = "Prices must be numbers!"
+                        });
+                    }
+
+                    if (price <= 0 || price > 4000)
+                        return BadRequest(new
+                        {
+                            Key = "ProductSpecs",
+                            Message = "Price must be bigger than zero and less than 4000!"
+                        });
+                }
 
                 var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == id);
@@ -276,13 +286,6 @@
                     {
                         Key = "Name",
                         Message = "Product with this name already exists!"
-                    });
-
-                if (price <= 0 || price > 4000)
-                    return BadRequest(new
-                    {
-                        Key = "Price",
-                        Message = "Price must be bigger than zero and less than 4000!"
                     });
 
                 var categoriesIds = await categoryService
@@ -300,7 +303,7 @@
                     var promotion = await db.Promotions
                         .FirstAsync(x => x.PromotionId == product.PromotionId);
 
-                    if (promotion.DiscountAmount != null && price <= promotion.DiscountAmount)
+                    if (promotion.DiscountAmount != null && decimal.Parse(productSpecs.OrderBy(x => x.Price).First().Price) <= promotion.DiscountAmount)
                     {
                         return BadRequest(new
                         {
@@ -320,7 +323,6 @@
                         productModel.Name,
                         productModel.Description,
                         productModel.Brand,
-                        price,
                         categoriesIds,
                         productSpecs,
                         productImage.ImageData,
@@ -340,7 +342,6 @@
                         productModel.Name,
                         productModel.Description,
                         productModel.Brand,
-                        price,
                         categoriesIds,
                         productSpecs,
                         image.ImageData,
@@ -399,7 +400,7 @@
 
                 return Ok(result);
             }
-            catch(ArgumentNullException err)
+            catch (ArgumentNullException err)
             {
                 return BadRequest(new
                 {
@@ -467,6 +468,24 @@
             try
             {
                 var products = await productService.GetRelatedProducts(productModel.Categories, productModel.ProductId);
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route("current-price")]
+        public async Task<ActionResult<decimal>> GetCurrentPrice([FromBody] CurrentProductPriceServiceModel productModel)
+        {
+            try
+            {
+                var products = await productService.GetCurrentPrice(productModel.ProductId, 
+                    productModel.Flavour,
+                    productModel.Package);
 
                 return Ok(products);
             }

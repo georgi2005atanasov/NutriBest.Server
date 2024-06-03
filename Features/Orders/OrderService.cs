@@ -105,11 +105,20 @@ namespace NutriBest.Server.Features.Orders
                     Grams = db.Packages.First(y => y.Id == x.PackageId).Grams,
                     Flavour = db.Flavours.First(y => y.Id == x.FlavourId).FlavourName,
                     ProductId = x.ProductId,
+                    Price = db.ProductsPackagesFlavours
+                        .First(y => y.FlavourId == x.FlavourId &&
+                        y.PackageId == x.PackageId &&
+                        y.ProductId == x.ProductId)
+                        .Price,
                     Product = new ProductListingServiceModel
                     {
                         ProductId = x.Product!.ProductId,
                         Name = x.Product.Name,
-                        Price = x.Product.Price,
+                        Price = x.Product
+                        .ProductPackageFlavours
+                        .First(y => y.PackageId == x.PackageId &&
+                        y.ProductId == x.Product.ProductId &&
+                        y.FlavourId == x.FlavourId).Price,
                         Categories = x.Product.ProductsCategories
                              .Select(c => c.Category.Name)
                              .ToList(),

@@ -64,9 +64,8 @@
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult> Create([FromForm] CreatePromotionServiceModel promotion) // may receive it from a form
         {
-            var (discountAmount, discountPercentage, minimumPrice) = ValidatePromotionPrices(promotion.DiscountAmount,
-                promotion.DiscountPercentage,
-                promotion.MinimumPrice
+            var (discountAmount, discountPercentage) = ValidatePromotionPrices(promotion.DiscountAmount,
+                promotion.DiscountPercentage
                 );
 
             if (discountPercentage >= 100)
@@ -119,7 +118,6 @@
                     discountPercentage,
                     promotion.StartDate,
                     promotion.EndDate,
-                    minimumPrice,
                     promotion.Category,
                     promotion.Brand);
 
@@ -150,9 +148,8 @@
         [Route("/promotions/{promotionId}")]
         public async Task<ActionResult> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
         {
-            var (discountAmount, discountPercentage, minimumPrice) = ValidatePromotionPrices(promotion.DiscountAmount,
-                promotion.DiscountPercentage,
-                promotion.MinimumPrice
+            var (discountAmount, discountPercentage) = ValidatePromotionPrices(promotion.DiscountAmount,
+                promotion.DiscountPercentage
                 );
 
             if (promotion.StartDate > promotion.EndDate)
@@ -175,7 +172,6 @@
                     promotion.Description,
                     discountAmount,
                     discountPercentage,
-                    minimumPrice,
                     promotion.Category,
                     promotion.Brand,
                     promotion.StartDate,
@@ -275,12 +271,11 @@
             }
         }
 
-        private (decimal? discountAmount, decimal? discountPercentage, decimal? minimumPrice)
-            ValidatePromotionPrices(string? promoDiscountAmount, string? promoDiscountPercentage, string? promoMinimumPrice)
+        private (decimal? discountAmount, decimal? discountPercentage)
+            ValidatePromotionPrices(string? promoDiscountAmount, string? promoDiscountPercentage)
         {
             decimal? amount = null;
             decimal? percentage = null;
-            decimal? minPrice = null;
 
             if (!string.IsNullOrEmpty(promoDiscountAmount) &&
                 decimal.TryParse(promoDiscountAmount, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal discountAmount))
@@ -305,18 +300,7 @@
                 throw new InvalidOperationException("Invalid discount!");
             }
 
-            if (!string.IsNullOrEmpty(promoMinimumPrice) && 
-                decimal.TryParse(promoMinimumPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal minimumPrice))
-            {
-                minPrice = minimumPrice;
-            }
-            else if (!string.IsNullOrEmpty(promoMinimumPrice) &&
-                !decimal.TryParse(promoMinimumPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal check))
-            {
-                throw new InvalidOperationException("Invalid minimum price!");
-            }
-
-            return (amount, percentage, minPrice);
+            return (amount, percentage);
         }
 
     }

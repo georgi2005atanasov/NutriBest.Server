@@ -9,6 +9,7 @@
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Services;
+    using System.Globalization;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService
@@ -42,7 +43,7 @@
         {
             var query = db.Products.AsQueryable();
 
-            var maxPrice = (int)Math.Ceiling(query.Select(x => x.Price).Max());
+            var maxPrice = (int)Math.Ceiling(query.Select(x => x.MaximumPrice).Max());
 
             query = this.SelectByCategories(query, categoriesFilter ?? "");
             query = this.GetBySearch(query, search ?? "");
@@ -61,7 +62,7 @@
                          {
                              ProductId = x.ProductId,
                              Name = x.Name,
-                             Price = x.Price,
+                             Price = x.StartingPrice,
                              Categories = x.ProductsCategories
                              .Select(c => c.Category.Name)
                              .ToList(),
@@ -97,7 +98,6 @@
         public async Task<int> Create(string name,
             string description,
             string brandName,
-            decimal price,
             List<int> categoriesIds,
             List<ProductSpecsServiceModel> productSpecs,
             string imageData,
@@ -115,11 +115,30 @@
                 ContentType = contentType
             };
 
+            var minPrice = decimal.MaxValue;
+
+            var maxPrice = decimal.MinValue;
+
+            foreach (var spec in productSpecs)
+            {
+
+                if (!decimal.TryParse(spec.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
+                    throw new FormatException($"Invalid price format: {spec.Price}");
+
+                if (minPrice > price)
+                    minPrice = price;
+
+                if (maxPrice < price)
+                    maxPrice = price;
+            }
+
+
             var product = new Product
             {
                 Name = name,
                 Description = description,
-                Price = price,
+                StartingPrice = minPrice,
+                MaximumPrice = maxPrice,
                 ProductImage = productImage,
                 Brand = brand,
                 CreatedOn = DateTime.UtcNow,
@@ -190,11 +209,16 @@
                 {
                     Flavour = flavour.FlavourName,
                     Grams = package.Grams,
-                    Quantity = productPackageFlavour.Quantity
+                    Quantity = productPackageFlavour.Quantity,
+                    Price = $"{productPackageFlavour.Price}"
                 };
 
                 specs.Add(spec);
             }
+
+            specs = specs
+                .OrderBy(x => x.Grams)
+                .ToList();
 
             return specs;
         }
@@ -203,7 +227,6 @@
             string name,
             string description,
             string brandName,
-            decimal price,
             List<int> categoriesIds,
             List<ProductSpecsServiceModel> productSpecs,
             string imageData,
@@ -220,7 +243,8 @@
 
             product.Name = name;
             product.Description = description;
-            product.Price = price;
+            product.StartingPrice = decimal.Parse(productSpecs.OrderBy(x => decimal.Parse(x.Price)).First().Price);
+            product.MaximumPrice = decimal.Parse(productSpecs.OrderByDescending(x => decimal.Parse(x.Price)).First().Price);
             product.ProductImage = productImage;
             product.ProductsCategories = new List<ProductCategory>();
             product.ProductPackageFlavours = new List<ProductPackageFlavour>();
@@ -336,10 +360,10 @@
             decimal newPrice = 0;
 
             if (promotion.DiscountPercentage != null)
-                newPrice = product.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100);
+                newPrice = product.StartingPrice * ((100 - (decimal)promotion.DiscountPercentage) / 100);
 
             if (promotion.DiscountAmount != null)
-                newPrice = product.Price - (decimal)promotion.DiscountAmount;
+                newPrice = product.StartingPrice - (decimal)promotion.DiscountAmount;
 
             var productListingModel = await Get(productId);
 
@@ -349,7 +373,7 @@
                 Image = productListingModel.Image,
                 Description = product.Description,
                 Name = product.Name,
-                Price = product.Price,
+                Price = product.StartingPrice,
                 PromotionId = product.PromotionId,
                 ProductId = product.ProductId,
                 Quantity = product.Quantity,
@@ -385,12 +409,17 @@
 
                 product.Quantity += productSpec.Quantity;
 
+                string currentPrice = productSpec.Price.Replace(',', '.');
+                if (!decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
+                    throw new FormatException($"Invalid price format: {productSpec.Price}");
+
                 var productPackageFlavour = new ProductPackageFlavour
                 {
                     ProductId = product.ProductId,
                     PackageId = package.Id,
                     FlavourId = flavour.Id,
-                    Quantity = productSpec.Quantity
+                    Quantity = productSpec.Quantity,
+                    Price = price // be aware
                 };
 
                 db.ProductsPackagesFlavours.Add(productPackageFlavour);
@@ -439,7 +468,7 @@
                 {
                     ProductId = x.ProductId,
                     Name = x.Name,
-                    Price = x.Price,
+                    Price = x.StartingPrice,
                     Categories = x.ProductsCategories
                              .Select(c => c.Category.Name)
                              .ToList(),
@@ -487,6 +516,19 @@
                     }
                 }
             }
+        }
+
+        public async Task<decimal?> GetCurrentPrice(int productId, string flavour, int grams)
+        {
+            var productPackageFlavour = await db.ProductsPackagesFlavours
+                .SingleOrDefaultAsync(x => x.Flavour!.FlavourName == flavour &&
+                x.ProductId == productId &&
+                x.Package!.Grams == grams);
+
+            if (productPackageFlavour == null)
+                return null;
+
+            return productPackageFlavour.Price;
         }
     }
 }

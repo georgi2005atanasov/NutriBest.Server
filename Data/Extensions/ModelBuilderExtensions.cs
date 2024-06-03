@@ -84,6 +84,9 @@ namespace NutriBest.Server.Data.Extensions
                 .WithOne()
                 .HasForeignKey<Order>(x => x.OrderDetailsId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.Ignore(x => x.GuestOrder);
+                e.Ignore(x => x.UserOrder);
             });
 
             builder.Entity<GuestOrder>(e =>

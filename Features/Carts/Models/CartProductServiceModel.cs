@@ -13,5 +13,7 @@
         public string Flavour { get; set; } = null!;
 
         public int Grams { get; set; }
+
+        public decimal? Price { get; set; }
     }
 }

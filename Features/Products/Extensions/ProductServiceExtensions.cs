@@ -158,7 +158,7 @@
                 var maxPrice = int.Parse(numbers[1]);
 
                 query = query
-                    .Where(x => x.Price >= minPrice && x.Price <= maxPrice || x.PromotionId != null);
+                    .Where(x => x.StartingPrice >= minPrice && x.StartingPrice <= maxPrice || x.PromotionId != null);
 
                 return query;
             }

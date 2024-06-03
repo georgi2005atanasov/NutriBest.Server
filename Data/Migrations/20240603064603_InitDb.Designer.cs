@@ -12,7 +12,7 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240531082556_InitDb")]
+    [Migration("20240603064603_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -446,9 +446,6 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
                     b.ToTable("GuestsOrders");
                 });
 
@@ -544,6 +541,9 @@ namespace NutriBest.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("GuestOrderId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("bit");
 
@@ -551,6 +551,13 @@ namespace NutriBest.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("OrderDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SessionToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserOrderId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -653,6 +660,9 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("MaximumPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -664,9 +674,6 @@ namespace NutriBest.Server.Data.Migrations
                         .HasMaxLength(60)
                         .HasColumnType("nvarchar(60)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("ProductImageId")
                         .HasColumnType("int");
 
@@ -675,6 +682,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("StartingPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ProductId");
 
@@ -786,6 +796,12 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PromotionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -1083,9 +1099,6 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
                     b.HasIndex("ProfileId");
 
                     b.ToTable("UsersOrders");
@@ -1216,15 +1229,6 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.GuestOrder", b =>
-                {
-                    b.HasOne("NutriBest.Server.Data.Models.Order", null)
-                        .WithOne("GuestOrder")
-                        .HasForeignKey("NutriBest.Server.Data.Models.GuestOrder", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
@@ -1373,12 +1377,6 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.UserOrder", b =>
                 {
-                    b.HasOne("NutriBest.Server.Data.Models.Order", null)
-                        .WithOne("UserOrder")
-                        .HasForeignKey("NutriBest.Server.Data.Models.UserOrder", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NutriBest.Server.Data.Models.Profile", "Profile")
                         .WithMany("UsersOrders")
                         .HasForeignKey("ProfileId")
@@ -1430,13 +1428,6 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Invoice", b =>
                 {
                     b.Navigation("OrderDetails");
-                });
-
-            modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
-                {
-                    b.Navigation("GuestOrder");
-
-                    b.Navigation("UserOrder");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Package", b =>
