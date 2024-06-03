@@ -31,7 +31,7 @@
         }
 
         [HttpGet]
-        [Route("/promotions/{promotionId}")]
+        [Route("/Promotions/{promotionId}")]
         public async Task<ActionResult> Get([FromRoute] int promotionId)
         {
             try
@@ -145,7 +145,7 @@
 
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/{promotionId}")]
+        [Route("/Promotions/{promotionId}")]
         public async Task<ActionResult> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage) = ValidatePromotionPrices(promotion.DiscountAmount,
@@ -201,7 +201,7 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/{promotionId}")]
+        [Route("/Promotions/{promotionId}")]
         public async Task<ActionResult<bool>> Remove([FromRoute] int promotionId)
         {
             try
@@ -218,7 +218,7 @@
 
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/status/{promotionId}")]
+        [Route("/Promotions/Status/{promotionId}")]
         public async Task<ActionResult<bool>> ChangePromotionStatus([FromRoute] int promotionId)
         {
             try
@@ -249,7 +249,7 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("{promotionId}/products")]
+        [Route("{promotionId}/Products")]
         public async Task<ActionResult<List<ProductServiceModel>>> GetProductsOfPromotion([FromRoute] int promotionId)
         {
             try

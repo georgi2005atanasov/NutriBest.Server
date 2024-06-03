@@ -65,7 +65,7 @@
         }
 
         [HttpGet]
-        [Route("specs/{id}/{name}")]
+        [Route("Specs/{id}/{name}")]
         public async Task<ActionResult<List<ProductSpecsServiceModel>>> GetSpecs([FromRoute] int id,
             [FromRoute] string name)
         {
@@ -423,7 +423,7 @@
         }
 
         [HttpGet]
-        [Route("identifiers")]
+        [Route("Identifiers")]
         public async Task<ActionResult<IEnumerable<int>>> GetProductsIds()
             => Ok(await db.Products
             .Select(x => x.ProductId)
@@ -462,7 +462,7 @@
         }
 
         [HttpPost]
-        [Route("related")]
+        [Route("Related")]
         public async Task<ActionResult<List<ProductListingServiceModel>>> GetRelatedProductsByCategory([FromBody] RelatedProductsServiceModel productModel)
         {
             try

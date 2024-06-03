@@ -41,7 +41,7 @@
         }
 
         [HttpPatch]
-        [Route("grant/{id}")]
+        [Route("Grant/{id}")]
         public async Task<ActionResult> GrantUser([FromRoute] string id, [FromForm] string role)
         {
             try
@@ -81,7 +81,7 @@
         }
 
         [HttpPatch]
-        [Route("disown/{id}")]
+        [Route("Disown/{id}")]
         public async Task<ActionResult> DisownUser([FromRoute] string id, [FromForm] string role)
         {
             try

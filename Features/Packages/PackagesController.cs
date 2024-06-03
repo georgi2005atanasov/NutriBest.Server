@@ -90,7 +90,7 @@
         }
 
         [HttpGet]
-        [Route("/products/by-quantity-count")]
+        [Route("/Products/by-quantity-count")]
         public async Task<ActionResult<PackageCountServiceModel>> GetProductsCountByQuantity()
         {
             try

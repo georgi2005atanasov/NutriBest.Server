@@ -49,7 +49,7 @@
         }
 
         [HttpGet]
-        [Route("brand/{name}")] // important!!!
+        [Route("Brand/{name}")] // important!!!
         public async Task<ActionResult<ImageListingServiceModel>> GetImageByBrandId([FromRoute] string name)
         {
             try

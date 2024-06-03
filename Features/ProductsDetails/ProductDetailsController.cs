@@ -15,7 +15,7 @@
 
 
         [HttpGet]
-        [Route("/products/details/{id}/{name}")]
+        [Route("/Products/Details/{id}/{name}")]
         public async Task<ActionResult<ProductListingServiceModel>> Details([FromRoute] int id,
             [FromRoute] string name)
         {
@@ -53,7 +53,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/details/{id}")]
+        [Route("/Products/Details/{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> SetDetails([FromRoute] int id,
             [FromForm] CreateProductDetailsServiceModel details)
         {
@@ -84,7 +84,7 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/details/{id}")]
+        [Route("/Products/Details/{id}")]
         public async Task<ActionResult<ProductListingServiceModel>> RemoveDetails([FromRoute] int id)
         {
             try

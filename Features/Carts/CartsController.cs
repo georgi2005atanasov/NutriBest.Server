@@ -32,7 +32,7 @@
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("/cart/get")]
+        [Route("/Cart/Get")]
         public async Task<IActionResult> GetCartFromSession()
         {
             try
@@ -86,7 +86,7 @@
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("/cart/set")]
+        [Route("/Cart/Set")]
         public async Task<ActionResult> SetProductCount([FromBody] CartProductServiceModel cartProduct)
         {
             if (cartProduct.Count <= 0)
@@ -162,7 +162,7 @@
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("/cart/add")]
+        [Route("/Cart/Add")]
         public async Task<ActionResult<string>> AddSessionCart([FromBody] CartProductServiceModel cartProduct)
         {
             if (cartProduct.Count <= 0)
@@ -300,7 +300,7 @@
         }
 
         [HttpPost]
-        [Route("/cart/apply-promo-code")]
+        [Route("/Cart/apply-promo-code")]
         public async Task<ActionResult<bool>> ApplyPromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
         {
             try
@@ -346,7 +346,7 @@
         }
 
         [HttpDelete]
-        [Route("/cart/remove-promo-code")]
+        [Route("/Cart/remove-promo-code")]
         public async Task<ActionResult<bool>> RemovePromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
         {
             try
@@ -377,7 +377,7 @@
         }
 
         [HttpDelete]
-        [Route("/cart/clean")]
+        [Route("/Cart/Clean")]
         public async Task<ActionResult> CleanSessionCart()
         {
             try

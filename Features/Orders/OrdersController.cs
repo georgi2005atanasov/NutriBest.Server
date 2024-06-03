@@ -32,7 +32,7 @@
         }
 
         [HttpPost]
-        [Route("confirm")]
+        [Route("Confirm")]
         public async Task<ActionResult<bool>> ConfirmOrder([FromQuery] int orderId)
         {
             try

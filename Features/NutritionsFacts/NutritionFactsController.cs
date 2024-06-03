@@ -23,7 +23,7 @@
         }
 
         [HttpGet]
-        [Route("/products/nutri-facts/{id}/{name}")]
+        [Route("/Products/nutri-facts/{id}/{name}")]
         public async Task<ActionResult<NutritionFactsServiceModel>> Facts([FromRoute] int id,
             [FromRoute] string name)
         {
@@ -57,7 +57,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/nutri-facts/{id}")]
+        [Route("/Products/nutri-facts/{id}")]
         public async Task<ActionResult> SetFacts([FromRoute] int id,
             [FromBody] NutritionFactsServiceModel details)
         {
@@ -87,7 +87,7 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/products/nutri-facts/{id}")]
+        [Route("/Products/nutri-facts/{id}")]
         public async Task<ActionResult<bool>> RemoveFacts([FromRoute] int id)
         {
             try

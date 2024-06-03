@@ -113,7 +113,7 @@
         }
 
         [HttpGet]
-        [Route("/products/by-brand-count")]
+        [Route("/Products/by-brand-count")]
         public async Task<ActionResult<List<BrandCountServiceModel>>> GetProductsByBrandCount()
         {
             try

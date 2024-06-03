@@ -14,7 +14,7 @@
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/add-product-promotion/{promotionId}/{productId}")]
+        [Route("/Promotions/add-product-promotion/{promotionId}/{productId}")]
         public async Task<ActionResult<bool>> Create([FromRoute] int promotionId,
             [FromRoute] int productId)
         {
@@ -57,7 +57,7 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("/promotions/remove-product-promotion/{productId}")]
+        [Route("/Promotions/remove-product-promotion/{productId}")]
         public async Task<ActionResult<bool>> Remove([FromRoute] int productId)
         {
             try

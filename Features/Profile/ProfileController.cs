@@ -46,7 +46,7 @@
         }
 
         [HttpGet]
-        [Route("mine")]
+        [Route("Mine")]
         [Authorize(Roles = "Administrator,Employee,User")]
         public async Task<ActionResult<ProfileServiceModel?>> GetCurrentUser()
         {
@@ -122,7 +122,7 @@
         }
 
         [HttpGet]
-        [Route("address")]
+        [Route("Address")]
         [Authorize(Roles = "Administrator,Employee,User")]
         public async Task<ActionResult<ProfileAddressServiceModel>> GetAddress()
         {
@@ -139,7 +139,7 @@
         }
 
         [HttpPost]
-        [Route("address")]
+        [Route("Address")]
         [Authorize(Roles = "Administrator,Employee,User")]
         public async Task<ActionResult<ProfileAddressServiceModel>> SetAddress([FromBody] ProfileAddressServiceModel addressModel)
         {
