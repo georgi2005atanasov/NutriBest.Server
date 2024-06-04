@@ -25,6 +25,24 @@
             this.profileService = profileService;
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("/Profiles")]
+        public async Task<ActionResult<AllProfilesServiceModel?>> All([FromQuery] int page, [FromQuery] string? search)
+        {
+            try
+            {
+                var allProfiles = await profileService.All(page, search);
+                return allProfiles;
+            }
+            catch (Exception)
+            {
+                return BadRequest(new
+                {
+                    Message = "User could not be found!"
+                });
+            }
+        }
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]

@@ -11,6 +11,8 @@
             public const int ProductsPerRowInTable = 1;
 
             public const int OrdersPerPage = 20;
+
+            public const int UsersPerPage = 50;
         }
 
         public class Product

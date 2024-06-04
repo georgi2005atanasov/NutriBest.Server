@@ -60,7 +60,6 @@
                     PackageId = package.Id,
                     Flavour = flavour,
                     FlavourId = flavour.Id,
-                    Price = (decimal)cartProductModel.Price!
                 };
 
                 db.CartProducts.Add(cartProduct);
@@ -234,14 +233,14 @@
             return true;
         }
 
-        public async Task<AllOrdersServiceModel> All(int page)
+        public async Task<AllOrdersServiceModel> All(int page, string? search)
         {
             var orders = db.Orders
                 .OrderByDescending(x => x.OrderDetails!.MadeOn)
-                .Skip((page - 1) * OrdersPerPage)
                 .AsQueryable();
 
-            var allOrders = new AllOrdersServiceModel() { 
+            var allOrders = new AllOrdersServiceModel()
+            {
                 TotalOrders = await orders.CountAsync()
             };
 
@@ -279,7 +278,9 @@
                         OrderId = order.Id,
                         MadeOn = orderDetails.MadeOn,
                         PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                        TotalPrice = cart!.TotalPrice
+                        TotalPrice = cart!.TotalPrice,
+                        PhoneNumber = guestOrder.PhoneNumber,
+                        Email = guestOrder.Email
                     };
 
                     allOrders.Orders.Add(orderModel);
@@ -298,6 +299,18 @@
                         .FirstAsync(x => x.Id == order.UserOrderId);
                 }
             }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+
+                allOrders.Orders = allOrders.Orders
+                    .Where(x => $"{x.OrderId}" == search ||
+                    x.PhoneNumber.ToLower().Contains(search) ||
+                    x.CustomerName.ToLower().Contains(search))
+                    .ToList();
+            }
+
             return allOrders;
         }
     }

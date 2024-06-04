@@ -1,9 +1,11 @@
-﻿using NutriBest.Server.Features.Profile.Models;
-
-namespace NutriBest.Server.Features.Admin
+﻿namespace NutriBest.Server.Features.Admin
 {
+    using NutriBest.Server.Features.Profile.Models;
+
     public interface IProfileService
     {
+        Task<AllProfilesServiceModel> All(int page, string? search);
+
         Task<string> UpdateProfile(string? name,
             string? userName,
             string? email,

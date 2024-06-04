@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Orders.Models;
 
@@ -14,11 +15,12 @@
         }
 
         [HttpGet]
-        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] int page)
+        [Authorize(Roles = "Administrator,Employee")]
+        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] int page, [FromQuery] string? search)
         {
             try
             {
-                var allOrders = await orderService.All(page);
+                var allOrders = await orderService.All(page, search);
 
                 return Ok(allOrders);
             }

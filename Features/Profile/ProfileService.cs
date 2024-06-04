@@ -6,6 +6,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using static ServicesConstants.PaginationConstants;
 
     public class ProfileService : IProfileService
     {
@@ -16,6 +17,70 @@
         {
             this.currentUser = currentUser;
             this.db = db;
+        }
+
+        public async Task<AllProfilesServiceModel> All(int page, string? search)
+        {
+            var profiles = db.Profiles
+                .OrderByDescending(x => x.CreatedOn)
+                .AsQueryable();
+
+            var allProfiles = new AllProfilesServiceModel
+            {
+                AllUsers = profiles.Count(),
+                Profiles = new List<ProfileListingServiceModel>()
+            };
+
+            profiles = profiles
+                .Skip((page - 1) * UsersPerPage)
+                .AsQueryable();
+
+            foreach (var profile in profiles)
+            {
+                var address = await db.Addresses
+                    .FirstOrDefaultAsync(x => x.ProfileId == profile.UserId);
+
+                City? city = new();
+
+                if (address != null)
+                {
+                    city = await db.Cities
+                    .FirstOrDefaultAsync(x => x.Id == address.CityId);
+                }
+
+                var user = await db.Users
+                    .FirstOrDefaultAsync(x => x.Id == profile.UserId);
+
+                var totalOrders = await db.UsersOrders
+                    .Where(x => x.ProfileId == profile.UserId)
+                    .CountAsync();
+
+                var profileModel = new ProfileListingServiceModel
+                {
+                    City = city != null ? city.CityName : null,
+                    Email = user!.Email,
+                    MadeOn = user.CreatedOn,
+                    PhoneNumber = user.PhoneNumber,
+                    TotalOrders = totalOrders,
+                    Name = profile.Name,
+                };
+
+                allProfiles.Profiles.Add(profileModel);
+            }
+
+            if (search != null)
+            {
+                search = search.ToLower();
+
+                allProfiles.Profiles = allProfiles
+                    .Profiles
+                    .Where(x => x.Email.ToLower().Contains(search) ||
+                    x.City.ToLower().Contains(search) ||
+                    x.PhoneNumber.ToLower().Contains(search))
+                    .ToList();
+            }
+
+            return allProfiles;
         }
 
         public async Task<ProfileAddressServiceModel> GetAddress()
