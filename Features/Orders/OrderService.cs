@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Carts.Models;
-using NutriBest.Server.Features.Invoices.Models;
-using NutriBest.Server.Features.Orders.Models;
-using NutriBest.Server.Features.Products.Models;
-using NutriBest.Server.Infrastructure.Services;
-
-namespace NutriBest.Server.Features.Orders
+﻿namespace NutriBest.Server.Features.Orders
 {
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Carts.Models;
+    using NutriBest.Server.Features.Invoices.Models;
+    using NutriBest.Server.Features.Orders.Models;
+    using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Infrastructure.Services;
+
     public class OrderService : IOrderService
     {
         protected readonly NutriBestDbContext db;
@@ -71,6 +71,9 @@ namespace NutriBest.Server.Features.Orders
             var orderFromDb = await db.Orders
                 .FirstOrDefaultAsync(x => x.Id == orderId);
 
+            string customerName = "";
+            string customerEmail = "";
+
             if (orderFromDb == null)
                 return null;
 
@@ -78,6 +81,16 @@ namespace NutriBest.Server.Features.Orders
             {
                 var userOrder = await db.UsersOrders
                     .FirstAsync(x => x.OrderId == orderFromDb.Id);
+
+                var profile = await db.Profiles
+                    .FirstAsync(x => x.UserId == userOrder.ProfileId);
+
+                customerName = profile.Name!;
+
+                var user = await db.Users
+                    .FirstAsync(x => x.Id == userOrder.ProfileId);
+
+                customerEmail = user.Email;
 
                 if (userOrder.ProfileId != currentUserService.GetUserId())
                 {
@@ -87,6 +100,12 @@ namespace NutriBest.Server.Features.Orders
 
             if (orderFromDb.GuestOrderId != null)
             {
+                var guestOrder = await db.GuestsOrders
+                    .FirstAsync(x => x.Id == orderFromDb.GuestOrderId);
+
+                customerName = guestOrder.Name;
+                customerEmail = guestOrder.Email;
+
                 if (orderFromDb.SessionToken != token)
                     throw new InvalidOperationException();
 
@@ -167,7 +186,11 @@ namespace NutriBest.Server.Features.Orders
                 IsConfirmed = orderFromDb.IsConfirmed,
                 IsFinished = orderFromDb.IsFinished,
                 MadeOn = orderDetails.MadeOn,
-                PaymentMethod = orderDetails.PaymentMethod.ToString()
+                PaymentMethod = orderDetails.PaymentMethod.ToString(),
+                IsPaid = orderDetails.IsPaid,
+                IsShipped = orderDetails.IsShipped,
+                Email = customerEmail,
+                CustomerName = customerName
             };
 
             if (orderDetails.InvoiceId != null)

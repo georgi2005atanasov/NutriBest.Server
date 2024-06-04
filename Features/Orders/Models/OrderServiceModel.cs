@@ -17,6 +17,10 @@
 
         public DateTime MadeOn { get; set; }
 
+        public bool IsPaid { get; set; }
+
+        public bool IsShipped { get; set; }
+
         public string Email { get; set; } = null!;
 
         public string CustomerName { get; set; } = null!;

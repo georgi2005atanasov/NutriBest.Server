@@ -33,6 +33,6 @@
         [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }
 
-        public string SessionToken { get; set; } = null!;
+        public string? SessionToken { get; set; }
     }
 }

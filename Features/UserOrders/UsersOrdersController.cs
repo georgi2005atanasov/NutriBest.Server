@@ -58,7 +58,8 @@
                     Message = "Invalid postal code!"
                 });
 
-            if (!int.TryParse(orderModel.PostalCode, out var postalCode))
+            int postalCode = 0;
+            if (!string.IsNullOrEmpty(orderModel.PostalCode) && !int.TryParse(orderModel.PostalCode, out postalCode))
                 return BadRequest(new
                 {
                     Message = "Invalid postal code!"
@@ -103,7 +104,7 @@
                     orderModel.City,
                     orderModel.Street,
                     orderModel.StreetNumber,
-                    postalCode,
+                    postalCode != 0 ? postalCode : null,
                     orderModel.PaymentMethod,
                     orderModel.HasInvoice,
                     orderModel.Invoice,
@@ -117,6 +118,7 @@
                 var userOrderId = await userOrderService.CreateUserOrder(userId, // mandatory
                     order.Id,
                     orderModel.Email,
+                    orderModel.Name,
                     orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
