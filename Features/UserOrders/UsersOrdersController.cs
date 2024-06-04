@@ -119,7 +119,6 @@
                     order.Id,
                     orderModel.Email,
                     orderModel.Name,
-                    orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
                 order.UserOrderId = userOrderId;

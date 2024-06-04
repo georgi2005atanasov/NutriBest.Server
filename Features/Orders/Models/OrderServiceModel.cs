@@ -24,5 +24,7 @@
         public string Email { get; set; } = null!;
 
         public string CustomerName { get; set; } = null!;
+
+        public string IBAN { get; set; } = null!;
     }
 }

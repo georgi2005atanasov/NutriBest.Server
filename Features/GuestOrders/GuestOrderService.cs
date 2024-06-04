@@ -7,8 +7,9 @@
     public class GuestOrderService :  OrderService, IGuestOrderService
     {
         public GuestOrderService(NutriBestDbContext db,
-            ICurrentUserService currentUserService)
-            :base(db, currentUserService)
+            ICurrentUserService currentUserService,
+            IConfiguration config)
+            :base(db, currentUserService, config)
         {
         }
 

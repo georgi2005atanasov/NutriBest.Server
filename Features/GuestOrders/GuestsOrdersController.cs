@@ -114,8 +114,8 @@
                 await db.SaveChangesAsync();
 
                 var guestOrderId = await guestOrderService.CreateGuestOrder(order.Id,
+                    orderModel.Name,
                     orderModel.Email,
-                    orderModel.PaymentMethod,
                     orderModel.PhoneNumber);
 
                 order.GuestOrderId = guestOrderId;

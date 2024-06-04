@@ -4,11 +4,13 @@
     {
         public class PaginationConstants
         {
-            public const int productsPerPage = 6;
-            public const int productsPerRow = 3;
+            public const int ProductsPerPage = 6;
+            public const int ProductsPerRow = 3;
 
-            public const int productsPerTable = 10;
-            public const int productsPerRowInTable = 1;
+            public const int ProductsPerTable = 10;
+            public const int ProductsPerRowInTable = 1;
+
+            public const int OrdersPerPage = 20;
         }
 
         public class Product

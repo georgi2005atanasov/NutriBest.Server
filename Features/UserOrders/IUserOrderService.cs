@@ -8,7 +8,6 @@
             int orderId,
             string name,
             string email,
-            string paymentMethod,
             string? phoneNumber);
     }
 }

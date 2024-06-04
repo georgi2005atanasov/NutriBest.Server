@@ -54,7 +54,7 @@
 
             var productsCount = query.Count();
 
-            int pagesToSkip = (page - 1) * ((productsView == "all") ? productsPerPage : productsPerTable);
+            int pagesToSkip = (page - 1) * ((productsView == "all") ? ProductsPerPage : ProductsPerTable);
 
             var queryProducts = query
                 .OrderByDescending(x => x.CreatedOn)
@@ -78,14 +78,14 @@
 
             queryProducts = queryProducts
                 .Skip(pagesToSkip)
-                .Take((productsView == "all") ? productsPerPage : productsPerTable);
+                .Take((productsView == "all") ? ProductsPerPage : ProductsPerTable);
 
             var products = await Task.Run(() => queryProducts.ToList());
 
             await GetPromotionPercentage(products);
 
             var productsRows = this.GetProductsRows(products,
-                (productsView == "all") ? productsPerRow : productsPerRowInTable);
+                (productsView == "all") ? ProductsPerRow : ProductsPerRowInTable);
 
             return new AllProductsServiceModel
             {

@@ -10,12 +10,13 @@
     public class UserOrderService : OrderService, IUserOrderService
     {
         public UserOrderService(NutriBestDbContext db,
-            ICurrentUserService currentUserService)
-            :base(db, currentUserService)
+            ICurrentUserService currentUserService,
+            IConfiguration config)
+            :base(db, currentUserService, config)
         {
         }
 
-        public async Task<int> CreateUserOrder(string userId, int orderId, string name, string email, string paymentMethod, string? phoneNumber)
+        public async Task<int> CreateUserOrder(string userId, int orderId, string name, string email, string? phoneNumber)
         {
             var profile = await db.Profiles
                 .FirstAsync(x => x.UserId == userId);

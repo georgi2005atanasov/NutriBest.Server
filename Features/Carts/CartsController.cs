@@ -148,7 +148,7 @@
 
                 await CalculateTotalAmounts(isSubtracting: false,
                     cart,
-                    existingProduct,
+                    existingProduct!, // be aware
                     productFromDb);
 
                 await SetSessionCart(cart);
@@ -475,13 +475,13 @@
 
                     if (promotion.DiscountPercentage != null)
                     {
-                        cart.TotalPrice -= (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.TotalPrice -= (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
                         cart.OriginalPrice -= (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountPercentage / 100 * (decimal)cartProduct.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
-                        cart.TotalPrice -= ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.TotalPrice -= ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
                         cart.OriginalPrice -= ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }
@@ -501,13 +501,13 @@
 
                     if (promotion.DiscountPercentage != null)
                     {
-                        cart.TotalPrice += (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
+                        cart.TotalPrice += (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
                         cart.OriginalPrice += (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountPercentage / 100 * (decimal)cartProduct.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
-                        cart.TotalPrice += ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
+                        cart.TotalPrice += ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
                         cart.OriginalPrice += ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }

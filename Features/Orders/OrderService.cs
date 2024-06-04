@@ -8,17 +8,21 @@
     using NutriBest.Server.Features.Orders.Models;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using static ServicesConstants.PaginationConstants;
 
     public class OrderService : IOrderService
     {
         protected readonly NutriBestDbContext db;
         private readonly ICurrentUserService currentUserService;
+        private readonly IConfiguration config;
 
         public OrderService(NutriBestDbContext db,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IConfiguration config)
         {
             this.db = db;
             this.currentUserService = currentUserService;
+            this.config = config;
         }
 
         public async Task<int> PrepareCart(decimal totalPrice,
@@ -56,6 +60,7 @@
                     PackageId = package.Id,
                     Flavour = flavour,
                     FlavourId = flavour.Id,
+                    Price = (decimal)cartProductModel.Price!
                 };
 
                 db.CartProducts.Add(cartProduct);
@@ -190,7 +195,8 @@
                 IsPaid = orderDetails.IsPaid,
                 IsShipped = orderDetails.IsShipped,
                 Email = customerEmail,
-                CustomerName = customerName
+                CustomerName = customerName,
+                IBAN = config.GetSection("IBAN").Value
             };
 
             if (orderDetails.InvoiceId != null)
@@ -226,6 +232,73 @@
             await db.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<AllOrdersServiceModel> All(int page)
+        {
+            var orders = db.Orders
+                .OrderByDescending(x => x.OrderDetails!.MadeOn)
+                .Skip((page - 1) * OrdersPerPage)
+                .AsQueryable();
+
+            var allOrders = new AllOrdersServiceModel() { 
+                TotalOrders = await orders.CountAsync()
+            };
+
+            orders = orders
+                .Skip((page - 1) * OrdersPerPage)
+                .AsQueryable();
+
+            foreach (var order in orders)
+            {
+                var orderDetails = await db.OrdersDetails
+                    .FirstAsync(x => x.Id == order.OrderDetailsId);
+
+                if (order.GuestOrderId != null)
+                {
+                    var guestOrder = await db.GuestsOrders
+                        .FindAsync(order.GuestOrderId);
+
+                    var address = await db.Addresses
+                        .FindAsync(orderDetails.AddressId);
+
+                    var city = await db.Cities
+                        .FindAsync(address!.CityId);
+
+                    var cart = await db.Carts
+                        .FindAsync(order.CartId);
+
+                    var orderModel = new OrderListingServiceModel
+                    {
+                        CustomerName = guestOrder!.Name,
+                        City = city!.CityName,
+                        IsConfirmed = order.IsConfirmed,
+                        IsFinished = order.IsFinished,
+                        IsShipped = orderDetails.IsShipped,
+                        IsPaid = orderDetails.IsPaid,
+                        OrderId = order.Id,
+                        MadeOn = orderDetails.MadeOn,
+                        PaymentMethod = orderDetails.PaymentMethod.ToString(),
+                        TotalPrice = cart!.TotalPrice
+                    };
+
+                    allOrders.Orders.Add(orderModel);
+
+                    allOrders.TotalDiscounts += cart.TotalSaved;
+                    allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalPrice;
+                    allOrders.TotalProducts += await db.CartProducts
+                                                    .Where(x => x.CartId == cart.Id)
+                                                    .CountAsync();
+                    allOrders.TotalPrice += cart.TotalPrice;
+                }
+
+                if (order.UserOrderId != null)
+                {
+                    var userOrder = await db.UsersOrders
+                        .FirstAsync(x => x.Id == order.UserOrderId);
+                }
+            }
+            return allOrders;
         }
     }
 }

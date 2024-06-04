@@ -14,6 +14,21 @@
         }
 
         [HttpGet]
+        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] int page)
+        {
+            try
+            {
+                var allOrders = await orderService.All(page);
+
+                return Ok(allOrders);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
         [Route("{orderId}")]
         public async Task<ActionResult<OrderServiceModel>> GetById([FromRoute] int orderId)
         {
