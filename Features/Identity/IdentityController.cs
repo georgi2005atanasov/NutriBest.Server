@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Identity
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Data.Models;
@@ -110,6 +111,26 @@
                 }
 
                 return BadRequest(new { Message = "Error resetting password." });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        [Route("Roles")]
+        public async Task<ActionResult<List<string>>> AllRoles()
+        {
+            try
+            {
+                var roles = await identityService.AllRoles();
+
+                return Ok(new
+                {
+                    Roles = roles
+                });
             }
             catch (Exception)
             {

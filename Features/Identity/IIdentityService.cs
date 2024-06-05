@@ -15,5 +15,7 @@
         Task<ProfileServiceModel> FindUserById(string id);
 
         Task<bool> CheckUserPassword(User user, string password);
+
+        Task<List<string>> AllRoles(); 
     }
 }

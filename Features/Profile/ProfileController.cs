@@ -35,7 +35,7 @@
                 var allProfiles = await profileService.All(page, search);
                 return allProfiles;
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest(new
                 {

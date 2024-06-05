@@ -17,20 +17,28 @@
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationSettings appSettings;
         private readonly IEmailService emailService;
 
         public IdentityService(UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
+            RoleManager<IdentityRole> roleManager,
             NutriBestDbContext db,
             ICurrentUserService currentUser,
             IEmailService emailService)
         {
             this.db = db;
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.appSettings = appSettings.Value;
             this.emailService = emailService;
         }
+
+        public async Task<List<string>> AllRoles()
+        => await roleManager.Roles
+                .Select(x => x.Name)
+                .ToListAsync();
 
         public async Task<bool> CheckUserPassword(User user, string password)
         {
