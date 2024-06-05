@@ -35,7 +35,7 @@
                 var allProfiles = await profileService.All(page, search);
                 return allProfiles;
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 return BadRequest(new
                 {
@@ -43,6 +43,8 @@
                 });
             }
         }
+
+        [HttpGet]
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]

@@ -1,22 +1,28 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using System.Linq;
     using static ServicesConstants.PaginationConstants;
 
     public class ProfileService : IProfileService
     {
         private readonly ICurrentUserService currentUser;
         private readonly NutriBestDbContext db;
+        private readonly UserManager<User> userManager;
 
-        public ProfileService(ICurrentUserService currentUser, NutriBestDbContext db)
+        public ProfileService(ICurrentUserService currentUser,
+            NutriBestDbContext db,
+            UserManager<User> userManager)
         {
             this.currentUser = currentUser;
             this.db = db;
+            this.userManager = userManager;
         }
 
         public async Task<AllProfilesServiceModel> All(int page, string? search)
@@ -27,7 +33,7 @@
 
             var allProfiles = new AllProfilesServiceModel
             {
-                AllUsers = profiles.Count(),
+                TotalUsers = profiles.Count(),
                 Profiles = new List<ProfileListingServiceModel>()
             };
 
@@ -56,6 +62,11 @@
                     .Where(x => x.ProfileId == profile.UserId)
                     .CountAsync();
 
+                var userOrders = db.UsersOrders
+                    .Where(x => x.ProfileId == profile.UserId);
+
+                decimal totalSpent = await GetTotalSpent(userOrders);
+
                 var profileModel = new ProfileListingServiceModel
                 {
                     City = city != null ? city.CityName : null,
@@ -64,6 +75,9 @@
                     PhoneNumber = user.PhoneNumber,
                     TotalOrders = totalOrders,
                     Name = profile.Name,
+                    ProfileId = profile.UserId,
+                    Roles = string.Join(", ", await userManager.GetRolesAsync(user)),
+                    TotalSpent = totalSpent
                 };
 
                 allProfiles.Profiles.Add(profileModel);
@@ -76,12 +90,36 @@
                 allProfiles.Profiles = allProfiles
                     .Profiles
                     .Where(x => x.Email.ToLower().Contains(search) ||
-                    x.City.ToLower().Contains(search) ||
-                    x.PhoneNumber.ToLower().Contains(search))
+                    (x.City != null && x.City.ToLower().Contains(search)) ||
+                    (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
+                    (x.Name != null && x.Name.ToLower().Contains(search)) ||
+                    x.Roles.ToLower().Contains(search))
+                    .OrderByDescending(x => x.MadeOn)
                     .ToList();
             }
 
             return allProfiles;
+        }
+
+        private async Task<decimal> GetTotalSpent(IQueryable<UserOrder> userOrders)
+        {
+            decimal totalSpent = 0;
+
+            foreach (var userOrder in userOrders)
+            {
+                var order = await db.Orders
+                    .FirstOrDefaultAsync(x => x.Id == userOrder.OrderId);
+
+                if (order != null) // i do this check because i seeded made some invalid orders
+                {
+                    var cart = await db.Carts
+                        .FirstAsync(x => x.Id == order.CartId);
+
+                    totalSpent += cart.TotalPrice;
+                }
+            }
+
+            return totalSpent;
         }
 
         public async Task<ProfileAddressServiceModel> GetAddress()

@@ -87,7 +87,7 @@ namespace NutriBest.Server.Data.Extensions
 
                 e.Ignore(x => x.GuestOrder);
                 e.Ignore(x => x.UserOrder);
-                e.HasQueryFilter(x => !x.IsDeleted); // important!
+                //e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
 
             builder.Entity<GuestOrder>(e =>
@@ -98,6 +98,7 @@ namespace NutriBest.Server.Data.Extensions
                 .OnDelete(DeleteBehavior.Restrict);
 
                 e.Ignore(e => e.Order);
+                //e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
 
             builder.Entity<UserOrder>(e =>
@@ -108,6 +109,7 @@ namespace NutriBest.Server.Data.Extensions
                 .OnDelete(DeleteBehavior.Restrict);
 
                 e.Ignore(e => e.Order);
+                //e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
 
             builder.Entity<OrderDetails>(e =>
@@ -119,7 +121,7 @@ namespace NutriBest.Server.Data.Extensions
 
                 e.Ignore(e => e.Order);
 
-                e.HasQueryFilter(x => !x.IsDeleted); // important!
+                //e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
         }
 

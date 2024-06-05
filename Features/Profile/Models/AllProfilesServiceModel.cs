@@ -4,6 +4,6 @@
     {
         public List<ProfileListingServiceModel> Profiles { get; set; } = new List<ProfileListingServiceModel>();
 
-        public int AllUsers { get; set; }
+        public int TotalUsers { get; set; }
     }
 }

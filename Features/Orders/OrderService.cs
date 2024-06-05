@@ -232,6 +232,7 @@
         public async Task<AllOrdersServiceModel> All(int page, string? search)
         {
             var orders = db.Orders
+                .Where(x => !x.IsDeleted)
                 .OrderByDescending(x => x.OrderDetails!.MadeOn)
                 .AsQueryable();
 
@@ -331,6 +332,7 @@
                     .Where(x => $"{x.OrderId}" == search ||
                     x.PhoneNumber.ToLower().Contains(search) ||
                     x.CustomerName.ToLower().Contains(search))
+                    .OrderByDescending(x => x.MadeOn)
                     .ToList();
             }
 
@@ -520,6 +522,22 @@
                     .FirstAsync(x => x.Id == orderDetails.InvoiceId);
 
                 invoice.IsDeleted = true;
+            }
+
+            if (order.GuestOrderId != null)
+            {
+                var guestOrder = await db.GuestsOrders
+                    .FirstAsync(x => x.Id == order.GuestOrderId);
+
+                guestOrder.IsDeleted = true;
+            }
+
+            if (order.UserOrderId != null)
+            {
+                var userOrder = await db.UsersOrders
+                    .FirstAsync(x => x.Id == order.UserOrderId);
+
+                userOrder.IsDeleted = true;
             }
 
             await db.SaveChangesAsync();
