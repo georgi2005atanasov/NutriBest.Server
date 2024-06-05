@@ -87,6 +87,7 @@ namespace NutriBest.Server.Data.Extensions
 
                 e.Ignore(x => x.GuestOrder);
                 e.Ignore(x => x.UserOrder);
+                e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
 
             builder.Entity<GuestOrder>(e =>
@@ -117,6 +118,16 @@ namespace NutriBest.Server.Data.Extensions
                 .OnDelete(DeleteBehavior.Restrict);
 
                 e.Ignore(e => e.Order);
+
+                e.HasQueryFilter(x => !x.IsDeleted); // important!
+            });
+        }
+
+        public static void ConfigureInvoices(this ModelBuilder builder)
+        {
+            builder.Entity<Invoice>(e =>
+            {
+                e.HasQueryFilter(x => !x.IsDeleted); // important!
             });
         }
 

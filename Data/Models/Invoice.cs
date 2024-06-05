@@ -34,5 +34,7 @@
         public string PersonInCharge { get; set; } = null!;
 
         public OrderDetails? OrderDetails { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

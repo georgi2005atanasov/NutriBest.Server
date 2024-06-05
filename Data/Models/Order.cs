@@ -34,5 +34,7 @@
         public string? Comment { get; set; }
 
         public string? SessionToken { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

@@ -72,8 +72,7 @@
 
         public async Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token)
         {
-            var orderFromDb = await db.Orders
-                .FirstOrDefaultAsync(x => x.Id == orderId);
+            var orderFromDb = await GetOrder(orderId);
 
             string customerName = "";
             string customerEmail = "";
@@ -180,8 +179,7 @@
                 CartProducts = cartProducts
             };
 
-            var orderDetails = await db.OrdersDetails
-                .FirstAsync(x => x.Id == orderFromDb.OrderDetailsId);
+            var orderDetails = await GetOrderDetails(orderFromDb.OrderDetailsId);
 
             var order = new OrderServiceModel
             {
@@ -219,8 +217,7 @@
 
         public async Task<bool> ConfirmOrder(int orderId)
         {
-            var order = await db.Orders
-                .FirstOrDefaultAsync(x => x.Id == orderId);
+            var order = await GetOrder(orderId);
 
             if (order == null)
                 return false;
@@ -250,8 +247,7 @@
 
             foreach (var order in orders)
             {
-                var orderDetails = await db.OrdersDetails
-                    .FirstAsync(x => x.Id == order.OrderDetailsId);
+                var orderDetails = await GetOrderDetails(order.OrderDetailsId);
 
                 var address = await db.Addresses
                         .FindAsync(orderDetails.AddressId);
@@ -353,8 +349,7 @@
 
         public async Task<OrderServiceModel?> GetFinishedByAdmin(int orderId)
         {
-            var orderFromDb = await db.Orders
-                .FirstOrDefaultAsync(x => x.Id == orderId);
+            var orderFromDb = await GetOrder(orderId);
 
             string customerName = "";
             string customerEmail = "";
@@ -450,8 +445,7 @@
                 CartProducts = cartProducts
             };
 
-            var orderDetails = await db.OrdersDetails
-                .FirstAsync(x => x.Id == orderFromDb.OrderDetailsId);
+            var orderDetails = await GetOrderDetails(orderFromDb.OrderDetailsId);
 
             var order = new OrderServiceModel
             {
@@ -486,5 +480,59 @@
 
             return order;
         }
+
+        public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped)
+        {
+            var order = await GetOrder(orderId);
+
+            if (order == null)
+                return false;
+
+            var details = await GetOrderDetails(order.OrderDetailsId);
+
+            order.IsFinished = isFinished;
+            details.IsPaid = isPaid;
+            details.IsShipped = isShipped;
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task DeleteById(int orderId)
+        {
+            var order = await GetOrder(orderId);
+
+            if (order == null)
+                throw new ArgumentNullException("Order Could not be Deleted!");
+
+            if (order.IsFinished == false)
+                throw new InvalidOperationException("The order must be finished before deleting it!");
+
+            var orderDetails = await GetOrderDetails(order.OrderDetailsId);
+
+            order.IsDeleted = true;
+            orderDetails.IsDeleted = true;
+
+            if (orderDetails.InvoiceId != null)
+            {
+                var invoice = await db.Invoices
+                    .FirstAsync(x => x.Id == orderDetails.InvoiceId);
+
+                invoice.IsDeleted = true;
+            }
+
+            await db.SaveChangesAsync();
+
+            return;
+        }
+
+        private async Task<OrderDetails> GetOrderDetails(int orderDetailsId)
+            => await db.OrdersDetails
+                .FirstAsync(x => x.Id == orderDetailsId);
+
+        private async Task<Order?> GetOrder(int orderId)
+            => await db.Orders
+                .FirstOrDefaultAsync(x => x.Id == orderId);
     }
 }

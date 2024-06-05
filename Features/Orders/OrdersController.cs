@@ -83,6 +83,33 @@
             }
         }
 
+        [HttpPut]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("change-status/{orderId}")]
+        public async Task<ActionResult<bool>> ChangeStatuses([FromBody] UpdateOrderServiceModel orderModel,
+            [FromRoute] int orderId)
+        {
+            try
+            {
+                var result = await orderService.ChangeStatuses(orderId,
+                    orderModel.IsFinished,
+                    orderModel.IsPaid,
+                    orderModel.IsShipped);
+
+                return Ok(new
+                {
+                    Successful = true
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new
+                {
+                    Successful = false
+                });
+            }
+        }
+
         [HttpPost]
         [Route("Confirm")]
         public async Task<ActionResult<bool>> ConfirmOrder([FromQuery] int orderId)
@@ -92,6 +119,37 @@
                 var result = await orderService.ConfirmOrder(orderId);
 
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("Admin/{orderId}")]
+        public async Task<ActionResult> Delete([FromRoute] int orderId)
+        {
+            try
+            {
+                await orderService.DeleteById(orderId);
+
+                return Ok();
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {

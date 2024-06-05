@@ -19,6 +19,13 @@
 
         Task<OrderServiceModel?> GetFinishedByAdmin(int orderId);
 
+        Task<bool> ChangeStatuses(int orderId,
+            bool isFinished,
+            bool isPaid,
+            bool isShipped);
+
+        Task DeleteById(int orderId); 
+
         Task<bool> ConfirmOrder(int orderId);
     }
 }
