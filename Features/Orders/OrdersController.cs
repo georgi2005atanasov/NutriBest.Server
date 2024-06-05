@@ -16,7 +16,8 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] int page, [FromQuery] string? search)
+        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] string? search,
+            [FromQuery] int page = 1)
         {
             try
             {
@@ -30,6 +31,23 @@
             }
         }
 
+        //[HttpGet]
+        //[Authorize(Roles = "User")]
+        //[Route("Mine")]
+        //public async Task<ActionResult<OrderServiceModel>> Mine([FromQuery] int page, [FromQuery] string? search)
+        //{
+        //    try
+        //    {
+        //        var allOrders = await orderService.Mine();
+
+        //        return Ok(allOrders);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
+
         [HttpGet]
         [Route("{orderId}")]
         public async Task<ActionResult<OrderServiceModel>> GetById([FromRoute] int orderId)
@@ -39,6 +57,23 @@
                 var token = GetSessionOrder();
 
                 var order = await orderService.GetFinishedOrder(orderId, token);
+
+                return Ok(order);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("Admin/{orderId}")]
+        public async Task<ActionResult<OrderServiceModel>> GetByIdFromAdmin([FromRoute] int orderId)
+        {
+            try
+            {
+                var order = await orderService.GetFinishedByAdmin(orderId);
 
                 return Ok(order);
             }

@@ -25,5 +25,7 @@
         public string City { get; set; } = null!;
 
         public decimal TotalPrice { get; set; }
+
+        public bool IsAnonymous { get; set; }
     }
 }

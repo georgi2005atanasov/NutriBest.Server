@@ -33,6 +33,7 @@
 
             profiles = profiles
                 .Skip((page - 1) * UsersPerPage)
+                .Take(UsersPerPage)
                 .AsQueryable();
 
             foreach (var profile in profiles)

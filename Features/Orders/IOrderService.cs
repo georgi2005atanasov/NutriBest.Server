@@ -13,7 +13,11 @@
 
         Task<AllOrdersServiceModel> All(int page, string? search);
 
+        Task<AllOrdersServiceModel> Mine();
+
         Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token);
+
+        Task<OrderServiceModel?> GetFinishedByAdmin(int orderId);
 
         Task<bool> ConfirmOrder(int orderId);
     }
