@@ -7,12 +7,9 @@
     {
         public static string GenerateToken()
         {
-            using (var cryptoProvider = new RNGCryptoServiceProvider())
-            {
-                byte[] tokenBytes = new byte[32];
-                cryptoProvider.GetBytes(tokenBytes);
-                return Convert.ToBase64String(tokenBytes);
-            }
+            byte[] tokenBytes = new byte[32];
+            RandomNumberGenerator.Fill(tokenBytes);
+            return Convert.ToBase64String(tokenBytes);
         }
     }
 }

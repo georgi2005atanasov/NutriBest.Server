@@ -6,6 +6,8 @@
     {
         Task<AllProfilesServiceModel> All(int page, string? search);
 
+        Task<ProfileDetailsServiceModel> GetDetailsById(string id);
+
         Task<string> UpdateProfile(string? name,
             string? userName,
             string? email,

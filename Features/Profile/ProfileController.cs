@@ -44,7 +44,6 @@
             }
         }
 
-        [HttpGet]
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
@@ -53,8 +52,9 @@
         {
             try
             {
-                Task<ProfileServiceModel> task = identityService.FindUserById(userId);
-                return await task!;
+                var userDetails = await profileService.GetDetailsById(userId);
+
+                return Ok(userDetails);
             }
             catch (Exception)
             {

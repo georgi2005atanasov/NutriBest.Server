@@ -5,6 +5,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
     using System.Linq;
@@ -12,14 +13,17 @@
 
     public class ProfileService : IProfileService
     {
+        private readonly IIdentityService identityService;
         private readonly ICurrentUserService currentUser;
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
 
-        public ProfileService(ICurrentUserService currentUser,
+        public ProfileService(IIdentityService identityService,
+            ICurrentUserService currentUser,
             NutriBestDbContext db,
             UserManager<User> userManager)
         {
+            this.identityService = identityService;
             this.currentUser = currentUser;
             this.db = db;
             this.userManager = userManager;
@@ -58,13 +62,7 @@
                 var user = await db.Users
                     .FirstOrDefaultAsync(x => x.Id == profile.UserId);
 
-                var totalOrders = await db.UsersOrders
-                    .Where(x => x.ProfileId == profile.UserId)
-                    .CountAsync();
-
-                var userOrders = db.UsersOrders
-                    .Where(x => x.ProfileId == profile.UserId);
-
+                var (totalOrders, userOrders) = await GetUserOrders(profile.UserId);
                 decimal totalSpent = await GetTotalSpent(userOrders);
 
                 var profileModel = new ProfileListingServiceModel
@@ -103,47 +101,23 @@
             return allProfiles;
         }
 
-        private async Task<decimal> GetTotalSpent(IQueryable<UserOrder> userOrders)
-        {
-            decimal totalSpent = 0;
-
-            foreach (var userOrder in userOrders)
-            {
-                var order = await db.Orders
-                    .FirstOrDefaultAsync(x => x.Id == userOrder.OrderId);
-
-                if (order != null) // i do this check because i seeded made some invalid orders
-                {
-                    var cart = await db.Carts
-                        .FirstAsync(x => x.Id == order.CartId);
-
-                    totalSpent += cart.TotalPrice;
-                }
-            }
-
-            return totalSpent;
-        }
-
         public async Task<ProfileAddressServiceModel> GetAddress()
         {
             var userId = currentUser.GetUserId();
 
-            var address = await db.Addresses
-                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+            if (userId == null)
+                throw new ArgumentNullException("Invalid user!");
+
+            var (address, city, country) = await GetAddressWithCityAndCountry(userId);
 
             if (address == null)
                 return new ProfileAddressServiceModel();
 
-            var city = await db.Cities
-                .FirstAsync(x => x.Id == address.CityId);
-            var country = await db.Countries
-                .FirstAsync(x => x.Id == address.CountryId);
-
             var result = new ProfileAddressServiceModel
             {
-                City = city.CityName,
-                Country = country.CountryName,
-                PostalCode = city.PostalCode,
+                City = city != null ? city.CityName : "",
+                Country = country != null ? country.CountryName : "",
+                PostalCode = city != null ? city.PostalCode : null,
                 Street = address.Street,
                 StreetNumber = address.StreetNumber
             };
@@ -157,6 +131,7 @@
 
             var city = await db.Cities
                 .FirstOrDefaultAsync(x => x.CityName == cityName);
+
             var country = await db.Countries
                 .FirstOrDefaultAsync(x => x.CountryName == countryName);
 
@@ -200,13 +175,10 @@
         {
             var id = currentUser.GetUserId();
 
-            var user = await db.Users
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
+            if (id == null)
+                throw new ArgumentNullException("Invalid user!");
 
-            var profile = await db.Profiles
-                .Where(x => x.UserId == id)
-                .FirstOrDefaultAsync();
+            var (profile, user) = await GetProfileWithUser(id);
 
             if (user == null || profile == null)
                 return "User could not be found";
@@ -274,5 +246,105 @@
 
             return "success";
         }
+
+        public async Task<ProfileDetailsServiceModel> GetDetailsById(string id)
+        {
+            var (profile, user) = await GetProfileWithUser(id);
+
+            if (user == null || profile == null)
+                throw new ArgumentNullException("User could not be found");
+
+            var (address, city, country) = await GetAddressWithCityAndCountry(id);
+
+            var (totalOrders, userOrders) = await GetUserOrders(profile.UserId);
+            decimal totalSpent = await GetTotalSpent(userOrders);
+
+            var profileDetails = new ProfileDetailsServiceModel
+            {
+                MadeOn = user.CreatedOn,
+                ModifiedOn = user.ModifiedOn,
+                IsDeleted = profile.IsDeleted,
+                City = city != null ? city.CityName : "",
+                Country = country != null ? country.CountryName : "",
+                Email = user.Email,
+                Gender = profile.Gender.ToString(),
+                Name = profile.Name,
+                UserName = user.UserName!, // be aware
+                Age = profile.Age,
+                ProfileId = id,
+                Street = address != null ? address.Street : "",
+                StreetNumber = address != null ? address.StreetNumber : "",
+                Roles = string.Join(", ", await userManager.GetRolesAsync(user)),
+                PhoneNumber = user.PhoneNumber,
+                TotalSpent = totalSpent,
+                TotalOrders = totalOrders
+            };
+
+            return profileDetails;
+        }
+
+        private async Task<(int totalOrders, IQueryable<UserOrder> userOrders)> GetUserOrders(string userId)
+        {
+            var totalOrders = await db.UsersOrders
+                    .Where(x => x.ProfileId == userId)
+                    .CountAsync();
+
+            var userOrders = db.UsersOrders
+                .Where(x => x.ProfileId == userId);
+
+            return (totalOrders, userOrders);
+        }
+
+        private async Task<(Profile? profile, User? user)> GetProfileWithUser(string id)
+        {
+            var user = await db.Users
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            var profile = await db.Profiles
+                .Where(x => x.UserId == id)
+                .FirstOrDefaultAsync();
+
+            return (profile, user);
+        }
+
+        private async Task<(Address? address, City? city, Country? country)> GetAddressWithCityAndCountry(string userId)
+        {
+            var address = await db.Addresses
+                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+
+            if (address == null)
+                return (null, null, null);
+
+            var city = await db.Cities
+                .FirstAsync(x => x.Id == address.CityId);
+
+            var country = await db.Countries
+                .FirstAsync(x => x.Id == address.CountryId);
+
+            return (address, city, country);
+        }
+
+        private async Task<decimal> GetTotalSpent(IQueryable<UserOrder> userOrders)
+        {
+            decimal totalSpent = 0;
+
+            foreach (var userOrder in userOrders)
+            {
+                var order = await db.Orders
+                    .FirstOrDefaultAsync(x => x.Id == userOrder.OrderId);
+
+                if (order != null) // i do this check because i seeded made some invalid orders
+                {
+                    var cart = await db.Carts
+                        .FirstAsync(x => x.Id == order.CartId);
+
+                    totalSpent += cart.TotalPrice;
+                }
+            }
+
+            return totalSpent;
+        }
     }
 }
+
