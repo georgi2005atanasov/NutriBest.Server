@@ -42,7 +42,7 @@
 
         [HttpPatch]
         [Route("Grant/{id}")]
-        public async Task<ActionResult> GrantUser([FromRoute] string id, [FromForm] string role)
+        public async Task<ActionResult> GrantUser([FromRoute] string id, [FromQuery] string role)
         {
             try
             {
@@ -82,7 +82,7 @@
 
         [HttpPatch]
         [Route("Disown/{id}")]
-        public async Task<ActionResult> DisownUser([FromRoute] string id, [FromForm] string role)
+        public async Task<ActionResult> DisownUser([FromRoute] string id, [FromQuery] string role)
         {
             try
             {

@@ -222,6 +222,22 @@
             if (order == null)
                 return false;
 
+            // reduce the quantity for each product in the cart
+            var cart = await db.Carts
+                .FirstAsync(x => x.Id == order.CartId);
+
+            var cartProducts = db.CartProducts
+                .Where(x => x.CartId == cart.Id);
+
+            foreach (var cartProduct in cartProducts)
+            {
+                var product = await db.Products
+                    .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+
+                product.Quantity -= cartProduct.Count;
+            }
+            // reduce the quantity for each product in the cart
+
             order.IsConfirmed = true;
 
             await db.SaveChangesAsync();

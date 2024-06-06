@@ -38,6 +38,7 @@
         public async Task<List<string>> AllRoles()
         => await roleManager.Roles
                 .Select(x => x.Name)
+                .Where(x => x != "Administrator")
                 .ToListAsync();
 
         public async Task<bool> CheckUserPassword(User user, string password)

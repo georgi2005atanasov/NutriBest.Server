@@ -31,34 +31,34 @@
             <title>Order Confirmation</title>
             <style>
                 body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-                .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-                .header { text-align: center; padding: 10px 0; }
-                .header img { max-width: 100px; }
-                .content { padding: 20px 0; }
-                .content h1 { color: #333333; }
-                .content p { color: #666666; line-height: 1.6; }
-                .button-container { text-align: center; margin: 20px 0; }
-                .button { background-color: #28a745; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; }
-                .footer { text-align: center; padding: 10px 0; color: #999999; font-size: 12px; }
+                #container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+                #header { text-align: center; padding: 10px 0; }
+                #header img { max-width: 100px; }
+                #content { padding: 20px 0; }
+                #content h1 { color: #333333; }
+                #content p { color: #666666; line-height: 1.6; }
+                #button-container { text-align: center; margin: 20px 0; }
+                #button { background-color: #28a745; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; }
+                #footer { text-align: center; padding: 10px 0; color: #999999; font-size: 12px; }
             </style>
         </head>
         <body>
-            <div class='container'>
-                <div class='header'>
+            <div id='container'>
+                <div id='header'>
 NutriBest
                 </div>
-                <div class='content'>
+                <div id='content'>
                     <h1>Thank you for your order!</h1>
                     <p>Hi {CustomerName},</p>
                     <p>We have received your order and it is currently being processed. Your order number is <strong>#{OrderNumber}</strong>.</p>
                     <p>Please click the button below to confirm your order:</p>
                     <div class='button-container'>
-                        <a href='{ConfirmationUrl}' class='button'>Confirm Order</a>
+                        <a href='{ConfirmationUrl}' id='button'>Confirm Order</a>
                     </div>
                     <p>If you have any questions, feel free to contact our support team.</p>
                     <p>Thank you for shopping with us!</p>
                 </div>
-                <div class='footer'>
+                <div id='footer'>
                     <p>&copy; {Date} NutriBest. All rights reserved.</p>
                 </div>
             </div>

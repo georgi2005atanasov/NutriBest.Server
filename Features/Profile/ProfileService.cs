@@ -77,7 +77,9 @@
                     Name = profile.Name,
                     ProfileId = profile.UserId,
                     Roles = string.Join(", ", await userManager.GetRolesAsync(user)),
-                    TotalSpent = totalSpent
+                    TotalSpent = totalSpent,
+                    UserName = user.UserName,
+                    IsDeleted = profile.IsDeleted
                 };
 
                 allProfiles.Profiles.Add(profileModel);
