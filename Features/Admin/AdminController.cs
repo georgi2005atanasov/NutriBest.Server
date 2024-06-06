@@ -119,5 +119,34 @@
                 return BadRequest();
             }
         }
+
+        [HttpPost]
+        [Route("Restore/{userId}")]
+        public async Task<ActionResult> RestoreProfile([FromRoute] string userId)
+        {
+            try
+            {
+                var restoredProfileEmail = await adminService.RestoreProfile(userId);
+
+                return Ok(new
+                {
+                    Message = $"Successfully restored profile with email '{restoredProfileEmail}'!"
+                });
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new
+                {
+                    Message = "User not Found!"
+                });
+            }
+        }
     }
 }

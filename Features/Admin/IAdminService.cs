@@ -5,5 +5,7 @@
     public interface IAdminService
     {
         Task<IEnumerable<UserServiceModel>> GetAllUsers();
+
+        Task<string> RestoreProfile(string id);
     }
 }

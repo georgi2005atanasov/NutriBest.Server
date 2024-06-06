@@ -45,5 +45,24 @@
 
             return usersModels;
         }
+
+        public async Task<string> RestoreProfile(string id)
+        {
+            var user = await db.Users
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            var profile = await db.Profiles
+               .FirstOrDefaultAsync(x => x.UserId == id);
+
+            if (profile == null || user == null)
+                throw new ArgumentNullException("Invalid user!");
+
+            user.IsDeleted = false;
+            profile.IsDeleted = false;
+
+            await db.SaveChangesAsync();
+
+            return user.Email;
+        }
     }
 }

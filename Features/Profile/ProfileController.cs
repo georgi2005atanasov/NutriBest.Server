@@ -44,17 +44,23 @@
             }
         }
 
-
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("{userId}")]
-        public async Task<ActionResult<ProfileServiceModel?>> GetById(string userId)
+        public async Task<ActionResult<ProfileServiceModel?>> GetById([FromRoute] string userId)
         {
             try
             {
                 var userDetails = await profileService.GetDetailsById(userId);
 
                 return Ok(userDetails);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
             }
             catch (Exception)
             {
