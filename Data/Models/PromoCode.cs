@@ -20,5 +20,7 @@
         public decimal DiscountPercentage { get; set; }
 
         public bool IsValid { get; set; }
+
+        public bool IsSent { get; set; }
     }
 }

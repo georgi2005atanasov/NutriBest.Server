@@ -119,7 +119,7 @@
         public async Task<(List<string>, int)> GetByDescription(string description)
         {
             var promoCodes = db.PromoCodes
-                .Where(x => x.Description == description)
+                .Where(x => x.Description == description && !x.IsSent)
                 .Select(x => new
                 {
                     x.Code,

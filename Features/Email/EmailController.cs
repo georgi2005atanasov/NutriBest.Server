@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Email
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Data.Models;
@@ -62,6 +63,33 @@
                 {
                     IsSuccess = true,
                     Message = "If the email is valid, a password reset link has been sent."
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route(nameof(SendPromoCode))]
+        public async Task<ActionResult> SendPromoCode([FromBody] SendEmailModel request)
+        {
+            if (string.IsNullOrEmpty(request.To))
+                return BadRequest(new
+                {
+                    Error = "Email is Required!"
+                });
+
+            try
+            {
+                await emailService.SendPromoCode(request);
+
+                return Ok(new
+                {
+                    IsSuccess = true,
+                    Message = "Successfully sent promo code!"
                 });
             }
             catch (Exception)

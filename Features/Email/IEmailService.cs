@@ -7,5 +7,7 @@
         void SendConfirmOrder(EmailConfirmOrderModel emailModel);
 
         void SendForgottenPassword(EmailModel request, string callbackUrl);
+
+        Task SendPromoCode(SendEmailModel request);
     }
 }
