@@ -74,7 +74,7 @@
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         [Route(nameof(SendPromoCode))]
-        public async Task<ActionResult> SendPromoCode([FromBody] SendEmailModel request)
+        public async Task<ActionResult> SendPromoCode([FromBody] SendPromoEmailModel request)
         {
             if (string.IsNullOrEmpty(request.To))
                 return BadRequest(new

@@ -8,6 +8,6 @@
 
         void SendForgottenPassword(EmailModel request, string callbackUrl);
 
-        Task SendPromoCode(SendEmailModel request);
+        Task SendPromoCode(SendPromoEmailModel request);
     }
 }

@@ -225,7 +225,11 @@
                 return "The gender must be different from the previous!";
 
             if (!string.IsNullOrEmpty(email))
+            {
                 user.Email = email;
+                user.NormalizedEmail = email.ToUpper();
+            }
+            
 
             if (!string.IsNullOrEmpty(name))
                 profile.Name = name;

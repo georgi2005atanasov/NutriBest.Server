@@ -188,7 +188,7 @@ NutriBest
             smtp.Disconnect(true);
         }
 
-        public async Task SendPromoCode(SendEmailModel request)
+        public async Task SendPromoCode(SendPromoEmailModel request)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));

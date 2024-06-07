@@ -52,7 +52,7 @@
             {
                 UserName = userName,
                 Email = email,
-                EmailConfirmed = true, // gotta make this through email confirmation
+                EmailConfirmed = true,
             };
 
             var result = await userManager.CreateAsync(user, password);

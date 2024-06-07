@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Identity.Models;
     using NutriBest.Server.Infrastructure.Services;
 
@@ -12,14 +13,17 @@
         private readonly IIdentityService identityService;
         private readonly UserManager<User> userManager;
         private readonly ICurrentUserService currentUserService;
+        private readonly IEmailService emailService;
 
         public IdentityController(IIdentityService identityService,
             UserManager<User> userManager,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IEmailService emailService)
         {
             this.identityService = identityService;
             this.userManager = userManager;
             this.currentUserService = currentUserService;
+            this.emailService = emailService;
         }
 
         [HttpPost]
@@ -41,10 +45,21 @@
                                      userModel.Password);
 
                 if (result.Succeeded)
+                {
+                    var user = await userManager.FindByEmailAsync(userModel.Email);
+
+                    if (user == null)
+                        return Ok(new
+                        {
+                            IsSuccess = true,
+                            Message = "If the email is valid, email confirmation has been sent."
+                        });
+
                     return Ok(new
                     {
                         Message = "Successfully added new user!"
                     });
+                }
 
                 return BadRequest(result.Errors);
             }
