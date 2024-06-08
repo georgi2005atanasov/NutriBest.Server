@@ -25,7 +25,7 @@
             this.config = config;
         }
 
-        public async Task<int> PrepareCart(decimal totalPrice,
+        public async Task<int> PrepareCart(decimal totalProducts,
            decimal originalPrice,
            decimal totalSaved,
            string? code,
@@ -33,7 +33,7 @@
         {
             var cart = new Cart
             {
-                TotalPrice = totalPrice,
+                TotalProducts = totalProducts,
                 OriginalPrice = originalPrice,
                 TotalSaved = totalSaved,
                 Code = code
@@ -92,7 +92,7 @@
 
                 var user = await db.Users
                     .FirstAsync(x => x.Id == userOrder.ProfileId);
-
+                
                 customerEmail = user.Email;
 
                 if (userOrder.ProfileId != currentUserService.GetUserId())
@@ -174,12 +174,13 @@
             {
                 Code = cart.Code,
                 OriginalPrice = cart.OriginalPrice,
-                TotalPrice = cart.TotalPrice,
+                TotalProducts = cart.TotalProducts,
                 TotalSaved = cart.TotalSaved,
                 CartProducts = cartProducts
             };
 
             var orderDetails = await GetOrderDetails(orderFromDb.OrderDetailsId);
+            var (address, city, country) = await GetAddressCityCountry(orderDetails);
 
             var order = new OrderServiceModel
             {
@@ -192,7 +193,12 @@
                 IsShipped = orderDetails.IsShipped,
                 Email = customerEmail,
                 CustomerName = customerName,
-                IBAN = config.GetSection("IBAN").Value
+                IBAN = config.GetSection("IBAN").Value,
+                City = city.CityName,
+                Country = country.CountryName,
+                Street = address.Street,
+                StreetNumber = address.StreetNumber,
+                ShippingPrice = cart.ShippingPrice ?? 0
             };
 
             if (orderDetails.InvoiceId != null)
@@ -272,9 +278,11 @@
                 var city = await db.Cities
                     .FindAsync(address != null ? address.CityId : "");
 
+                var country = await db.Countries
+                    .FindAsync(city != null ? city.CountryId : "");
+
                 var cart = await db.Carts
                     .FindAsync(order.CartId);
-
 
                 if (order.GuestOrderId != null)
                 {
@@ -285,6 +293,7 @@
                     {
                         CustomerName = guestOrder!.Name,
                         City = city != null ? city!.CityName : "",
+                        Country = country != null ? country!.CountryName : "",
                         IsConfirmed = order.IsConfirmed,
                         IsFinished = order.IsFinished,
                         IsShipped = orderDetails.IsShipped,
@@ -292,7 +301,7 @@
                         OrderId = order.Id,
                         MadeOn = orderDetails.MadeOn,
                         PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                        TotalPrice = cart!.TotalPrice,
+                        TotalPrice = cart!.TotalProducts + (cart.ShippingPrice ?? 0),
                         PhoneNumber = guestOrder.PhoneNumber,
                         Email = guestOrder.Email,
                         IsAnonymous = true
@@ -316,6 +325,7 @@
                     {
                         CustomerName = profile.Name ?? "",
                         City = city != null ? city!.CityName : "",
+                        Country = country != null ? country!.CountryName : "",
                         IsConfirmed = order.IsConfirmed,
                         IsFinished = order.IsFinished,
                         IsShipped = orderDetails.IsShipped,
@@ -323,7 +333,7 @@
                         OrderId = order.Id,
                         MadeOn = orderDetails.MadeOn,
                         PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                        TotalPrice = cart!.TotalPrice,
+                        TotalPrice = cart!.TotalProducts + (cart.ShippingPrice ?? 0),
                         PhoneNumber = user.PhoneNumber,
                         Email = user.Email,
                         IsAnonymous = false
@@ -333,11 +343,11 @@
                 }
 
                 allOrders.TotalDiscounts += cart!.TotalSaved; // be aware
-                allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalPrice;
+                allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
                 allOrders.TotalProducts += await db.CartProducts
                                                 .Where(x => x.CartId == cart.Id)
                                                 .CountAsync();
-                allOrders.TotalPrice += cart.TotalPrice;
+                allOrders.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
             }
 
             if (!string.IsNullOrEmpty(search))
@@ -458,12 +468,14 @@
             {
                 Code = cart.Code,
                 OriginalPrice = cart.OriginalPrice,
-                TotalPrice = cart.TotalPrice,
+                TotalProducts = cart.TotalProducts,
                 TotalSaved = cart.TotalSaved,
-                CartProducts = cartProducts
+                CartProducts = cartProducts,
+                ShippingPrice = cart.ShippingPrice
             };
 
             var orderDetails = await GetOrderDetails(orderFromDb.OrderDetailsId);
+            var (address, city, country) = await GetAddressCityCountry(orderDetails);
 
             var order = new OrderServiceModel
             {
@@ -476,7 +488,12 @@
                 IsShipped = orderDetails.IsShipped,
                 Email = customerEmail,
                 CustomerName = customerName,
-                IBAN = config.GetSection("IBAN").Value
+                IBAN = config.GetSection("IBAN").Value,
+                City = city.CityName,
+                Country = country.CountryName,
+                Street = address.Street,
+                StreetNumber = address.StreetNumber,
+                ShippingPrice = cart.ShippingPrice ?? 0
             };
 
             if (orderDetails.InvoiceId != null)
@@ -497,6 +514,29 @@
             }
 
             return order;
+        }
+
+        public async Task SetShippingPrice(int cartId, string countryName)
+        {
+            var cart = await db.Carts
+                .FirstAsync(x => x.Id == cartId);
+
+            var country = await db.Countries
+                .FirstAsync(x => x.CountryName == countryName);
+
+            cart.ShippingPrice = country.ShippingPrice;
+        }
+
+        private async Task<(Address address, City city, Country country)> GetAddressCityCountry(OrderDetails orderDetails)
+        {
+            var address = await db.Addresses
+                .FirstAsync(x => x.Id == orderDetails.AddressId);
+            var city = await db.Cities
+                .FirstAsync(x => x.Id == address.CityId);
+            var country = await db.Countries
+                .FirstAsync(x => x.Id == address.CountryId);
+
+            return (address, city, country);
         }
 
         public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped)
@@ -530,6 +570,8 @@
             var orderDetails = await GetOrderDetails(order.OrderDetailsId);
 
             order.IsDeleted = true;
+            order.DeletedOn = DateTime.UtcNow;
+            order.DeletedBy = currentUserService.GetUserName() ?? "";
             orderDetails.IsDeleted = true;
 
             if (orderDetails.InvoiceId != null)

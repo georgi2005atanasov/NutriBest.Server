@@ -5,6 +5,14 @@
 
     public class OrderServiceModel
     {
+        public string City { get; set; } = null!;
+
+        public string Country { get; set; } = null!;
+
+        public string Street { get; set; } = null!;
+
+        public string? StreetNumber { get; set; }
+
         public CartServiceModel? Cart { get; set; }
 
         public bool IsFinished { get; set; }
@@ -26,5 +34,7 @@
         public string CustomerName { get; set; } = null!;
 
         public string IBAN { get; set; } = null!;
+
+        public decimal ShippingPrice { get; set; }
     }
 }

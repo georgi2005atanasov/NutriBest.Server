@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Infrastructure.Extensions
+﻿using NutriBest.Server.Features;
+
+namespace NutriBest.Server.Infrastructure.Extensions
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,7 @@
     using NutriBest.Server.Infrastructure.Middlewares;
     using System;
     using System.Globalization;
+    using static ServicesConstants.Shipping;
 
     public static class ApplicationBuilderExtensions
     {
@@ -54,7 +57,8 @@
                             country = new Country
                             {
                                 CountryName = data.Country,
-                                IsoCode = data.IsoCode
+                                IsoCode = data.IsoCode,
+                                ShippingPrice = ShippingForDE
                             };
 
                             db.Countries.Add(country);
@@ -102,7 +106,8 @@
                             country = new Country
                             {
                                 CountryName = data.Country,
-                                IsoCode = data.IsoCode
+                                IsoCode = data.IsoCode,
+                                ShippingPrice = ShippingForBG
                             };
 
                             db.Countries.Add(country);

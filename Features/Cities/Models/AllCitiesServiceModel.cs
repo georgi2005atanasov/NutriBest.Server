@@ -5,5 +5,7 @@
         public string Country { get; set; } = null!;
 
         public List<CityServiceModel>? Cities { get; set; }
+
+        public decimal ShippingPrice { get; set; }
     }
 }

@@ -6,10 +6,12 @@
 
         public string? Code { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public decimal TotalProducts { get; set; }
 
         public decimal OriginalPrice { get; set; }
 
         public decimal TotalSaved { get; set; }
+
+        public decimal? ShippingPrice { get; set; }
     }
 }

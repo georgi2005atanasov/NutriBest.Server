@@ -17,12 +17,14 @@
         public string? Code { get; set; }
 
         [Required]
-        public decimal TotalPrice { get; set; }
+        public decimal TotalProducts { get; set; }
 
         [Required]
         public decimal TotalSaved { get; set; }
 
         [Required]
         public decimal OriginalPrice { get; set; }
+
+        public decimal? ShippingPrice { get; set; }
     }
 }

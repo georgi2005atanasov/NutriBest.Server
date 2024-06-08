@@ -83,7 +83,7 @@
 
             try
             {
-                var cartId = await guestOrderService.PrepareCart(cookieCart.TotalPrice,
+                var cartId = await guestOrderService.PrepareCart(cookieCart.TotalProducts,
                     cookieCart.OriginalPrice,
                     cookieCart.TotalSaved,
                     cookieCart.Code,
@@ -108,6 +108,8 @@
                     orderModel.HasInvoice,
                     orderModel.Invoice,
                     orderModel.Comment);
+
+                await guestOrderService.SetShippingPrice(cartId, orderModel.Country); // new
 
                 db.Orders.Add(order);
 

@@ -307,7 +307,7 @@
             {
                 CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
-                if (cart.TotalPrice == 0)
+                if (cart.TotalProducts == 0)
                 {
                     return BadRequest(new
                     {
@@ -327,7 +327,7 @@
 
                 await DisablePromoCode(cart);
 
-                cart.TotalPrice -= promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalProducts -= promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved += promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.Code = promoCode.Code;
 
@@ -353,7 +353,7 @@
             {
                 CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
-                if (cart.TotalPrice == 0)
+                if (cart.TotalProducts == 0)
                 {
                     return BadRequest(new
                     {
@@ -384,7 +384,7 @@
             {
                 var cart = GetSessionCart() ?? new CartServiceModel();
 
-                if (cart.TotalPrice == 0)
+                if (cart.TotalProducts == 0)
                     return BadRequest(new
                     {
                         Message = "The cart is already empty!"
@@ -435,7 +435,7 @@
                 var prevPromoCode = await db.PromoCodes
                 .FirstAsync(x => x.Code == code);
 
-                cart.TotalPrice += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalProducts += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
             }
 
@@ -444,7 +444,7 @@
                 var prevPromoCode = await db.PromoCodes
                 .FirstAsync(x => x.Code == cart.Code);
 
-                cart.TotalPrice += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalProducts += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
             }
         }
@@ -456,7 +456,7 @@
                 var prevPromoCode = await db.PromoCodes
                 .FirstAsync(x => x.Code == cart.Code);
 
-                cart.TotalPrice -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                cart.TotalProducts -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
             }
         }
@@ -475,20 +475,20 @@
 
                     if (promotion.DiscountPercentage != null)
                     {
-                        cart.TotalPrice -= (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
+                        cart.TotalProducts -= (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
                         cart.OriginalPrice -= (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountPercentage / 100 * (decimal)cartProduct.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
-                        cart.TotalPrice -= ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
+                        cart.TotalProducts -= ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
                         cart.OriginalPrice -= ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved -= (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }
                 }
                 else
                 {
-                    cart.TotalPrice -= (decimal)cartProduct.Price! * cartProduct.Count;
+                    cart.TotalProducts -= (decimal)cartProduct.Price! * cartProduct.Count;
                     cart.OriginalPrice -= (decimal)cartProduct.Price * cartProduct.Count;
                 }
             }
@@ -501,20 +501,20 @@
 
                     if (promotion.DiscountPercentage != null)
                     {
-                        cart.TotalPrice += (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
+                        cart.TotalProducts += (decimal)cartProduct.Price! * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count; // be aware
                         cart.OriginalPrice += (decimal)cartProduct.Price * ((100 - (decimal)promotion.DiscountPercentage) / 100) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountPercentage / 100 * (decimal)cartProduct.Price * cartProduct.Count;
                     }
                     if (promotion.DiscountAmount != null)
                     {
-                        cart.TotalPrice += ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
+                        cart.TotalProducts += ((decimal)cartProduct.Price! - (decimal)promotion.DiscountAmount) * cartProduct.Count; // be aware
                         cart.OriginalPrice += ((decimal)cartProduct.Price - (decimal)promotion.DiscountAmount) * cartProduct.Count;
                         cart.TotalSaved += (decimal)promotion.DiscountAmount * cartProduct.Count;
                     }
                 }
                 else
                 {
-                    cart.TotalPrice += (decimal)cartProduct.Price! * cartProduct.Count;
+                    cart.TotalProducts += (decimal)cartProduct.Price! * cartProduct.Count;
                     cart.OriginalPrice += (decimal)cartProduct.Price * cartProduct.Count;
                 }
             }

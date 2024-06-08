@@ -43,6 +43,14 @@
                         .OrderBy(x => x.Country)
                         .ToListAsync();
 
+                    foreach (var country in cities)
+                    {
+                        var countryFromDb = await db.Countries
+                            .FirstAsync(x => x.CountryName == country.Country);
+
+                        country.ShippingPrice = countryFromDb.ShippingPrice;
+                    }
+
                     var cacheEntryOptions = new MemoryCacheEntryOptions
                     {
                         SlidingExpiration = TimeSpan.FromMinutes(30)

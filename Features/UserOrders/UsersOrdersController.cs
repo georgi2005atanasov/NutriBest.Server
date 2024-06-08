@@ -78,7 +78,7 @@
                     });
                 }
 
-                var cartId = await userOrderService.PrepareCart(cookieCart.TotalPrice,
+                var cartId = await userOrderService.PrepareCart(cookieCart.TotalProducts,
                     cookieCart.OriginalPrice,
                     cookieCart.TotalSaved,
                     cookieCart.Code,
@@ -110,6 +110,8 @@
                     orderModel.Invoice,
                     orderModel.Comment,
                     userId); // mandatory
+
+                await userOrderService.SetShippingPrice(cartId, orderModel.Country); // new
 
                 db.Orders.Add(order);
 

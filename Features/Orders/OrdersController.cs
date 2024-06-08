@@ -16,7 +16,7 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<OrderServiceModel>> All([FromQuery] string? search,
+        public async Task<ActionResult<AllOrdersServiceModel>> All([FromQuery] string? search,
             [FromQuery] int page = 1)
         {
             try

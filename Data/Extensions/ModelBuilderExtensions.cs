@@ -75,6 +75,17 @@ namespace NutriBest.Server.Data.Extensions
             });
         }
 
+        public static void ConfigureShippings(this ModelBuilder builder)
+        {
+            builder.Entity<ShippingDiscount>(e =>
+            {
+                e.HasOne(x => x.Country)
+                .WithOne(x => x.ShippingDiscount)
+                .HasForeignKey<ShippingDiscount>(x => x.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
         public static void ConfigureOrders(this ModelBuilder builder)
         {
             //better owned types but i miss sth

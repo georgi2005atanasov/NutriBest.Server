@@ -95,5 +95,11 @@
         {
             public const int CountryNameMaxLength = 60;
         }
+
+        public class Shipping
+        {
+            public const int ShippingForBG = 10;
+            public const int ShippingForDE = 25;
+        }
     }
 }

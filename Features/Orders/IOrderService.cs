@@ -5,7 +5,7 @@
 
     public interface IOrderService
     {
-        Task<int> PrepareCart(decimal totalPrice,
+        Task<int> PrepareCart(decimal totalProducts,
             decimal originalPrice,
             decimal totalSaved,
             string? code,
@@ -27,5 +27,7 @@
         Task DeleteById(int orderId); 
 
         Task<bool> ConfirmOrder(int orderId);
+
+        Task SetShippingPrice(int cartId, string country);
     }
 }

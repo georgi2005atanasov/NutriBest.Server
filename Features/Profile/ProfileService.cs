@@ -343,7 +343,7 @@
                     var cart = await db.Carts
                         .FirstAsync(x => x.Id == order.CartId);
 
-                    totalSpent += cart.TotalPrice;
+                    totalSpent += cart.TotalProducts + (cart.ShippingPrice ?? 0);
                 }
             }
 

@@ -62,6 +62,8 @@
 
         public DbSet<PromoCode> PromoCodes { get; set; } = null!;
 
+        public DbSet<ShippingDiscount> ShippingDiscounts { get; set; } = null!;
+
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)
             : base(options)

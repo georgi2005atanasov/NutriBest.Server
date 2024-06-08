@@ -14,6 +14,12 @@
 
         public string? IsoCode { get; set; }
 
+        public decimal ShippingPrice { get; set; }
+
+        public int? ShippingDiscountId { get; set; }
+
+        public ShippingDiscount? ShippingDiscount { get; set; }
+
         public HashSet<Address> Addresses { get; set; } = new HashSet<Address>();
 
         public HashSet<City> Cities { get; set; } = new HashSet<City>();
