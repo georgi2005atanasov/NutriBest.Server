@@ -235,7 +235,10 @@
                 profile.Name = name;
 
             if (!string.IsNullOrEmpty(userName))
+            {
                 user.UserName = userName;
+                user.NormalizedUserName = userName.ToUpper();
+            }
 
             if (age != null)
                 profile.Age = age;

@@ -13,6 +13,8 @@
 
         public string? StreetNumber { get; set; }
 
+        public string? PhoneNumber { get; set; }
+
         public CartServiceModel? Cart { get; set; }
 
         public bool IsFinished { get; set; }

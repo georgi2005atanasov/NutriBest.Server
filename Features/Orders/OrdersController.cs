@@ -31,22 +31,22 @@
             }
         }
 
-        //[HttpGet]
-        //[Authorize(Roles = "User")]
-        //[Route("Mine")]
-        //public async Task<ActionResult<OrderServiceModel>> Mine([FromQuery] int page, [FromQuery] string? search)
-        //{
-        //    try
-        //    {
-        //        var allOrders = await orderService.Mine();
+        [HttpGet]
+        [Authorize(Roles = "User")]
+        [Route("Mine")]
+        public async Task<ActionResult<AllOrdersServiceModel>> Mine([FromQuery] int page, [FromQuery] string? search)
+        {
+            try
+            {
+                var currentUserOrders = await orderService.Mine(page, search);
 
-        //        return Ok(allOrders);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+                return Ok(currentUserOrders);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
 
         [HttpGet]
         [Route("{orderId}")]

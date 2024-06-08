@@ -13,7 +13,7 @@
 
         Task<AllOrdersServiceModel> All(int page, string? search);
 
-        Task<AllOrdersServiceModel> Mine();
+        Task<AllOrdersServiceModel> Mine(int page, string? search);
 
         Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token);
 

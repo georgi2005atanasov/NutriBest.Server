@@ -282,6 +282,7 @@ NutriBest
             <p>Dear valued customer,</p>
             <p>We are excited to offer you an exclusive promocode as a token of our appreciation for your loyalty.</p>
             <p>Use the code <strong>{promoCode}</strong> at checkout to get 20% off your next purchase!</p>
+            <p>But you have to hurry up, because after <strong>{expiresIn}</strong> days the promocode won't be valid!</p>
             <p>Visit our website to explore our wide range of fitness supplements designed to help you achieve your health goals.</p>
             <a href=""http://localhost:5173/"" class=""button"">Shop Now</a>
         </div>
@@ -305,7 +306,8 @@ NutriBest
                 throw new ArgumentNullException($"There are no promo codes with description {request.PromoCodeDescription}!");
 
             var body = htmlTemplate
-                .Replace("{promoCode}", code);
+                .Replace("{promoCode}", code)
+                .Replace("{expiresIn}", $"{expiresIn}");
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
             using var smtp = new SmtpClient();
