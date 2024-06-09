@@ -540,7 +540,28 @@
             var country = await db.Countries
                 .FirstAsync(x => x.CountryName == countryName);
 
-            cart.ShippingPrice = country.ShippingPrice;
+            if (country.ShippingDiscountId != null)
+            {
+                var shippingDiscount = await db.ShippingDiscounts
+                    .FirstAsync(x => x.Id == country.ShippingDiscountId);
+
+                if ((shippingDiscount.MinimumPrice != null &&
+                    cart.TotalProducts >= shippingDiscount.MinimumPrice) ||
+                    shippingDiscount.MinimumPrice == null
+                    )
+                {
+                    var priceWithDiscount = country.ShippingPrice * ((100 - shippingDiscount.DiscountPercentage) / 100);
+                    cart.ShippingPrice = priceWithDiscount;
+                }
+                else
+                {
+                    cart.ShippingPrice = country.ShippingPrice;
+                }
+            }
+            else
+            {
+                cart.ShippingPrice = country.ShippingPrice;
+            }
         }
 
         private async Task GetDiscountPercentageForTheProducts(List<CartProductServiceModel> cartProducts)

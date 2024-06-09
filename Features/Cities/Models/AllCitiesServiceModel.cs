@@ -7,5 +7,9 @@
         public List<CityServiceModel>? Cities { get; set; }
 
         public decimal ShippingPrice { get; set; }
+        
+        public decimal? MinimumPriceForDiscount { get; set; }
+
+        public decimal ShippingPriceWithDiscount { get; set; }
     }
 }
