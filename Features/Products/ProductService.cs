@@ -189,7 +189,7 @@
                 throw new ArgumentNullException("Invalid product!");
 
             var productPackageFlavours = await db.ProductsPackagesFlavours
-                .Where(x => x.ProductId == id)
+                .Where(x => x.ProductId == id && x.Quantity > 0) // x.Quantity > 0
                 .ToListAsync();
 
             if (!productPackageFlavours.Any())

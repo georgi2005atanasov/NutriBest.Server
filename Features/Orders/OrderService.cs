@@ -363,7 +363,7 @@
                 .ToListAsync();
 
             await GetDiscountPercentageForTheProducts(cartProducts);
-            
+
             var cartModel = new CartServiceModel
             {
                 Code = cart.Code,
@@ -501,25 +501,33 @@
             if (order == null)
                 return false;
 
-            // reduce the quantity for each product in the cart
-            var cart = await db.Carts
-                .FirstAsync(x => x.Id == order.CartId);
-
-            var cartProducts = db.CartProducts
-                .Where(x => x.CartId == cart.Id);
-
-            foreach (var cartProduct in cartProducts)
+            if (!order.IsConfirmed)
             {
-                var product = await db.Products
-                    .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+                var cart = await db.Carts
+                    .FirstAsync(x => x.Id == order.CartId);
 
-                product.Quantity -= cartProduct.Count;
+                var cartProducts = db.CartProducts
+                    .Where(x => x.CartId == cart.Id);
+
+                foreach (var cartProduct in cartProducts)
+                {
+                    var product = await db.Products
+                        .FirstAsync(x => x.ProductId == cartProduct.ProductId);
+
+                    var productPackageFlavour = await db.ProductsPackagesFlavours
+                        .FirstAsync(x => x.ProductId == cartProduct.ProductId &&
+                        x.FlavourId == cartProduct.FlavourId &&
+                        x.PackageId == cartProduct.PackageId);
+
+                    product.Quantity -= cartProduct.Count;
+                    productPackageFlavour.Quantity -= cartProduct.Count;
+                }
+                // reduce the quantity for each product in the cart
+
+                order.IsConfirmed = true;
+
+                await db.SaveChangesAsync();
             }
-            // reduce the quantity for each product in the cart
-
-            order.IsConfirmed = true;
-
-            await db.SaveChangesAsync();
 
             return true;
         }

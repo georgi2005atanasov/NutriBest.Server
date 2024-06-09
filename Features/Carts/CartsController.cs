@@ -125,11 +125,11 @@
 
                     existingProduct.Count = cartProduct.Count;
 
-                    if (!CanRemoveProduct(productFromDb.Quantity, existingProduct.Count))
+                    if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, existingProduct.Count))
                     {
                         return BadRequest(new
                         {
-                            Message = $"Sorry, we have {productFromDb.Quantity} units of this product available."
+                            Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
                         });
                     }
                 }
@@ -137,11 +137,11 @@
                 {
                     cart.CartProducts.Add(cartProduct);
 
-                    if (!CanRemoveProduct(productFromDb.Quantity, cartProduct.Count))
+                    if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, cartProduct.Count))
                     {
                         return BadRequest(new
                         {
-                            Message = $"Sorry, we have {productFromDb.Quantity} units of this product available."
+                            Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
                         });
                     }
                 }
@@ -532,7 +532,7 @@
                     x.Flavour!.FlavourName == cartProduct.Flavour
                     && x.Package!.Grams == cartProduct.Grams);
 
-        private bool CanRemoveProduct(int? quantity, int count)
-            => quantity >= count;
+        private bool CanRemoveProduct(int? quantity, int wantedAmount)
+            => quantity >= wantedAmount;
     }
 }
