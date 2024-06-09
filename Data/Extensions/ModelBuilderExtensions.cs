@@ -1,5 +1,4 @@
-﻿
-namespace NutriBest.Server.Data.Extensions
+﻿namespace NutriBest.Server.Data.Extensions
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -75,14 +74,16 @@ namespace NutriBest.Server.Data.Extensions
             });
         }
 
-        public static void ConfigureShippings(this ModelBuilder builder)
+        public static void ConfigureShippingDiscounts(this ModelBuilder builder)
         {
             builder.Entity<ShippingDiscount>(e =>
             {
-                e.HasOne(x => x.Country)
+                e.HasMany(x => x.Countries)
                 .WithOne(x => x.ShippingDiscount)
-                .HasForeignKey<ShippingDiscount>(x => x.CountryId)
+                .HasForeignKey(x => x.ShippingDiscountId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasQueryFilter(x => !x.IsDeleted);
             });
         }
 
