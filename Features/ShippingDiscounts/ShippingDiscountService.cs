@@ -14,6 +14,25 @@
             this.db = db;
         }
 
+        public async Task<AllShippingDiscountsServiceModel> All()
+        {
+            var countries = db.Countries
+                .AsQueryable();
+
+            var allShippingDiscounts = new AllShippingDiscountsServiceModel();
+
+            foreach (var country in countries)
+            {
+                if (country.ShippingDiscountId != null)
+                {
+                    var discount = await Get(country.CountryName);
+                    allShippingDiscounts.ShippingDiscounts.Add(discount);
+                }
+            }
+
+            return allShippingDiscounts;
+        }
+
         public async Task<ShippingDiscountServiceModel> Get(string countryName)
         {
             var country = await GetCountry(countryName);
@@ -69,6 +88,10 @@
 
                 await db.SaveChangesAsync();
 
+                country.ShippingDiscountId = shippingDiscount.Id;
+
+                await db.SaveChangesAsync();
+
                 return shippingDiscount.Id;
             }
             else
@@ -80,13 +103,11 @@
                     EndDate = endDate
                 };
 
-                country.ShippingDiscount = shippingDiscount; // i am trying to ma the shipping discount with the mapping prop
-
                 db.ShippingDiscounts.Add(shippingDiscount);
 
                 await db.SaveChangesAsync();
 
-                country.ShippingDiscountId = country.ShippingDiscount.Id;
+                country.ShippingDiscountId = shippingDiscount.Id;
 
                 await db.SaveChangesAsync();
 

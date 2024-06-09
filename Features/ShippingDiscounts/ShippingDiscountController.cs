@@ -17,6 +17,30 @@
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("All")]
+        public async Task<ActionResult<ShippingDiscountServiceModel>> All()
+        {
+            try
+            {
+                var shippingDiscounts = await shippingDiscountService.All();
+
+                return Ok(shippingDiscounts);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
         [Route("{countryName}")]
         public async Task<ActionResult<ShippingDiscountServiceModel>> Get([FromRoute] string countryName)
         {
@@ -38,7 +62,7 @@
                 return BadRequest();
             }
         }
-            
+
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
@@ -47,15 +71,15 @@
             if (!decimal.TryParse(shippingDiscountModel.DiscountPercentage, NumberStyles.Any, CultureInfo.InvariantCulture, out var discountPercentage))
                 return BadRequest(new
                 {
-                    Key = "Price",
-                    Message = "Prices must be numbers!"
+                    Key = "DiscountPercentage",
+                    Message = "The Discount Percentage must be between 1 and 100!"
                 });
 
-            if (!string.IsNullOrEmpty(shippingDiscountModel.MinimumPrice) && 
+            if (!string.IsNullOrEmpty(shippingDiscountModel.MinimumPrice) &&
                 !decimal.TryParse(shippingDiscountModel.DiscountPercentage, NumberStyles.Any, CultureInfo.InvariantCulture, out var minimumPrice))
                 return BadRequest(new
                 {
-                    Key = "Price",
+                    Key = "MinimumPrice",
                     Message = "Prices must be numbers!"
                 });
 

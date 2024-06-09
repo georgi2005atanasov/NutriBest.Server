@@ -4,6 +4,8 @@
 
     public interface IShippingDiscountService
     {
+        Task<AllShippingDiscountsServiceModel> All();
+
         Task<ShippingDiscountServiceModel> Get(string countryName);
 
         Task<int> Create(string countryName,
