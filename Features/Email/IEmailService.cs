@@ -8,6 +8,9 @@
 
         void SendForgottenPassword(EmailModel request, string callbackUrl);
 
+        void SendNewOrderToAdmin(EmailOrderModel request);
+
         Task SendPromoCode(SendPromoEmailModel request);
+
     }
 }

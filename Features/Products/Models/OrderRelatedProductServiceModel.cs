@@ -17,5 +17,9 @@
         public int Grams { get; set; }
 
         public decimal Price { get; set; }
+
+        public int? PromotionId { get; set; }
+
+        public decimal DiscountPercentage { get; set; }
     }
 }

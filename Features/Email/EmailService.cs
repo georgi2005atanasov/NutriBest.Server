@@ -2,6 +2,8 @@
 {
     using MailKit.Net.Smtp;
     using MailKit.Security;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.EntityFrameworkCore;
     using MimeKit;
     using MimeKit.Text;
@@ -84,6 +86,100 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
+            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+            smtp.Send(email);
+            smtp.Disconnect(true);
+        }
+
+        public void SendNewOrderToAdmin(EmailOrderModel request)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.To.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.Subject = request.Subject;
+
+            var htmlTemplate = @"
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>New Order Notification</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+            #container { width: 100%; max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+            #header { text-align: center; padding: 10px 0; }
+            #header img { max-width: 100px; }
+            #content { padding: 20px 0; }
+            #content h2 { color: #333333; }
+            #content p { color: #666666; line-height: 1.6; }
+            #order-details { margin: 20px 0; }
+            #order-details table { width: 100%; border-collapse: collapse; }
+            #order-details th, #order-details td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+            #order-details th { background-color: #f2f2f2; }
+            #footer { text-align: center; padding: 10px 0; color: #999999; font-size: 12px; }
+        </style>
+    </head>
+    <body>
+        <div id='container'>
+            <div id='content'>
+                <h2>New Order Received!</h2>
+                <p><strong>{CustomerName}</strong> has just placed an order.</p>
+                <p>Order Details:</p>
+                <div id='order-details'>
+                    <table>
+                        <tr>
+                            <th>Order Number: </th>
+                            <td>#{OrderNumber}</td>
+                        </tr>
+                        <tr>
+                            <th>Customer Name: </th>
+                            <td>{CustomerName}</td>
+                        </tr>
+                        <tr>
+                            <th>Email: </th>
+                            <td>{CustomerEmail}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number: </th>
+                            <td>{PhoneNumber}</td>
+                        </tr>
+                        <tr>
+                            <th>Order Date: </th>
+                            <td>{OrderDate}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Amount: </th>
+                            <td>{OrderAmount}BGN</td>
+                        </tr>
+                    </table>
+                </div>
+                <p>Click <a href='{OrderDetailsUrl}'>here</a> to view the order details in the admin panel.</p>
+                <p>Thank you!</p>
+            </div>
+            <div id='footer'>
+                <p>&copy; {Date} NutriBest. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>";
+
+            // Replace placeholders with actual values
+            var body = htmlTemplate
+                .Replace("{CustomerName}", request.CustomerName)
+                .Replace("{OrderNumber}", $"000000{request.OrderId}")
+                .Replace("{CustomerEmail}", request.CustomerEmail)
+                .Replace("{PhoneNumber}", request.PhoneNumber ?? "")
+                .Replace("{OrderDate}", DateTime.UtcNow.ToString("yyyy-MM-dd"))
+                .Replace("{OrderAmount}", request.TotalPrice)
+                .Replace("{OrderDetailsUrl}", request.OrderDetailsUrl)
+                .Replace("{Date}", $"{DateTime.UtcNow.Year}");
+
+            email.Body = new TextPart(TextFormat.Html) { Text = body };
+
+            using var smtp = new SmtpClient();
+            smtp.Timeout = 60000;
             smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
             smtp.Send(email);

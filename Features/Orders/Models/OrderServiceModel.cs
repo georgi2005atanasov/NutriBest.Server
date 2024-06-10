@@ -38,5 +38,7 @@
         public string IBAN { get; set; } = null!;
 
         public decimal ShippingPrice { get; set; }
+
+        public string? Comment { get; set; }
     }
 }

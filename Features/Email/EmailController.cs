@@ -34,6 +34,21 @@
         }
 
         [HttpPost]
+        [Route(nameof(SendOrderToAdmin))]
+        public IActionResult SendOrderToAdmin([FromBody] EmailOrderModel request)
+        {
+            try
+            {
+                emailService.SendNewOrderToAdmin(request);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
         [Route(nameof(ForgottenPassword))]
         public async Task<ActionResult> ForgottenPassword([FromBody] EmailModel request)
         {
