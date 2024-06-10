@@ -34,6 +34,22 @@
         }
 
         [HttpPost]
+        [Route(nameof(SendConfirmedOrderToAdmin))]
+        public IActionResult SendConfirmedOrderToAdmin([FromBody] EmailConfirmedOrderModel confirmedOrderModel)
+        {
+            try
+            {
+                emailService.SendConfirmedOrderToAdmin(confirmedOrderModel);
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
         [Route(nameof(SendOrderToAdmin))]
         public IActionResult SendOrderToAdmin([FromBody] EmailOrderModel request)
         {

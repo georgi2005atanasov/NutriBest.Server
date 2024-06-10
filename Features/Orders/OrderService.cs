@@ -530,9 +530,9 @@
                 order.IsConfirmed = true;
 
                 await db.SaveChangesAsync();
+                return true;
             }
-
-            return true;
+            return false;
         }
 
         public async Task SetShippingPrice(int cartId, string countryName)

@@ -2,8 +2,6 @@
 {
     using MailKit.Net.Smtp;
     using MailKit.Security;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.EntityFrameworkCore;
     using MimeKit;
     using MimeKit.Text;
@@ -86,6 +84,7 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
+            smtp.Timeout = 120000;
             smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
             smtp.Send(email);
@@ -179,7 +178,7 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            smtp.Timeout = 60000;
+            smtp.Timeout = 120000;
             smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
             smtp.Send(email);
@@ -278,6 +277,7 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
+            smtp.Timeout = 120000;
             smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
             smtp.Send(email);
@@ -407,6 +407,7 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
             using var smtp = new SmtpClient();
+            smtp.Timeout = 120000;
             smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
             smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
             smtp.Send(email);
@@ -419,6 +420,73 @@ NutriBest
                 .FirstAsync(x => x.Code == code);
             codeFromDb.IsSent = true;
             await db.SaveChangesAsync();
+        }
+
+        public void SendConfirmedOrderToAdmin(EmailConfirmedOrderModel request)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.To.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.Subject = request.Subject;
+
+            var htmlTemplate = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        #container { width: 100%; max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        #header { text-align: center; padding: 10px 0; }
+        #content { padding: 20px 0; }
+        #content h2 { color: #333333; }
+        #content p { color: #666666; line-height: 1.6; }
+        #order-details { margin: 20px 0; }
+        #footer { text-align: center; padding: 10px 0; color: #999999; font-size: 12px; }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #007BFF;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id=""container"">
+        <div id=""header"">
+            <h2>Order Confirmed!</h2>
+        </div>
+        <div id=""content"">
+            <p>An order with ID <strong>#{OrderId}</strong> has been confirmed.</p>
+            <p>Click the button below to view the order details:</p>
+            <a href=""{OrderLink}"" class=""button"">View Order</a>
+        </div>
+        <div id=""footer"">
+            <p>&copy; {Year} YourCompany. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            var body = htmlTemplate
+       .Replace("{OrderId}", request.OrderId.ToString())
+       .Replace("{OrderLink}", request.OrderDetailsUrl)
+       .Replace("{Year}", DateTime.UtcNow.Year.ToString());
+
+            email.Body = new TextPart(TextFormat.Html) { Text = body };
+
+            using var smtp = new SmtpClient();
+            smtp.Timeout = 120000;
+            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+            smtp.Send(email);
+            smtp.Disconnect(true);
         }
     }
 }

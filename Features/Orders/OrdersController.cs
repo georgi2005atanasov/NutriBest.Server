@@ -134,7 +134,10 @@
             {
                 var result = await orderService.ConfirmOrder(orderId);
 
-                return Ok(result);
+                return Ok(new
+                {
+                    HasUpdated = result
+                });
             }
             catch (Exception)
             {

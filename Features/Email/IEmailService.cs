@@ -6,6 +6,8 @@
     {
         void SendConfirmOrder(EmailConfirmOrderModel emailModel);
 
+        void SendConfirmedOrderToAdmin(EmailConfirmedOrderModel emailModel);
+
         void SendForgottenPassword(EmailModel request, string callbackUrl);
 
         void SendNewOrderToAdmin(EmailOrderModel request);
