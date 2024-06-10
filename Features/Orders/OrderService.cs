@@ -564,6 +564,49 @@
             }
         }
 
+        public async Task<OrderRelatedProductsServiceModel> GetOrderRelatedProducts(decimal price)
+        {
+            var productsPackagesFlavours = db.ProductsPackagesFlavours
+                .AsQueryable();
+
+            var relatedProducts = new OrderRelatedProductsServiceModel();
+
+            foreach (var productPackageFlavour in productsPackagesFlavours)
+            {
+                if (productPackageFlavour.Price >= price)
+                {
+                    var product = await db.Products
+                        .FirstAsync(x => x.ProductId == productPackageFlavour.ProductId);
+
+                    var flavour = await db.Flavours
+                        .FirstAsync(x => x.Id == productPackageFlavour.FlavourId);
+
+                    var package = await db.Packages
+                        .FirstAsync(x => x.Id == productPackageFlavour.PackageId);
+
+                    var productModel = new OrderRelatedProductServiceModel
+                    {
+                        ProductId = product.ProductId,
+                        Name = product.Name,
+                        Price = productPackageFlavour.Price,
+                        Flavour = flavour.FlavourName,
+                        Grams = package.Grams,
+                        //Image = await imageService.GetImageByProductId(product.ProductId),
+                        Quantity = productPackageFlavour.Quantity
+                    };
+
+                    relatedProducts.Products.Add(productModel);
+                }
+            }
+
+            relatedProducts.Products = relatedProducts.Products
+                .OrderBy(x => x.Price)
+                .Take(4)
+                .ToList();
+
+            return relatedProducts;
+        }
+
         private async Task GetDiscountPercentageForTheProducts(List<CartProductServiceModel> cartProducts)
         {
             foreach (var product in cartProducts)
@@ -584,54 +627,6 @@
                     }
                 }
             }
-        }
-
-        private async Task<(string customerName, string customerEmail, string phoneNumber)> GetCurrentOrderUserDetails(Order orderFromDb)
-        {
-            string customerName = "";
-            string customerEmail = "";
-            string phoneNumber = "";
-
-            if (orderFromDb.UserOrderId != null)
-            {
-                var userOrder = await db.UsersOrders
-                    .FirstAsync(x => x.OrderId == orderFromDb.Id);
-
-                var profile = await db.Profiles
-                    .FirstAsync(x => x.UserId == userOrder.ProfileId);
-
-                customerName = profile.Name!;
-
-                var user = await db.Users
-                    .FirstAsync(x => x.Id == userOrder.ProfileId);
-
-                customerEmail = user.Email;
-                phoneNumber = user.PhoneNumber;
-            }
-
-            if (orderFromDb.GuestOrderId != null)
-            {
-                var guestOrder = await db.GuestsOrders
-                    .FirstAsync(x => x.Id == orderFromDb.GuestOrderId);
-
-                customerName = guestOrder.Name;
-                customerEmail = guestOrder.Email;
-                phoneNumber = guestOrder.PhoneNumber ?? "";
-            }
-
-            return (customerName, customerEmail, phoneNumber);
-        }
-
-        private async Task<(Address address, City city, Country country)> GetAddressCityCountry(OrderDetails orderDetails)
-        {
-            var address = await db.Addresses
-                .FirstAsync(x => x.Id == orderDetails.AddressId);
-            var city = await db.Cities
-                .FirstAsync(x => x.Id == address.CityId);
-            var country = await db.Countries
-                .FirstAsync(x => x.Id == address.CountryId);
-
-            return (address, city, country);
         }
 
         public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped)
@@ -696,6 +691,54 @@
             await db.SaveChangesAsync();
 
             return;
+        }
+
+        private async Task<(string customerName, string customerEmail, string phoneNumber)> GetCurrentOrderUserDetails(Order orderFromDb)
+        {
+            string customerName = "";
+            string customerEmail = "";
+            string phoneNumber = "";
+
+            if (orderFromDb.UserOrderId != null)
+            {
+                var userOrder = await db.UsersOrders
+                    .FirstAsync(x => x.OrderId == orderFromDb.Id);
+
+                var profile = await db.Profiles
+                    .FirstAsync(x => x.UserId == userOrder.ProfileId);
+
+                customerName = profile.Name!;
+
+                var user = await db.Users
+                    .FirstAsync(x => x.Id == userOrder.ProfileId);
+
+                customerEmail = user.Email;
+                phoneNumber = user.PhoneNumber;
+            }
+
+            if (orderFromDb.GuestOrderId != null)
+            {
+                var guestOrder = await db.GuestsOrders
+                    .FirstAsync(x => x.Id == orderFromDb.GuestOrderId);
+
+                customerName = guestOrder.Name;
+                customerEmail = guestOrder.Email;
+                phoneNumber = guestOrder.PhoneNumber ?? "";
+            }
+
+            return (customerName, customerEmail, phoneNumber);
+        }
+
+        private async Task<(Address address, City city, Country country)> GetAddressCityCountry(OrderDetails orderDetails)
+        {
+            var address = await db.Addresses
+                .FirstAsync(x => x.Id == orderDetails.AddressId);
+            var city = await db.Cities
+                .FirstAsync(x => x.Id == address.CityId);
+            var country = await db.Countries
+                .FirstAsync(x => x.Id == address.CountryId);
+
+            return (address, city, country);
         }
 
         private async Task<OrderDetails> GetOrderDetails(int orderDetailsId)

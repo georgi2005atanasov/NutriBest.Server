@@ -126,7 +126,7 @@
                     err.Message
                 });
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

@@ -3,7 +3,6 @@
     using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
     using static ServicesConstants.Product;
-    using static ServicesConstants.Brand;
 
     public class ProductServiceModel
     {

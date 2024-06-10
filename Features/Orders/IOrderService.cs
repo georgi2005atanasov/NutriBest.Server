@@ -15,6 +15,8 @@
 
         Task<AllOrdersServiceModel> Mine(int page, string? search);
 
+        Task<OrderRelatedProductsServiceModel> GetOrderRelatedProducts(decimal price);
+
         Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token);
 
         Task<OrderServiceModel?> GetFinishedByAdmin(int orderId);

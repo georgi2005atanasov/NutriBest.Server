@@ -83,6 +83,22 @@
             }
         }
 
+        [HttpGet]
+        [Route("RelatedProducts")]
+        public async Task<ActionResult<OrderRelatedProductsServiceModel>> GetRelatedProducts([FromForm] decimal price)
+        {
+            try
+            {
+                var relatedProducts = await orderService.GetOrderRelatedProducts(price);
+
+                return Ok(relatedProducts);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("change-status/{orderId}")]
