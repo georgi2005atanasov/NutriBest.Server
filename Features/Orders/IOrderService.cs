@@ -24,7 +24,8 @@
         Task<bool> ChangeStatuses(int orderId,
             bool isFinished,
             bool isPaid,
-            bool isShipped);
+            bool isShipped,
+            bool isConfirmed);
 
         Task DeleteById(int orderId); 
 

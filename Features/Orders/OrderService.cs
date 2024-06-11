@@ -649,7 +649,7 @@
             }
         }
 
-        public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped)
+        public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped, bool isConfirmed)
         {
             var order = await this.GetOrder(db, orderId);
 
@@ -661,6 +661,7 @@
             order.IsFinished = isFinished;
             details.IsPaid = isPaid;
             details.IsShipped = isShipped;
+            order.IsConfirmed = isConfirmed;
 
             await db.SaveChangesAsync();
 

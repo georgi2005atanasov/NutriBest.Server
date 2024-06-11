@@ -110,7 +110,8 @@
                 var result = await orderService.ChangeStatuses(orderId,
                     orderModel.IsFinished,
                     orderModel.IsPaid,
-                    orderModel.IsShipped);
+                    orderModel.IsShipped,
+                    orderModel.IsConfirmed);
 
                 return Ok(new
                 {
