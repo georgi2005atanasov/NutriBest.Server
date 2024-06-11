@@ -6,6 +6,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Identity.Models;
+    using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Services;
 
     public class IdentityController : ApiController
@@ -14,16 +15,19 @@
         private readonly UserManager<User> userManager;
         private readonly ICurrentUserService currentUserService;
         private readonly IEmailService emailService;
+        private readonly INotificationService notificationService;
 
         public IdentityController(IIdentityService identityService,
             UserManager<User> userManager,
             ICurrentUserService currentUserService,
-            IEmailService emailService)
+            IEmailService emailService,
+            INotificationService notificationService)
         {
             this.identityService = identityService;
             this.userManager = userManager;
             this.currentUserService = currentUserService;
             this.emailService = emailService;
+            this.notificationService = notificationService;
         }
 
         [HttpPost]
@@ -48,12 +52,7 @@
                 {
                     var user = await userManager.FindByEmailAsync(userModel.Email);
 
-                    if (user == null)
-                        return Ok(new
-                        {
-                            IsSuccess = true,
-                            Message = "If the email is valid, email confirmation has been sent."
-                        });
+                    await notificationService.SendNotificationToAdmin("Register", $"User {user.UserName} Has Just Registered!");
 
                     return Ok(new
                     {
@@ -92,6 +91,9 @@
                     return Unauthorized();
 
                 var encryptedToken = await identityService.GetEncryptedToken(user);
+
+                await notificationService.SendNotificationToAdmin("Login", $"User {user.UserName} Has Just Logged in!");
+
                 return encryptedToken;
             }
             catch (Exception)

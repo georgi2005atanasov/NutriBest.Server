@@ -27,6 +27,7 @@
     using NutriBest.Server.Infrastructure.Services;
     using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.ShippingDiscounts;
+    using NutriBest.Server.Features.Notifications;
 
     public static class ServiceCollectionExtensions
     {
@@ -57,7 +58,8 @@
                 .AddTransient<IGuestOrderService, GuestOrderService>()
                 .AddTransient<IUserOrderService, UserOrderService>()
                 .AddTransient<IOrderService, OrderService>()
-                .AddTransient<IShippingDiscountService, ShippingDiscountService>();
+                .AddTransient<IShippingDiscountService, ShippingDiscountService>()
+                .AddTransient<INotificationService, NotificationService>();
 
             return services;
         }

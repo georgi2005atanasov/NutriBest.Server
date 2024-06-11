@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NutriBest.Server;
+using NutriBest.Server.Features.Notifications.Hubs;
 using NutriBest.Server.Infrastructure.Extensions;
 using System.Text;
 
@@ -55,6 +56,8 @@ builder
     .Configure<ApplicationSettings>(applicationSettings)
     .AddApiControllers();
 
+builder.Services.AddSignalR();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecureSwagger", Version = "v1" });
@@ -82,7 +85,11 @@ app.UseAuthorization();
 
 app.UseCors("MyCorsPolicy");
 
-app.UseEndpoints(endpoints => endpoints.MapControllers())
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/Hubs/Notification");
+})
 .ApplyMigrations();
 
 //app.UseSwaggerAuthorized(app.Services); gotta uncomment this in the future
