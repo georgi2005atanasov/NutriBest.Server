@@ -7,6 +7,7 @@
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
+    using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.OrderDetails;
     using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.UserOrders.Models;
@@ -20,18 +21,21 @@
         private readonly IOrderDetailsService orderDetailsService;
         private readonly ICurrentUserService currentUserService;
         private readonly IPromoCodeService promoCodeService;
+        private readonly INotificationService notificationService;
 
         public UsersOrdersController(NutriBestDbContext db,
             IUserOrderService userOrderService,
             IOrderDetailsService orderDetailsService,
             ICurrentUserService currentUserService,
-            IPromoCodeService promoCodeService)
+            IPromoCodeService promoCodeService,
+            INotificationService notificationService)
         {
             this.db = db;
             this.userOrderService = userOrderService;
             this.orderDetailsService = orderDetailsService;
             this.currentUserService = currentUserService;
             this.promoCodeService = promoCodeService;
+            this.notificationService = notificationService;
         }
 
         [HttpPost]
@@ -128,7 +132,11 @@
                 if (!string.IsNullOrEmpty(cookieCart.Code))
                     await promoCodeService.DisableByCode(cookieCart.Code);
 
+                decimal totalOrderPrice = cookieCart.TotalProducts;
+
                 await SetSessionCart(new CartServiceModel());
+
+                await notificationService.SendNotificationToAdmin("success", $"'{orderModel.Name}' Has Just Made an Order for {totalOrderPrice:f2}BGN!");
 
                 await db.SaveChangesAsync();
 

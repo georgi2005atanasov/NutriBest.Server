@@ -10,20 +10,24 @@
     using NutriBest.Server.Infrastructure.Services;
     using static ServicesConstants.PaginationConstants;
     using NutriBest.Server.Features.Orders.Extensions;
+    using NutriBest.Server.Features.Notifications;
 
     public class OrderService : IOrderService
     {
         protected readonly NutriBestDbContext db;
         private readonly ICurrentUserService currentUserService;
         private readonly IConfiguration config;
+        private readonly INotificationService notificationService;
 
         public OrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
-            IConfiguration config)
+            IConfiguration config,
+            INotificationService notificationService)
         {
             this.db = db;
             this.currentUserService = currentUserService;
             this.config = config;
+            this.notificationService = notificationService;
         }
 
         public async Task<int> PrepareCart(decimal totalProducts,
@@ -528,6 +532,8 @@
                 // reduce the quantity for each product in the cart
 
                 order.IsConfirmed = true;
+
+                await notificationService.SendNotificationToAdmin("success", $"Order #000000{order.Id} Has Just Been Confirmed!");
 
                 await db.SaveChangesAsync();
                 return true;

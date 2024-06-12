@@ -2,14 +2,16 @@
 {
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Services;
 
     public class GuestOrderService :  OrderService, IGuestOrderService
     {
         public GuestOrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
-            IConfiguration config)
-            :base(db, currentUserService, config)
+            IConfiguration config,
+            INotificationService notificationService)
+            :base(db, currentUserService, config, notificationService)
         {
         }
 

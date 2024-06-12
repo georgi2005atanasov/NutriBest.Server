@@ -52,7 +52,7 @@
                 {
                     var user = await userManager.FindByEmailAsync(userModel.Email);
 
-                    await notificationService.SendNotificationToAdmin("Register", $"'{user.UserName}' Has Just Registered!");
+                    await notificationService.SendNotificationToAdmin("success", $"'{user.UserName}' Has Just Registered!");
 
                     return Ok(new
                     {
@@ -92,7 +92,7 @@
 
                 var encryptedToken = await identityService.GetEncryptedToken(user);
 
-                await notificationService.SendNotificationToAdmin("Login", $"'{user.UserName}' Has Just Logged in!");
+                await notificationService.SendNotificationToAdmin("success", $"'{user.UserName}' Has Just Logged In!");
 
                 return encryptedToken;
             }
