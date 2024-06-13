@@ -63,6 +63,16 @@
             await base.OnDisconnectedAsync(exception);
         }
 
+        public Task NotifyAdmin(string notificationType, string message)
+        {
+            return Clients.Group("AdminGroup").SendAsync("NotifyAdmin", notificationType, message);
+        }
+
+        public Task NotifyLowStock(string priority, string message, string productId)
+        {
+            return Clients.Group("AdminGroup").SendAsync("NotifyLowStock", priority, message, productId);
+        }
+
         public async Task JoinPage(string pageName)
         {
             var currentConnections = PageConnections.GetOrAdd(pageName, _ => new ConcurrentDictionary<string, bool>());
@@ -78,7 +88,7 @@
             await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroup);
         }
 
-        private async Task GetUsersCount()
+        public async Task GetUsersCount()
             => await Clients.Group(AdminGroup).SendAsync("GetUsersCount", PageConnections
                 .Where(x => x.Value.Count > 0)
                 .Select(x => new

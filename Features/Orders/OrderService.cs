@@ -516,6 +516,8 @@
                 var cartProducts = db.CartProducts
                     .Where(x => x.CartId == cart.Id);
 
+                var lowStocks = new List<LowInStockServiceModel>();
+
                 foreach (var cartProduct in cartProducts)
                 {
                     var product = await db.Products
@@ -528,6 +530,16 @@
 
                     product.Quantity -= cartProduct.Count;
                     productPackageFlavour.Quantity -= cartProduct.Count;
+
+                    if (product.Quantity < 20)
+                    {
+                        lowStocks.Add(new LowInStockServiceModel
+                        {
+                            Name = product.Name,
+                            ProductId = product.ProductId,
+                            Quantity = (int)product.Quantity!
+                        });
+                    }
                 }
                 // reduce the quantity for each product in the cart
 
@@ -536,6 +548,12 @@
                 await notificationService.SendNotificationToAdmin("success", $"Order #000000{order.Id} Has Just Been Confirmed!");
 
                 await db.SaveChangesAsync();
+
+                foreach (var product in lowStocks)
+                {
+                    await notificationService.SendLowInStockNotification(product.Name, product.ProductId, product.Quantity);
+                }
+
                 return true;
             }
             return false;
@@ -667,9 +685,15 @@
             order.IsFinished = isFinished;
             details.IsPaid = isPaid;
             details.IsShipped = isShipped;
-            order.IsConfirmed = isConfirmed;
 
-            await db.SaveChangesAsync();
+            if (isConfirmed && !order.IsConfirmed)
+            {
+                await ConfirmOrder(order.Id);
+            }
+            else
+            {
+                await db.SaveChangesAsync();
+            }
 
             return true;
         }

@@ -14,6 +14,6 @@ namespace NutriBest.Server.Data.Models
 
         public Priority Priority { get; set; }
 
-        public string Link { get; set; } = null!;
+        public bool IsDeleted { get; set; }
     }
 }

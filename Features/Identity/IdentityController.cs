@@ -43,6 +43,13 @@
                         Message = "Both passwords should match!"
                     });
 
+                if (userModel.UserName.Contains(" "))
+                    return BadRequest(new
+                    {
+                        Key = "UserName",
+                        Message = "Username must not contain white spaces!"
+                    });
+
                 var result = await identityService
                          .CreateUser(userModel.UserName,
                                      userModel.Email,
