@@ -32,7 +32,7 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        [Route("all-users")]
+        [Route("AllUsers")]
         public async Task<ActionResult<IEnumerable<UserServiceModel>>> GetUsers()
         {
             var users = await adminService.GetAllUsers();

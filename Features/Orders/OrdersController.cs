@@ -101,7 +101,7 @@
 
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("change-status/{orderId}")]
+        [Route("ChangeStatus/{orderId}")]
         public async Task<ActionResult<bool>> ChangeStatuses([FromBody] UpdateOrderServiceModel orderModel,
             [FromRoute] int orderId)
         {

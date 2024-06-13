@@ -302,6 +302,5 @@
 
             return (amount, percentage);
         }
-
     }
 }

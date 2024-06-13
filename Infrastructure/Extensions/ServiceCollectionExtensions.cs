@@ -37,6 +37,7 @@
                 .AddHostedService<PromoCodeCleanupService>()
                 .AddHostedService<PromotionCleanupService>()
                 .AddHostedService<PromotionActivationService>()
+                .AddHostedService<ShippingDiscountCleanupService>()
                 .AddScoped<IEmailService, EmailService>()
                 .AddScoped<ICurrentUserService, CurrentUserService>()
                 .AddTransient<IAdminService, AdminService>()

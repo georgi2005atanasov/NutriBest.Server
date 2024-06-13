@@ -93,7 +93,7 @@
         }
 
         [HttpGet]
-        [Route("by-code")]
+        [Route("ByCode")]
         public async Task<ActionResult<PromoCodeListingModel>> GetByCode([FromForm] string code)
         {
             try
@@ -116,7 +116,7 @@
         }
 
         [HttpGet]
-        [Route("by-description")]
+        [Route("ByDescription")]
         public async Task<ActionResult<Dictionary<string, List<string>>>> GetByDescription([FromForm] string description)
         {
             try

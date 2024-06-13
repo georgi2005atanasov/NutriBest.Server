@@ -83,7 +83,7 @@ namespace NutriBest.Server.Features.Flavours
         }
 
         [HttpGet]
-        [Route("/Products/by-flavour-count")]
+        [Route("/Products/ByFlavourCount")]
         public async Task<ActionResult<List<FlavourCountServiceModel>>> GetProductsByFlavourCount()
         {
             try

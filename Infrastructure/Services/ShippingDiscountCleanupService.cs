@@ -19,26 +19,26 @@ namespace NutriBest.Server.Infrastructure.Services
             {
                 using (var scope = serviceProvider.CreateScope())
                 {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<NutriBestDbContext>();
+                    var db = scope.ServiceProvider.GetRequiredService<NutriBestDbContext>();
 
-                    var expiredShippingDiscounts = await dbContext.ShippingDiscounts
+                    var expiredShippingDiscounts = await db.ShippingDiscounts
                         .Where(x => !x.IsDeleted)
-                        .Where(x => x.EndDate >= DateTime.UtcNow)
+                        .Where(x => x.EndDate <= DateTime.UtcNow)
                         .ToListAsync(stoppingToken);
 
                     foreach (var shippingDiscount in expiredShippingDiscounts)
                     {
-                        var country = await dbContext.Countries
+                        var country = await db.Countries
                             .FirstOrDefaultAsync(x => x.ShippingDiscountId == shippingDiscount.Id);
 
                         if (country != null)
                         {
                             country.ShippingDiscountId = null;
-                            dbContext.ShippingDiscounts.Remove(shippingDiscount);
+                            db.ShippingDiscounts.Remove(shippingDiscount);
                         }
                     }
 
-                    await dbContext.SaveChangesAsync(stoppingToken);
+                    await db.SaveChangesAsync(stoppingToken);
                 }
 
                 await Task.Delay(interval, stoppingToken);

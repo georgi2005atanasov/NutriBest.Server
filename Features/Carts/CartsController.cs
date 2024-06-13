@@ -247,7 +247,7 @@
 
         [HttpDelete]
         [AllowAnonymous]
-        [Route("/cart/remove")]
+        [Route("/Cart/Remove")]
         public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)
         {
             CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
@@ -300,7 +300,7 @@
         }
 
         [HttpPost]
-        [Route("/Cart/apply-promo-code")]
+        [Route("/Cart/ApplyPromoCode")]
         public async Task<ActionResult<bool>> ApplyPromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
         {
             try
@@ -346,7 +346,7 @@
         }
 
         [HttpDelete]
-        [Route("/Cart/remove-promo-code")]
+        [Route("/Cart/RemovePromoCode")]
         public async Task<ActionResult<bool>> RemovePromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
         {
             try

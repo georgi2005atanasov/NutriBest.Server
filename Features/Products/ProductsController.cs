@@ -414,7 +414,7 @@
         }
 
         [HttpGet]
-        [Route("by-category-count")]
+        [Route("ByCategoryCount")]
         public async Task<ActionResult<bool>> GetByCategoryCount()
         {
             var products = await categoryService.GetProductsCountByCategory();
@@ -478,7 +478,7 @@
         }
 
         [HttpPost]
-        [Route("current-price")]
+        [Route("CurrentPrice")]
         public async Task<ActionResult<decimal>> GetCurrentPrice([FromBody] CurrentProductPriceServiceModel productModel)
         {
             try
