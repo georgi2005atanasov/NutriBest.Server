@@ -38,6 +38,16 @@
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
+        public static void ConfigureNotifications(this ModelBuilder builder)
+        {
+            var priorityConverter = new EnumToStringConverter<Priority>();
+
+            builder
+                .Entity<Notification>()
+                .Property(e => e.Priority)
+                .HasConversion(priorityConverter);
+        }
+
         public static void ConfigureAddresses(this ModelBuilder builder)
         {
             builder.Entity<Address>()

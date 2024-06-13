@@ -6,44 +6,44 @@
     public class NotificationHub : Hub
     {
         public const string AdminGroup = "AdminGroup";
-        private static readonly ConcurrentDictionary<string, HashSet<string>> PageConnections = new ConcurrentDictionary<string, HashSet<string>>()
+        private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PageConnections = new ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>()
         {
-            ["/"] = new HashSet<string>(),
-            ["/login"] = new HashSet<string>(),
-            ["/forgot-password"] = new HashSet<string>(),
-            ["/Identity/ResetPassword"] = new HashSet<string>(),
-            ["/register"] = new HashSet<string>(),
-            ["/logout"] = new HashSet<string>(),
-            ["/home"] = new HashSet<string>(),
-            ["/products"] = new HashSet<string>(),
-            ["/products/add"] = new HashSet<string>(),
-            ["/products/all"] = new HashSet<string>(),
-            ["/profile"] = new HashSet<string>(),
-            ["/profile/:id"] = new HashSet<string>(),
-            ["/profile/address"] = new HashSet<string>(),
-            ["/profiles"] = new HashSet<string>(),
-            ["/promotions"] = new HashSet<string>(),
-            ["/promotions/add"] = new HashSet<string>(),
-            ["/categories"] = new HashSet<string>(),
-            ["/categories/add"] = new HashSet<string>(),
-            ["/brands"] = new HashSet<string>(),
-            ["/brands/add"] = new HashSet<string>(),
-            ["/flavours"] = new HashSet<string>(),
-            ["/flavours/add"] = new HashSet<string>(),
-            ["/packages"] = new HashSet<string>(),
-            ["/packages/add"] = new HashSet<string>(),
-            ["/more"] = new HashSet<string>(),
-            ["/cart"] = new HashSet<string>(),
-            ["/promo-codes"] = new HashSet<string>(),
-            ["/promo-codes/add"] = new HashSet<string>(),
-            ["/order"] = new HashSet<string>(),
-            ["/order/finished"] = new HashSet<string>(),
-            ["/order/confirm"] = new HashSet<string>(),
-            ["/orders"] = new HashSet<string>(),
-            ["/my-orders"] = new HashSet<string>(),
-            ["/shipping-discounts"] = new HashSet<string>(),
-            ["/shipping-discounts/add"] = new HashSet<string>(),
-            ["/shipping-discounts/all"] = new HashSet<string>()
+            ["/"] = new ConcurrentDictionary<string, bool>(),
+            ["/login"] = new ConcurrentDictionary<string, bool>(),
+            ["/forgot-password"] = new ConcurrentDictionary<string, bool>(),
+            ["/Identity/ResetPassword"] = new ConcurrentDictionary<string, bool>(),
+            ["/register"] = new ConcurrentDictionary<string, bool>(),
+            ["/logout"] = new ConcurrentDictionary<string, bool>(),
+            ["/home"] = new ConcurrentDictionary<string, bool>(),
+            ["/products"] = new ConcurrentDictionary<string, bool>(),
+            ["/products/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/products/all"] = new ConcurrentDictionary<string, bool>(),
+            ["/profile"] = new ConcurrentDictionary<string, bool>(),
+            ["/profile/:id"] = new ConcurrentDictionary<string, bool>(),
+            ["/profile/address"] = new ConcurrentDictionary<string, bool>(),
+            ["/profiles"] = new ConcurrentDictionary<string, bool>(),
+            ["/promotions"] = new ConcurrentDictionary<string, bool>(),
+            ["/promotions/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/categories"] = new ConcurrentDictionary<string, bool>(),
+            ["/categories/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/brands"] = new ConcurrentDictionary<string, bool>(),
+            ["/brands/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/flavours"] = new ConcurrentDictionary<string, bool>(),
+            ["/flavours/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/packages"] = new ConcurrentDictionary<string, bool>(),
+            ["/packages/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/more"] = new ConcurrentDictionary<string, bool>(),
+            ["/cart"] = new ConcurrentDictionary<string, bool>(),
+            ["/promo-codes"] = new ConcurrentDictionary<string, bool>(),
+            ["/promo-codes/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/order"] = new ConcurrentDictionary<string, bool>(),
+            ["/order/finished"] = new ConcurrentDictionary<string, bool>(),
+            ["/order/confirm"] = new ConcurrentDictionary<string, bool>(),
+            ["/orders"] = new ConcurrentDictionary<string, bool>(),
+            ["/my-orders"] = new ConcurrentDictionary<string, bool>(),
+            ["/shipping-discounts"] = new ConcurrentDictionary<string, bool>(),
+            ["/shipping-discounts/add"] = new ConcurrentDictionary<string, bool>(),
+            ["/shipping-discounts/all"] = new ConcurrentDictionary<string, bool>()
         };
         public override async Task OnConnectedAsync()
         {
@@ -52,49 +52,40 @@
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            foreach (var page in PageConnections)
+            var connections = PageConnections.Values;
+
+            foreach (var connection in connections)
             {
-                if (page.Value.Remove(Context.ConnectionId))
-                {
-                    await GetUsersCount();
-                }
+                connection.TryRemove(Context.ConnectionId, out _);
             }
 
+            await GetUsersCount();
             await base.OnDisconnectedAsync(exception);
         }
 
         public async Task JoinPage(string pageName)
         {
-            if (PageConnections.ContainsKey(pageName))
-            {
-                PageConnections.AddOrUpdate(pageName,
-                    addValueFactory: _ => new HashSet<string> { Context.ConnectionId },
-                    updateValueFactory: (key, oldValue) => { oldValue.Add(Context.ConnectionId); return oldValue; });
+            var currentConnections = PageConnections.GetOrAdd(pageName, _ => new ConcurrentDictionary<string, bool>());
 
-                await GetUsersCount();
-                await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroup);
-            }
-        }
-
-        public async Task LeavePage(string pageName)
-        {
-            if (PageConnections.TryGetValue(pageName, out var connections))
+            foreach (var connections in PageConnections.Values)
             {
-                connections.Remove(Context.ConnectionId);
-                await GetUsersCount();
+                connections.TryRemove(Context.ConnectionId, out _);
             }
 
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, AdminGroup);
+            currentConnections.TryAdd(Context.ConnectionId, true);
+
+            await GetUsersCount();
+            await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroup);
         }
 
         private async Task GetUsersCount()
             => await Clients.Group(AdminGroup).SendAsync("GetUsersCount", PageConnections
                 .Where(x => x.Value.Count > 0)
                 .Select(x => new
-            {
-                Route = x.Key,
-                Count = x.Value.Count
-            })
+                {
+                    Route = x.Key,
+                    Count = x.Value.Count
+                })
                 .ToList());
     }
 }
