@@ -140,6 +140,13 @@
                     HasUpdated = result
                 });
             }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
             catch (Exception)
             {
                 return BadRequest();

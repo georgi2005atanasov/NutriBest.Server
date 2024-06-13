@@ -7,7 +7,7 @@
         Task SendNotificationToAdmin(string notificationType, string message);
         
         Task SendLowInStockNotification(string productName,
-            int productId, int quantity);
+            int productId, int quantity, string orderId);
 
         Task<bool> DeleteNotification(string message);
     }

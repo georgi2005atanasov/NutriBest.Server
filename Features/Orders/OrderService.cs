@@ -543,16 +543,16 @@
                 }
                 // reduce the quantity for each product in the cart
 
-                order.IsConfirmed = true;
+                foreach (var product in lowStocks)
+                {
+                    await notificationService.SendLowInStockNotification(product.Name, product.ProductId, product.Quantity, $"#000000{orderId}");
+                }
 
                 await notificationService.SendNotificationToAdmin("success", $"Order #000000{order.Id} Has Just Been Confirmed!");
 
-                await db.SaveChangesAsync();
+                order.IsConfirmed = true;
 
-                foreach (var product in lowStocks)
-                {
-                    await notificationService.SendLowInStockNotification(product.Name, product.ProductId, product.Quantity);
-                }
+                await db.SaveChangesAsync();
 
                 return true;
             }

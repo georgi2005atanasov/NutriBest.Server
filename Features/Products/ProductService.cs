@@ -192,8 +192,8 @@
                 .Where(x => x.ProductId == id && x.Quantity > 0) // x.Quantity > 0
                 .ToListAsync();
 
-            if (!productPackageFlavours.Any())
-                throw new InvalidOperationException("Product could not be found!");
+            //if (!productPackageFlavours.Any())
+            //    throw new InvalidOperationException("Product could not be found!");
 
             var specs = new List<ProductSpecsServiceModel>();
 

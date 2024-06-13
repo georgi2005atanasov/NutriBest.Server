@@ -14,6 +14,8 @@ namespace NutriBest.Server.Data.Models
 
         public Priority Priority { get; set; }
 
+        public int? ProductId { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }
