@@ -24,7 +24,7 @@
             this.promoCodeService = promoCodeService;
         }
 
-        public void SendConfirmOrder(EmailConfirmOrderModel request)
+        public async Task SendConfirmOrder(EmailConfirmOrderModel request)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
@@ -84,14 +84,42 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            smtp.Timeout = 120000;
-            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            int maxRetries = 5;
+            int retryDelay = 5000;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    smtp.Timeout = 120000;
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                    return; // Success! Exit the function after successful send
+                }
+                catch (Exception ex)
+                {
+                    attempt++; // Increment the attempt counter
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt >= maxRetries)
+                    {
+                        throw; // Re-throw the exception after the last attempt
+                    }
+                    await Task.Delay(retryDelay); // Wait before retrying
+                }
+                finally
+                {
+                    if (smtp.IsConnected)
+                    {
+                        await smtp.DisconnectAsync(true);
+                    }
+                }
+            }
         }
 
-        public void SendNewOrderToAdmin(EmailOrderModel request)
+        public async Task SendNewOrderToAdmin(EmailOrderModel request)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
@@ -178,14 +206,42 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            smtp.Timeout = 120000;
-            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            int maxRetries = 5;
+            int retryDelay = 5000;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    smtp.Timeout = 120000;
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                    return; // Success! Exit the function after successful send
+                }
+                catch (Exception ex)
+                {
+                    attempt++; // Increment the attempt counter
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt >= maxRetries)
+                    {
+                        throw; // Re-throw the exception after the last attempt
+                    }
+                    await Task.Delay(retryDelay); // Wait before retrying
+                }
+                finally
+                {
+                    if (smtp.IsConnected)
+                    {
+                        await smtp.DisconnectAsync(true);
+                    }
+                }
+            }
         }
 
-        public void SendForgottenPassword(EmailModel request, string callbackUrl)
+        public async Task SendForgottenPassword(EmailModel request, string callbackUrl)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
@@ -277,11 +333,39 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            smtp.Timeout = 120000;
-            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            int maxRetries = 5; 
+            int retryDelay = 5000;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    smtp.Timeout = 120000;
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                    return; // Success! Exit the function after successful send
+                }
+                catch (Exception ex)
+                {
+                    attempt++; // Increment the attempt counter
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt >= maxRetries)
+                    {
+                        throw; // Re-throw the exception after the last attempt
+                    }
+                    await Task.Delay(retryDelay); // Wait before retrying
+                }
+                finally
+                {
+                    if (smtp.IsConnected)
+                    {
+                        await smtp.DisconnectAsync(true);
+                    }
+                }
+            }
         }
 
         public async Task SendPromoCode(SendPromoEmailModel request)
@@ -377,7 +461,7 @@ NutriBest
             <h1>Welcome to NutriBest!</h1>
             <p>Dear valued customer,</p>
             <p>We are excited to offer you an exclusive promocode as a token of our appreciation for your loyalty.</p>
-            <p>Use the code <strong>{promoCode}</strong> at checkout to get 20% off your next purchase!</p>
+            <p>Use the code <strong>{promoCode}</strong> at checkout to get surprising discount from your next purchase!</p>
             <p>But you have to hurry up, because after <strong>{expiresIn}</strong> days the promocode won't be valid!</p>
             <p>Visit our website to explore our wide range of fitness supplements designed to help you achieve your health goals.</p>
             <a href=""http://localhost:5173/"" class=""button"">Shop Now</a>
@@ -406,12 +490,41 @@ NutriBest
                 .Replace("{expiresIn}", $"{expiresIn}");
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
+
             using var smtp = new SmtpClient();
-            smtp.Timeout = 120000;
-            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            int maxRetries = 5;
+            int retryDelay = 5000;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    smtp.Timeout = 120000;
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                    return; // Success! Exit the function after successful send
+                }
+                catch (Exception ex)
+                {
+                    attempt++; // Increment the attempt counter
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt >= maxRetries)
+                    {
+                        throw; // Re-throw the exception after the last attempt
+                    }
+                    await Task.Delay(retryDelay); // Wait before retrying
+                }
+                finally
+                {
+                    if (smtp.IsConnected)
+                    {
+                        await smtp.DisconnectAsync(true);
+                    }
+                }
+            }
         }
 
         private async Task MarkAsSent(string? code)
@@ -422,7 +535,7 @@ NutriBest
             await db.SaveChangesAsync();
         }
 
-        public void SendConfirmedOrderToAdmin(EmailConfirmedOrderModel request)
+        public async Task SendConfirmedOrderToAdmin(EmailConfirmedOrderModel request)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
@@ -482,11 +595,39 @@ NutriBest
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
-            smtp.Timeout = 120000;
-            smtp.Connect(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-            smtp.Authenticate(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+            int maxRetries = 5;
+            int retryDelay = 5000;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    smtp.Timeout = 120000;
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+                    await smtp.SendAsync(email);
+                    await smtp.DisconnectAsync(true);
+                    return; // Success! Exit the function after successful send
+                }
+                catch (Exception ex)
+                {
+                    attempt++; // Increment the attempt counter
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt >= maxRetries)
+                    {
+                        throw; // Re-throw the exception after the last attempt
+                    }
+                    await Task.Delay(retryDelay); // Wait before retrying
+                }
+                finally
+                {
+                    if (smtp.IsConnected)
+                    {
+                        await smtp.DisconnectAsync(true);
+                    }
+                }
+            }
         }
     }
 }

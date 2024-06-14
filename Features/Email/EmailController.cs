@@ -9,22 +9,26 @@
     public class EmailController : ApiController
     {
         private readonly UserManager<User> userManager;
+        private readonly IConfiguration config;
         private readonly IEmailService emailService;
 
         public EmailController(UserManager<User> userManager,
-            IEmailService emailService)
+
+            IEmailService emailService,
+            IConfiguration config)
         {
             this.userManager = userManager;
+            this.config = config;
             this.emailService = emailService;
         }
 
         [HttpPost]
         [Route(nameof(SendConfirmOrderEmail))]
-        public IActionResult SendConfirmOrderEmail([FromBody] EmailConfirmOrderModel request)
+        public async Task<IActionResult> SendConfirmOrderEmail([FromBody] EmailConfirmOrderModel request)
         {
             try
             {
-                emailService.SendConfirmOrder(request);
+                await emailService.SendConfirmOrder(request);
                 return Ok();
             }
             catch (Exception)
@@ -35,11 +39,11 @@
 
         [HttpPost]
         [Route(nameof(SendConfirmedOrderToAdmin))]
-        public IActionResult SendConfirmedOrderToAdmin([FromBody] EmailConfirmedOrderModel confirmedOrderModel)
+        public async Task<IActionResult> SendConfirmedOrderToAdmin([FromBody] EmailConfirmedOrderModel confirmedOrderModel)
         {
             try
             {
-                emailService.SendConfirmedOrderToAdmin(confirmedOrderModel);
+                await emailService.SendConfirmedOrderToAdmin(confirmedOrderModel);
 
                 return Ok();
             }
@@ -51,7 +55,7 @@
 
         [HttpPost]
         [Route(nameof(SendOrderToAdmin))]
-        public IActionResult SendOrderToAdmin([FromBody] EmailOrderModel request)
+        public ActionResult SendOrderToAdmin([FromBody] EmailOrderModel request)
         {
             try
             {
@@ -87,9 +91,10 @@
 
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
                 //ENSURE WHEN IT GOES TO PRODUCTION TO CHANGE TO HTTPS
-                var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: "http", host: "localhost:5173");
+                var host = config.GetSection("ClientHost").Value;
+                var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: "http", host: host);
 
-                emailService.SendForgottenPassword(request, callbackUrl ?? "");
+                await emailService.SendForgottenPassword(request, callbackUrl ?? "");
                 return Ok(new
                 {
                     IsSuccess = true,

@@ -4,13 +4,13 @@
 
     public interface IEmailService
     {
-        void SendConfirmOrder(EmailConfirmOrderModel emailModel);
+        Task SendConfirmOrder(EmailConfirmOrderModel emailModel);
 
-        void SendConfirmedOrderToAdmin(EmailConfirmedOrderModel emailModel);
+        Task SendConfirmedOrderToAdmin(EmailConfirmedOrderModel emailModel);
 
-        void SendForgottenPassword(EmailModel request, string callbackUrl);
+        Task SendForgottenPassword(EmailModel request, string callbackUrl);
 
-        void SendNewOrderToAdmin(EmailOrderModel request);
+        Task SendNewOrderToAdmin(EmailOrderModel request);
 
         Task SendPromoCode(SendPromoEmailModel request);
 
