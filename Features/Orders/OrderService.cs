@@ -11,6 +11,7 @@
     using static ServicesConstants.PaginationConstants;
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.Notifications;
+    using AutoMapper;
 
     public class OrderService : IOrderService
     {
@@ -18,16 +19,19 @@
         private readonly ICurrentUserService currentUserService;
         private readonly IConfiguration config;
         private readonly INotificationService notificationService;
+        private readonly IMapper mapper;
 
         public OrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
             IConfiguration config,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IMapper mapper)
         {
             this.db = db;
             this.currentUserService = currentUserService;
             this.config = config;
             this.notificationService = notificationService;
+            this.mapper = mapper;
         }
 
         public async Task<int> PrepareCart(decimal totalProducts,
@@ -309,16 +313,17 @@
                 var invoice = await db.Invoices
                     .FirstAsync(x => x.Id == orderDetails.InvoiceId);
 
-                order.Invoice = new InvoiceServiceModel
-                {
-                    FirstName = invoice.FirstName,
-                    LastName = invoice.LastName,
-                    CompanyName = invoice.CompanyName,
-                    Bullstat = invoice.Bullstat,
-                    PersonInCharge = invoice.PersonInCharge,
-                    PhoneNumber = invoice.PhoneNumber,
-                    VAT = invoice.VAT
-                };
+                order.Invoice = mapper.Map<InvoiceServiceModel>(invoice); 
+                //new InvoiceServiceModel
+                //{
+                //    FirstName = invoice.FirstName,
+                //    LastName = invoice.LastName,
+                //    CompanyName = invoice.CompanyName,
+                //    Bullstat = invoice.Bullstat,
+                //    PersonInCharge = invoice.PersonInCharge,
+                //    PhoneNumber = invoice.PhoneNumber,
+                //    VAT = invoice.VAT
+                //};
             }
 
             return order;
@@ -541,7 +546,6 @@
                         });
                     }
                 }
-                // reduce the quantity for each product in the cart
 
                 foreach (var product in lowStocks)
                 {

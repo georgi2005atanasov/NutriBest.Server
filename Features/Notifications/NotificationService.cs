@@ -1,20 +1,47 @@
 ﻿namespace NutriBest.Server.Features.Notifications
 {
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications.Hubs;
+    using NutriBest.Server.Features.Notifications.Models;
+    using static ServicesConstants.PaginationConstants;
 
     public class NotificationService : INotificationService
     {
         private readonly IHubContext<NotificationHub> hubContext;
         private readonly NutriBestDbContext db;
+        private readonly IMapper mapper;
 
-        public NotificationService(IHubContext<NotificationHub> hubContext, NutriBestDbContext db)
+        public NotificationService(IHubContext<NotificationHub> hubContext,
+            NutriBestDbContext db,
+            IMapper mapper)
         {
             this.hubContext = hubContext;
             this.db = db;
+            this.mapper = mapper;
+        }
+
+        public async Task<AllNotificationsServiceModel> All(int page)
+        {
+            var notifications = db.Notifications
+                .Where(x => !x.IsDeleted)
+                .ProjectTo<NotificationServiceModel>(mapper.ConfigurationProvider)
+                .OrderByDescending(x => x.SentAt);
+
+            var allNotificationsServiceModel = new AllNotificationsServiceModel
+            {
+                TotalNotifications = await notifications.CountAsync(),
+                Notifications = await notifications
+                                        .Skip((page - 1) * NotificationsPerPage)
+                                        .Take(NotificationsPerPage)
+                                        .ToListAsync()
+            };
+
+            return allNotificationsServiceModel;
         }
 
         public Task<bool> DeleteNotification(string message)
@@ -69,6 +96,7 @@
             }
             else if (quantity < 0)
             {
+                notification.Priority = Data.Enums.Priority.High;
                 await hubContext.Clients.All.SendAsync("NotifyLowStock", notification.Priority.ToString(), $"Cannot Fulfill the Order. Product '{productName}' is Out of Stock!", productId);
                 throw new InvalidOperationException($"Cannot Fulfill Order {orderId}. Product '{productName}' is Out of Stock!");
             }
@@ -76,18 +104,6 @@
 
         public async Task SendNotificationToAdmin(string notificationType, string message)
         {
-            // Store notification in the database
-            //var notification = new Notification
-            //{
-            //    Type = notificationType,
-            //    Message = message,
-            //    Timestamp = DateTime.UtcNow
-            //};
-            //_dbContext.Notifications.Add(notification);
-            //await _dbContext.SaveChangesAsync();
-
-            // Send notification to connected clients
-
             await hubContext.Clients.All.SendAsync("NotifyAdmin", notificationType, message);
         }
     }

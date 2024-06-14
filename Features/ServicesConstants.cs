@@ -13,6 +13,8 @@
             public const int OrdersPerPage = 20;
 
             public const int UsersPerPage = 50;
+
+            public const int NotificationsPerPage = 10;
         }
 
         public class Product

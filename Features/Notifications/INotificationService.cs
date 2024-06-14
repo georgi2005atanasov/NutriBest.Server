@@ -4,8 +4,10 @@
 
     public interface INotificationService
     {
+        Task<AllNotificationsServiceModel> All(int page);
+
         Task SendNotificationToAdmin(string notificationType, string message);
-        
+
         Task SendLowInStockNotification(string productName,
             int productId, int quantity, string orderId);
 

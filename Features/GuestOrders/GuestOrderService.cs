@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
+    using AutoMapper;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications;
@@ -10,8 +11,9 @@
         public GuestOrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
             IConfiguration config,
-            INotificationService notificationService)
-            :base(db, currentUserService, config, notificationService)
+            INotificationService notificationService,
+            IMapper mapper)
+            :base(db, currentUserService, config, notificationService, mapper)
         {
         }
 
