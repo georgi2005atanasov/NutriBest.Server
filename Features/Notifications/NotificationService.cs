@@ -44,9 +44,19 @@
             return allNotificationsServiceModel;
         }
 
-        public Task<bool> DeleteNotification(string message)
+        public async Task<bool> DeleteNotification(string message)
         {
-            throw new NotImplementedException();
+            var notification = await db.Notifications
+                .FirstOrDefaultAsync(x => x.Message == message);
+
+            if (notification == null)
+                return false;
+
+            notification.IsDeleted = true;
+
+            await db.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task SendLowInStockNotification(string productName, int productId, int quantity, string orderId)
