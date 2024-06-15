@@ -31,7 +31,7 @@
 
         Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId);
 
-        Task<decimal?> GetCurrentPrice(int productId, string flavour, int grams);
+        Task<ProductPriceQuantityServiceModel?> GetCurrentPriceWithQuantity(int productId, string flavour, int grams);
 
         Task<int> Update(int id,
             string name,

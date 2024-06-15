@@ -518,7 +518,7 @@
             }
         }
 
-        public async Task<decimal?> GetCurrentPrice(int productId, string flavour, int grams)
+        public async Task<ProductPriceQuantityServiceModel?> GetCurrentPriceWithQuantity(int productId, string flavour, int grams)
         {
             var productPackageFlavour = await db.ProductsPackagesFlavours
                 .SingleOrDefaultAsync(x => x.Flavour!.FlavourName == flavour &&
@@ -528,7 +528,13 @@
             if (productPackageFlavour == null)
                 return null;
 
-            return productPackageFlavour.Price;
+            var priceWithQuantityModel = new ProductPriceQuantityServiceModel
+            {
+                Price = productPackageFlavour.Price,
+                Quantity = productPackageFlavour.Quantity
+            };
+
+            return priceWithQuantityModel;
         }
     }
 }

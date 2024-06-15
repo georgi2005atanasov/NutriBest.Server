@@ -478,16 +478,16 @@
         }
 
         [HttpPost]
-        [Route("CurrentPrice")]
-        public async Task<ActionResult<decimal>> GetCurrentPrice([FromBody] CurrentProductPriceServiceModel productModel)
+        [Route("CurrentPriceWithQuantity")]
+        public async Task<ActionResult<ProductPriceQuantityServiceModel>> GetCurrentPriceWithQuantity([FromBody] CurrentProductPriceServiceModel productModel)
         {
             try
             {
-                var products = await productService.GetCurrentPrice(productModel.ProductId, 
+                var product = await productService.GetCurrentPriceWithQuantity(productModel.ProductId, 
                     productModel.Flavour,
                     productModel.Package);
 
-                return Ok(products);
+                return Ok(product);
             }
             catch (Exception)
             {
