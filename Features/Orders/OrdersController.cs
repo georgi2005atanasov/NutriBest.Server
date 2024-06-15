@@ -85,7 +85,7 @@
 
         [HttpGet]
         [Route("RelatedProducts")]
-        public async Task<ActionResult<OrderRelatedProductsServiceModel>> GetRelatedProducts([FromForm] decimal price)
+        public async Task<ActionResult<OrderRelatedProductsServiceModel>> GetRelatedProducts([FromQuery] decimal price)
         {
             try
             {
