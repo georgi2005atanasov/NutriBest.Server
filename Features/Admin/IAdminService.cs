@@ -7,5 +7,7 @@
         Task<IEnumerable<UserServiceModel>> GetAllUsers();
 
         Task<string> RestoreProfile(string id);
+
+        Task<bool> DeleteProfile(string id);
     }
 }

@@ -18,6 +18,25 @@
             this.userManager = userManager;
         }
 
+        public async Task<bool> DeleteProfile(string id)
+        {
+            var user = await db.Users
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            var profile = await db.Profiles
+               .FirstOrDefaultAsync(x => x.UserId == id);
+
+            if (profile == null || user == null)
+                throw new ArgumentNullException("Invalid user!");
+
+            db.Profiles.Remove(profile);
+            db.Users.Remove(user);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<IEnumerable<UserServiceModel>> GetAllUsers()
         {
             var users = db.Users

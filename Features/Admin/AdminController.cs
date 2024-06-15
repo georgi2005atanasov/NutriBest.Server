@@ -148,5 +148,20 @@
                 });
             }
         }
+
+        [HttpDelete]
+        [Route("DeleteProfile/{id}")]
+        public async Task<ActionResult<bool>> DeleteProfile([FromRoute] string id) 
+        {
+            try
+            {
+                var result = await adminService.DeleteProfile(id);
+                return Ok(result);
+            }
+            catch (Exception err)
+            {
+                return BadRequest();
+            }
+        }
     }
 }
