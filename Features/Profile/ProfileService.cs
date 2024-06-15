@@ -226,13 +226,27 @@
 
             if (!string.IsNullOrEmpty(email))
             {
+                if (await db.Newsletters.AnyAsync(x => x.Email == user.Email))
+                {
+                    var newsletter = await db.Newsletters
+                        .FirstAsync(x => x.Email == user.Email);
+                    newsletter.Email = email;
+                }
                 user.Email = email;
                 user.NormalizedEmail = email.ToUpper();
             }
             
 
             if (!string.IsNullOrEmpty(name))
+            {
+                if (await db.Newsletters.AnyAsync(x => x.Name == profile.Name))
+                {
+                    var newsletter = await db.Newsletters
+                        .FirstAsync(x => x.Name == profile.Name);
+                    newsletter.Name = name;
+                }
                 profile.Name = name;
+            }
 
             if (!string.IsNullOrEmpty(userName))
             {

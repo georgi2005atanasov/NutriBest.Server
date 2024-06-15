@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Countries\" />
-    <Folder Include="Features\Newsletter\Models\" />
   </ItemGroup>
 
 </Project>

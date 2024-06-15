@@ -2,6 +2,8 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Features.Newsletter.Models;
+
     public class NewsletterController : ApiController
     {
         private readonly INewsletterService newsletterService;
@@ -34,5 +36,21 @@
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        public async Task<ActionResult<AllSubscribersServiceModel>> AllSubscribers([FromQuery] int page,
+            [FromQuery] string? search = "", [FromQuery] string? type = "all")
+        {
+            try
+            {
+                var subscribers = await newsletterService.AllSubscribers(page, search, type);
+
+                return Ok(subscribers);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

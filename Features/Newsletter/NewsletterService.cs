@@ -4,6 +4,8 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Newsletter.Models;
+    using static ServicesConstants.PaginationConstants;
 
     public class NewsletterService : INewsletterService
     {
@@ -77,6 +79,119 @@
             await db.SaveChangesAsync();
 
             return subscription.Id;
+        }
+
+        public async Task<AllSubscribersServiceModel> AllSubscribers(int page, string? search, string? groupType)
+        {
+            var totalSubscribers = await db.Newsletters
+                .CountAsync();
+
+            var allSubscribersModel = new AllSubscribersServiceModel
+            {
+                TotalSubscribers = totalSubscribers,
+                Subscribers = await GetFilteredSubscribers(page, search, groupType)
+            };
+
+            return allSubscribersModel;
+        }
+
+        private async Task<List<SubscriberServiceModel>> GetFilteredSubscribers(int page, string? search, string? groupType)
+        {
+            var subscribers = db.Newsletters
+                .AsQueryable();
+
+            var subscribersToReturn = new List<SubscriberServiceModel>();
+
+            foreach (var subscriber in subscribers)
+            {
+                var subscriberModel = new SubscriberServiceModel
+                {
+                    Email = subscriber.Email,
+                    HasOrders = subscriber.HasOrders,
+                    TotalOrders = subscriber.TotalOrders,
+                    IsAnonymous = subscriber.IsAnonymous,
+                    Name = subscriber.Name,
+                    PhoneNumber = subscriber.PhoneNumber,
+                    RegisteredOn = subscriber.CreatedOn
+                };
+
+                switch (groupType)
+                {
+                    case "withOrders":
+                        if (subscriber.IsAnonymous)
+                        {
+                            var guestOrder = await db.GuestsOrders
+                                .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
+
+                            if (guestOrder != null)
+                            {
+                                subscribersToReturn.Add(subscriberModel);
+                            }
+                        }
+                        else
+                        {
+                            var userOrder = await db.UsersOrders
+                               .FirstOrDefaultAsync(x => subscriber.Email == subscriber.Email);
+
+                            if (userOrder != null)
+                            {
+                                subscribersToReturn.Add(subscriberModel);
+                            }
+                        }
+                        break;
+                    case "withoutOrders":
+                        if (subscriber.IsAnonymous)
+                        {
+                            var guestOrder = await db.GuestsOrders
+                                .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
+
+                            if (guestOrder == null)
+                            {
+                                subscribersToReturn.Add(subscriberModel);
+                            }
+                        }
+                        else
+                        {
+                            var userOrder = await db.UsersOrders
+                               .FirstOrDefaultAsync(x => subscriber.Email == subscriber.Email);
+
+                            if (userOrder == null)
+                            {
+                                subscribersToReturn.Add(subscriberModel);
+                            }
+                        }
+                        break;
+                    case "guests":
+                        if (subscriber.IsAnonymous)
+                            subscribersToReturn.Add(subscriberModel);
+                        break;
+                    case "users":
+                        if (!subscriber.IsAnonymous)
+                            subscribersToReturn.Add(subscriberModel);
+                        break;
+                    default:
+                        subscribersToReturn.Add(subscriberModel);
+                        break;
+                }
+            }
+
+            subscribersToReturn = subscribersToReturn
+                .Skip((page - 1) * UsersPerPage)
+                .Take(UsersPerPage)
+                .ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+
+                subscribersToReturn = subscribersToReturn
+                    .Where(x => x.Name!.ToLower().Contains(search) ||
+                    x.PhoneNumber!.ToLower().Contains(search) ||
+                    x.Email.ToLower().Contains(search))
+                    .ToList();
+            }
+
+            return subscribersToReturn;
         }
     }
 }
