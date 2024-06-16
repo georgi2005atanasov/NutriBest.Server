@@ -133,5 +133,31 @@
                 return BadRequest();
             }
         }
+
+        [HttpPost]
+        [Route(nameof(SendJoinedToNewsletter))]
+        public async Task<ActionResult> SendJoinedToNewsletter([FromBody] EmailModel request)
+        {
+            if (string.IsNullOrEmpty(request.To))
+                return BadRequest(new
+                {
+                    Error = "Email is Required!"
+                });
+
+            try
+            {
+                await emailService.SendJoinedToNewsletter(request);
+
+                return Ok(new
+                {
+                    IsSuccess = true,
+                    Message = "Successfully sent promo code!"
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

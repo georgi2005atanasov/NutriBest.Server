@@ -13,6 +13,23 @@
             this.newsletterService = newsletterService;
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        public async Task<ActionResult<AllSubscribersServiceModel>> AllSubscribers([FromQuery] int page,
+            [FromQuery] string? search = "", [FromQuery] string? type = "all")
+        {
+            try
+            {
+                var subscribers = await newsletterService.AllSubscribers(page, search, type);
+
+                return Ok(subscribers);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult<int>> AddToNewsletter([FromForm] string email)
@@ -36,16 +53,19 @@
             }
         }
 
-        [HttpGet]
+        [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<AllSubscribersServiceModel>> AllSubscribers([FromQuery] int page,
-            [FromQuery] string? search = "", [FromQuery] string? type = "all")
+        [Route("Admin/RemoveFromNewsletter")]
+        public async Task<ActionResult<bool>> RemoveFromNewsletter([FromForm] string email)
         {
             try
             {
-                var subscribers = await newsletterService.AllSubscribers(page, search, type);
+                var result = await newsletterService.Remove(email);
 
-                return Ok(subscribers);
+                return Ok(new
+                {
+                    Succeeded = result
+                });
             }
             catch (Exception)
             {

@@ -14,5 +14,6 @@
 
         Task SendPromoCode(SendPromoEmailModel request);
 
+        Task SendJoinedToNewsletter(EmailModel request);
     }
 }

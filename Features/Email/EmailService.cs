@@ -83,40 +83,7 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-            using var smtp = new SmtpClient();
-            int maxRetries = 5;
-            int retryDelay = 5000;
-            int attempt = 0;
-
-            while (attempt < maxRetries)
-            {
-                try
-                {
-                    smtp.Timeout = 120000;
-                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-                    await smtp.SendAsync(email);
-                    await smtp.DisconnectAsync(true);
-                    return; // Success! Exit the function after successful send
-                }
-                catch (Exception ex)
-                {
-                    attempt++; // Increment the attempt counter
-                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                    if (attempt >= maxRetries)
-                    {
-                        throw; // Re-throw the exception after the last attempt
-                    }
-                    await Task.Delay(retryDelay); // Wait before retrying
-                }
-                finally
-                {
-                    if (smtp.IsConnected)
-                    {
-                        await smtp.DisconnectAsync(true);
-                    }
-                }
-            }
+            await SendEmail(email);
         }
 
         public async Task SendNewOrderToAdmin(EmailOrderModel request)
@@ -205,40 +172,7 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-            using var smtp = new SmtpClient();
-            int maxRetries = 5;
-            int retryDelay = 5000;
-            int attempt = 0;
-
-            while (attempt < maxRetries)
-            {
-                try
-                {
-                    smtp.Timeout = 120000;
-                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-                    await smtp.SendAsync(email);
-                    await smtp.DisconnectAsync(true);
-                    return; // Success! Exit the function after successful send
-                }
-                catch (Exception ex)
-                {
-                    attempt++; // Increment the attempt counter
-                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                    if (attempt >= maxRetries)
-                    {
-                        throw; // Re-throw the exception after the last attempt
-                    }
-                    await Task.Delay(retryDelay); // Wait before retrying
-                }
-                finally
-                {
-                    if (smtp.IsConnected)
-                    {
-                        await smtp.DisconnectAsync(true);
-                    }
-                }
-            }
+            await SendEmail(email);
         }
 
         public async Task SendForgottenPassword(EmailModel request, string callbackUrl)
@@ -332,40 +266,7 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-            using var smtp = new SmtpClient();
-            int maxRetries = 5; 
-            int retryDelay = 5000;
-            int attempt = 0;
-
-            while (attempt < maxRetries)
-            {
-                try
-                {
-                    smtp.Timeout = 120000;
-                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-                    await smtp.SendAsync(email);
-                    await smtp.DisconnectAsync(true);
-                    return; // Success! Exit the function after successful send
-                }
-                catch (Exception ex)
-                {
-                    attempt++; // Increment the attempt counter
-                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                    if (attempt >= maxRetries)
-                    {
-                        throw; // Re-throw the exception after the last attempt
-                    }
-                    await Task.Delay(retryDelay); // Wait before retrying
-                }
-                finally
-                {
-                    if (smtp.IsConnected)
-                    {
-                        await smtp.DisconnectAsync(true);
-                    }
-                }
-            }
+            await SendEmail(email);
         }
 
         public async Task SendPromoCode(SendPromoEmailModel request)
@@ -491,48 +392,7 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-            using var smtp = new SmtpClient();
-            int maxRetries = 5;
-            int retryDelay = 5000;
-            int attempt = 0;
-
-            while (attempt < maxRetries)
-            {
-                try
-                {
-                    smtp.Timeout = 120000;
-                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
-                    await smtp.SendAsync(email);
-                    await smtp.DisconnectAsync(true);
-                    return; // Success! Exit the function after successful send
-                }
-                catch (Exception ex)
-                {
-                    attempt++; // Increment the attempt counter
-                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                    if (attempt >= maxRetries)
-                    {
-                        throw; // Re-throw the exception after the last attempt
-                    }
-                    await Task.Delay(retryDelay); // Wait before retrying
-                }
-                finally
-                {
-                    if (smtp.IsConnected)
-                    {
-                        await smtp.DisconnectAsync(true);
-                    }
-                }
-            }
-        }
-
-        private async Task MarkAsSent(string? code)
-        {
-            var codeFromDb = await db.PromoCodes
-                .FirstAsync(x => x.Code == code);
-            codeFromDb.IsSent = true;
-            await db.SaveChangesAsync();
+            await SendEmail(email);
         }
 
         public async Task SendConfirmedOrderToAdmin(EmailConfirmedOrderModel request)
@@ -594,6 +454,86 @@ NutriBest
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
+            await SendEmail(email);
+        }
+
+        public async Task SendJoinedToNewsletter(EmailModel request)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.To.Add(MailboxAddress.Parse(request.To));
+            email.Subject = request.Subject;
+
+            var htmlTemplate = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Newsletter Subscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header img {
+            width: 100px;
+        }
+        .content {
+            text-align: center;
+        }
+        .content h1 {
+            color: #007BFF;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""content"">
+            <h1>Subscription Successful!</h1>
+            <p>Thank you for subscribing to our newsletter.</p>
+            <p>You will now receive the latest updates and news.</p>
+        </div>
+        <div class=""footer"">
+            <p>If you did not subscribe to this newsletter, please ignore this email.</p>
+            <p>&copy; {Year} YourCompany. All rights reserved.</p>
+        </div>
+
+    </div>
+</body>
+</html>";
+
+            var body = htmlTemplate.Replace("{Year}", $"{DateTime.UtcNow.Year}");
+
+            email.Body = new TextPart(TextFormat.Html) { Text = body };
+
+            await SendEmail(email);
+        }
+
+        private async Task SendEmail(MimeMessage email)
+        {
             using var smtp = new SmtpClient();
             int maxRetries = 5;
             int retryDelay = 5000;
@@ -628,6 +568,14 @@ NutriBest
                     }
                 }
             }
+        }
+
+        private async Task MarkAsSent(string? code)
+        {
+            var codeFromDb = await db.PromoCodes
+                .FirstAsync(x => x.Code == code);
+            codeFromDb.IsSent = true;
+            await db.SaveChangesAsync();
         }
     }
 }

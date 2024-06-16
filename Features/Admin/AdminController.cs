@@ -158,7 +158,7 @@
                 var result = await adminService.DeleteProfile(id);
                 return Ok(result);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

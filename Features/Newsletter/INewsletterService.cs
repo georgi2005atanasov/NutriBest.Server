@@ -6,6 +6,8 @@
     {
         public Task<int> Add(string email);
 
+        public Task<bool> Remove(string email);
+
         public Task<AllSubscribersServiceModel> AllSubscribers(int page,
             string? search,
             string? groupType);

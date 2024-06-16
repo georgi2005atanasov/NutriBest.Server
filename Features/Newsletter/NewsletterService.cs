@@ -4,6 +4,8 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Email;
+    using NutriBest.Server.Features.Email.Models;
     using NutriBest.Server.Features.Newsletter.Models;
     using static ServicesConstants.PaginationConstants;
 
@@ -11,17 +13,20 @@
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
+        private readonly IEmailService emailService;
 
         public NewsletterService(NutriBestDbContext db,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IEmailService emailService)
         {
             this.db = db;
             this.userManager = userManager;
+            this.emailService = emailService;
         }
 
         public async Task<int> Add(string email)
         {
-            if (await db.Newsletters.AnyAsync(x => x.Email == email))
+            if (await db.Newsletters.AnyAsync(x => x.Email == email && !x.IsDeleted))
             {
                 throw new InvalidOperationException($"'{email}' is already subscribed!");
             }
@@ -78,6 +83,12 @@
 
             await db.SaveChangesAsync();
 
+            //await emailService.SendJoinedToNewsletter(new EmailModel
+            //{
+            //    To = email,
+            //    Subject = "Newsletter Subscription"
+            //});
+
             return subscription.Id;
         }
 
@@ -95,9 +106,25 @@
             return allSubscribersModel;
         }
 
+        public async Task<bool> Remove(string email)
+        {
+            var newsletter = await db.Newsletters
+                .FirstOrDefaultAsync(x => x.Email == email && !x.IsDeleted);
+
+            if (newsletter == null)
+                return false;
+
+            db.Newsletters.Remove(newsletter);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
         private async Task<List<SubscriberServiceModel>> GetFilteredSubscribers(int page, string? search, string? groupType)
         {
             var subscribers = db.Newsletters
+                .Where(x => !x.IsDeleted)
                 .AsQueryable();
 
             var subscribersToReturn = new List<SubscriberServiceModel>();
