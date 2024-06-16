@@ -131,7 +131,7 @@
                 return (new List<string>(), 0);
             }
 
-            var expireIn = (promoCodes.First().CreatedOn - DateTime.UtcNow).Duration().Days;
+            var expireIn = 10 - (promoCodes.First().CreatedOn - DateTime.UtcNow).Duration().Days;
 
             return (await promoCodes.Select(x => x.Code).ToListAsync(), expireIn);
         }

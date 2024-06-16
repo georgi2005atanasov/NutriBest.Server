@@ -26,7 +26,7 @@
 
         public async Task<int> Add(string email)
         {
-            if (await db.Newsletters.AnyAsync(x => x.Email == email && !x.IsDeleted))
+            if (await db.Newsletter.AnyAsync(x => x.Email == email && !x.IsDeleted))
             {
                 throw new InvalidOperationException($"'{email}' is already subscribed!");
             }
@@ -79,22 +79,16 @@
                 PhoneNumber = phoneNumber
             };
 
-            db.Newsletters.Add(subscription);
+            db.Newsletter.Add(subscription);
 
             await db.SaveChangesAsync();
-
-            //await emailService.SendJoinedToNewsletter(new EmailModel
-            //{
-            //    To = email,
-            //    Subject = "Newsletter Subscription"
-            //});
 
             return subscription.Id;
         }
 
         public async Task<AllSubscribersServiceModel> AllSubscribers(int page, string? search, string? groupType)
         {
-            var totalSubscribers = await db.Newsletters
+            var totalSubscribers = await db.Newsletter
                 .CountAsync();
 
             var allSubscribersModel = new AllSubscribersServiceModel
@@ -108,13 +102,13 @@
 
         public async Task<bool> Remove(string email)
         {
-            var newsletter = await db.Newsletters
+            var newsletter = await db.Newsletter
                 .FirstOrDefaultAsync(x => x.Email == email && !x.IsDeleted);
 
             if (newsletter == null)
                 return false;
 
-            db.Newsletters.Remove(newsletter);
+            db.Newsletter.Remove(newsletter);
 
             await db.SaveChangesAsync();
 
@@ -123,7 +117,7 @@
 
         private async Task<List<SubscriberServiceModel>> GetFilteredSubscribers(int page, string? search, string? groupType)
         {
-            var subscribers = db.Newsletters
+            var subscribers = db.Newsletter
                 .Where(x => !x.IsDeleted)
                 .AsQueryable();
 
@@ -142,65 +136,9 @@
                     RegisteredOn = subscriber.CreatedOn
                 };
 
-                switch (groupType)
-                {
-                    case "withOrders":
-                        if (subscriber.IsAnonymous)
-                        {
-                            var guestOrder = await db.GuestsOrders
-                                .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
-
-                            if (guestOrder != null)
-                            {
-                                subscribersToReturn.Add(subscriberModel);
-                            }
-                        }
-                        else
-                        {
-                            var userOrder = await db.UsersOrders
-                               .FirstOrDefaultAsync(x => subscriber.Email == subscriber.Email);
-
-                            if (userOrder != null)
-                            {
-                                subscribersToReturn.Add(subscriberModel);
-                            }
-                        }
-                        break;
-                    case "withoutOrders":
-                        if (subscriber.IsAnonymous)
-                        {
-                            var guestOrder = await db.GuestsOrders
-                                .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
-
-                            if (guestOrder == null)
-                            {
-                                subscribersToReturn.Add(subscriberModel);
-                            }
-                        }
-                        else
-                        {
-                            var userOrder = await db.UsersOrders
-                               .FirstOrDefaultAsync(x => subscriber.Email == subscriber.Email);
-
-                            if (userOrder == null)
-                            {
-                                subscribersToReturn.Add(subscriberModel);
-                            }
-                        }
-                        break;
-                    case "guests":
-                        if (subscriber.IsAnonymous)
-                            subscribersToReturn.Add(subscriberModel);
-                        break;
-                    case "users":
-                        if (!subscriber.IsAnonymous)
-                            subscribersToReturn.Add(subscriberModel);
-                        break;
-                    default:
-                        subscribersToReturn.Add(subscriberModel);
-                        break;
-                }
+                await CheckGroupType(subscriberModel, subscribersToReturn, groupType);
             }
+
 
             subscribersToReturn = subscribersToReturn
                 .Skip((page - 1) * UsersPerPage)
@@ -219,6 +157,68 @@
             }
 
             return subscribersToReturn;
+        }
+
+        public async Task CheckGroupType(SubscriberServiceModel subscriberModel, List<SubscriberServiceModel> subscribersToReturn, string groupType)
+        {
+            switch (groupType)
+            {
+                case "withOrders":
+                    if (subscriberModel.IsAnonymous)
+                    {
+                        var guestOrder = await db.GuestsOrders
+                            .FirstOrDefaultAsync(x => x.Email == subscriberModel.Email);
+
+                        if (guestOrder != null)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                    }
+                    else
+                    {
+                        var userOrder = await db.UsersOrders
+                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriberModel.Email);
+
+                        if (userOrder != null)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                    }
+                    break;
+                case "withoutOrders":
+                    if (subscriberModel.IsAnonymous)
+                    {
+                        var guestOrder = await db.GuestsOrders
+                            .FirstOrDefaultAsync(x => x.Email == subscriberModel.Email);
+
+                        if (guestOrder == null)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                    }
+                    else
+                    {
+                        var userOrder = await db.UsersOrders
+                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriberModel.Email);
+
+                        if (userOrder == null)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                    }
+                    break;
+                case "guests":
+                    if (subscriberModel.IsAnonymous)
+                        subscribersToReturn.Add(subscriberModel);
+                    break;
+                case "users":
+                    if (!subscriberModel.IsAnonymous)
+                        subscribersToReturn.Add(subscriberModel);
+                    break;
+                default:
+                    subscribersToReturn.Add(subscriberModel);
+                    break;
+            }
         }
     }
 }

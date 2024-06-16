@@ -532,6 +532,62 @@ NutriBest
             await SendEmail(email);
         }
 
+        public async Task SendMessageToSubscribers(EmailSubscribersServiceModel request, string groupType)
+        {
+            var subscribers = db.Newsletter
+                .AsQueryable();
+
+            var subscribersToSendMessage = new List<string>();
+
+            foreach (var subscriber in subscribers)
+            {
+                await CheckSubscribers(subscribersToSendMessage, subscriber, groupType);
+            }
+
+            foreach (var subscriber in subscribersToSendMessage)
+            {
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+                email.To.Add(MailboxAddress.Parse(subscriber));
+                email.Subject = request.Subject;
+                email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
+
+                await SendEmail(email);
+            }
+        }
+
+        public async Task SendPromoCodesToSubscribers(EmailSubscribersPromoCodeServiceModel request, string groupType)
+        {
+            var subscribers = db.Newsletter
+                .AsQueryable();
+
+            var subscribersToSendMessage = new List<string>();
+
+            foreach (var subscriber in subscribers)
+            {
+                await CheckSubscribers(subscribersToSendMessage, subscriber, groupType);
+            }
+
+            var promoCodesCount = await db.PromoCodes
+                .Where(x => x.Description == request.PromoCodeDescription)
+                .CountAsync();
+
+            if (promoCodesCount < subscribersToSendMessage.Count)
+            {
+                throw new InvalidOperationException("The Promo Codes are not Enough!");
+            }
+
+            foreach (var subscriber in subscribersToSendMessage)
+            {
+                await SendPromoCode(new SendPromoEmailModel
+                {
+                    PromoCodeDescription = request.PromoCodeDescription,
+                    Subject = request.Subject,
+                    To = subscriber
+                });
+            }
+        }
+
         private async Task SendEmail(MimeMessage email)
         {
             using var smtp = new SmtpClient();
@@ -548,11 +604,11 @@ NutriBest
                     await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
                     await smtp.SendAsync(email);
                     await smtp.DisconnectAsync(true);
-                    return; // Success! Exit the function after successful send
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    attempt++; // Increment the attempt counter
+                    attempt++;
                     Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
                     if (attempt >= maxRetries)
                     {
@@ -567,6 +623,70 @@ NutriBest
                         await smtp.DisconnectAsync(true);
                     }
                 }
+            }
+        }
+
+        private async Task CheckSubscribers(List<string> subscribersToSendMessage,
+            Data.Models.Newsletter subscriber,
+            string groupType)
+        {
+            switch (groupType)
+            {
+                case "withOrders":
+                    if (subscriber.IsAnonymous)
+                    {
+                        var guestOrder = await db.GuestsOrders
+                            .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
+
+                        if (guestOrder != null)
+                        {
+                            subscribersToSendMessage.Add(subscriber.Email);
+                        }
+                    }
+                    else
+                    {
+                        var userOrder = await db.UsersOrders
+                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriber.Email);
+
+                        if (userOrder != null)
+                        {
+                            subscribersToSendMessage.Add(subscriber.Email);
+                        }
+                    }
+                    break;
+                case "withoutOrders":
+                    if (subscriber.IsAnonymous)
+                    {
+                        var guestOrder = await db.GuestsOrders
+                            .FirstOrDefaultAsync(x => x.Email == subscriber.Email);
+
+                        if (guestOrder == null)
+                        {
+                            subscribersToSendMessage.Add(subscriber.Email);
+                        }
+                    }
+                    else
+                    {
+                        var userOrder = await db.UsersOrders
+                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriber.Email);
+
+                        if (userOrder == null)
+                        {
+                            subscribersToSendMessage.Add(subscriber.Email);
+                        }
+                    }
+                    break;
+                case "guests":
+                    if (subscriber.IsAnonymous)
+                        subscribersToSendMessage.Add(subscriber.Email);
+                    break;
+                case "users":
+                    if (!subscriber.IsAnonymous)
+                        subscribersToSendMessage.Add(subscriber.Email);
+                    break;
+                default:
+                    subscribersToSendMessage.Add(subscriber.Email);
+                    break;
             }
         }
 

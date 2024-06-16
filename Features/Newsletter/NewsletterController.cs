@@ -16,11 +16,11 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<AllSubscribersServiceModel>> AllSubscribers([FromQuery] int page,
-            [FromQuery] string? search = "", [FromQuery] string? type = "all")
+            [FromQuery] string? search = "", [FromQuery] string? groupType = "all")
         {
             try
             {
-                var subscribers = await newsletterService.AllSubscribers(page, search, type);
+                var subscribers = await newsletterService.AllSubscribers(page, search, groupType);
 
                 return Ok(subscribers);
             }

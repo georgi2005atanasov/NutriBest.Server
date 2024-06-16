@@ -81,7 +81,6 @@
             try
             {
                 var user = await userManager.FindByEmailAsync(request.To);
-                //if (user == null || !await userManager.IsEmailConfirmedAsync(user))
                 if (user == null)
                     return Ok(new
                     {
@@ -152,6 +151,46 @@
                 {
                     IsSuccess = true,
                     Message = "Successfully sent promo code!"
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(SendMessageToSubscribers))]
+        public async Task<ActionResult> SendMessageToSubscribers([FromBody] EmailSubscribersServiceModel request, 
+            [FromQuery] string groupType)
+        {
+            try
+            {
+                await emailService.SendMessageToSubscribers(request, groupType);
+
+                return Ok(new
+                {
+                    IsSuccess = true,
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(SendPromoCodesToSubscribers))]
+        public async Task<ActionResult> SendPromoCodesToSubscribers([FromBody] EmailSubscribersPromoCodeServiceModel request,
+            [FromQuery] string groupType)
+        {
+            try
+            {
+                await emailService.SendPromoCodesToSubscribers(request, groupType);
+
+                return Ok(new
+                {
+                    IsSuccess = true,
                 });
             }
             catch (Exception)

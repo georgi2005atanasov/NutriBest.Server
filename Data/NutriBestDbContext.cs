@@ -66,7 +66,7 @@
 
         public DbSet<Notification> Notifications { get; set; } = null!;
 
-        public DbSet<Newsletter> Newsletters { get; set; } = null!;
+        public DbSet<Newsletter> Newsletter { get; set; } = null!;
 
         public NutriBestDbContext(DbContextOptions<NutriBestDbContext> options,
             ICurrentUserService currentUser)

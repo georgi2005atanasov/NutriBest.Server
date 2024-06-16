@@ -15,5 +15,9 @@
         Task SendPromoCode(SendPromoEmailModel request);
 
         Task SendJoinedToNewsletter(EmailModel request);
+
+        Task SendMessageToSubscribers(EmailSubscribersServiceModel request, string groupType);
+
+        Task SendPromoCodesToSubscribers(EmailSubscribersPromoCodeServiceModel request, string groupType);
     }
 }

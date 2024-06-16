@@ -226,9 +226,9 @@
 
             if (!string.IsNullOrEmpty(email))
             {
-                if (await db.Newsletters.AnyAsync(x => x.Email == user.Email))
+                if (await db.Newsletter.AnyAsync(x => x.Email == user.Email))
                 {
-                    var newsletter = await db.Newsletters
+                    var newsletter = await db.Newsletter
                         .FirstAsync(x => x.Email == user.Email);
                     newsletter.Email = email;
                 }
@@ -239,9 +239,9 @@
 
             if (!string.IsNullOrEmpty(name))
             {
-                if (await db.Newsletters.AnyAsync(x => x.Name == profile.Name))
+                if (await db.Newsletter.AnyAsync(x => x.Name == profile.Name))
                 {
-                    var newsletter = await db.Newsletters
+                    var newsletter = await db.Newsletter
                         .FirstAsync(x => x.Name == profile.Name);
                     newsletter.Name = name;
                 }
