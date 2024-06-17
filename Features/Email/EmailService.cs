@@ -7,6 +7,7 @@
     using MimeKit.Text;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Email.Models;
+    using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.PromoCodes;
 
     public class EmailService : IEmailService
@@ -14,14 +15,17 @@
         private readonly NutriBestDbContext db;
         private readonly IConfiguration config;
         private readonly IPromoCodeService promoCodeService;
+        private readonly INotificationService notificationService;
 
         public EmailService(NutriBestDbContext db,
             IConfiguration config,
-            IPromoCodeService promoCodeService)
+            IPromoCodeService promoCodeService,
+            INotificationService notificationService)
         {
             this.db = db;
             this.config = config;
             this.promoCodeService = promoCodeService;
+            this.notificationService = notificationService;
         }
 
         public async Task SendConfirmOrder(EmailConfirmOrderModel request)
@@ -256,13 +260,15 @@ NutriBest
             <p>Thank you,<br>Your Company Name</p>
         </div>
         <div class='footer'>
-            <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+            <p>&copy; {Year} Your Company Name. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>";
 
-            var body = htmlTemplate.Replace("{callbackUrl}", callbackUrl);
+            var body = htmlTemplate
+                .Replace("{callbackUrl}", callbackUrl)
+                .Replace("{Year}", $"{DateTime.UtcNow.Year}");
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
@@ -356,7 +362,6 @@ NutriBest
 <body>
     <div class=""email-container"">
         <div class=""header"">
-            <img src=""https://yourwebsite.com/logo.png"" alt=""NutriBest Logo"" class=""logo"">
         </div>
         <div class=""content"">
             <h1>Welcome to NutriBest!</h1>
@@ -441,7 +446,7 @@ NutriBest
             <a href=""{OrderLink}"" class=""button"">View Order</a>
         </div>
         <div id=""footer"">
-            <p>&copy; {Year} YourCompany. All rights reserved.</p>
+            <p>&copy; {Year} NutriBest. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -518,7 +523,7 @@ NutriBest
         </div>
         <div class=""footer"">
             <p>If you did not subscribe to this newsletter, please ignore this email.</p>
-            <p>&copy; {Year} YourCompany. All rights reserved.</p>
+            <p>&copy; {Year} NutriBest. All rights reserved.</p>
         </div>
 
     </div>
@@ -535,6 +540,7 @@ NutriBest
         public async Task SendMessageToSubscribers(EmailSubscribersServiceModel request, string groupType)
         {
             var subscribers = db.Newsletter
+                .Where(x => !x.IsDeleted)
                 .AsQueryable();
 
             var subscribersToSendMessage = new List<string>();
@@ -550,15 +556,73 @@ NutriBest
                 email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
                 email.To.Add(MailboxAddress.Parse(subscriber));
                 email.Subject = request.Subject;
-                email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
+
+                var htmlTemplate = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Newsletter Subscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""content"">
+            <p>{Body}</p>
+        </div>
+        <div class=""footer"">
+            <a href=""{Host}/newsletter/{Email}"">Unsubscribe From our Newsletter.</a>
+            <p>&copy; {Year} NutriBest. All rights reserved.</p>
+        </div>
+
+    </div>
+</body>
+</html>";
+
+                var body = htmlTemplate
+                    .Replace("{Email}", subscriber)
+                    .Replace("{Year}", $"{DateTime.UtcNow.Year}")
+                    .Replace("{Body}", request.Body)
+                    .Replace("{Host}", $"http://{config.GetSection("ClientHost").Value}");
+
+                email.Body = new TextPart(TextFormat.Html) { Text = body };
 
                 await SendEmail(email);
             }
+            await notificationService.SendNotificationToAdmin("success", "Successfully Sent Message to the Newsletter Subscribers!");
         }
 
         public async Task SendPromoCodesToSubscribers(EmailSubscribersPromoCodeServiceModel request, string groupType)
         {
             var subscribers = db.Newsletter
+                .Where(x => !x.IsDeleted)
                 .AsQueryable();
 
             var subscribersToSendMessage = new List<string>();
@@ -569,7 +633,10 @@ NutriBest
             }
 
             var promoCodesCount = await db.PromoCodes
-                .Where(x => x.Description == request.PromoCodeDescription)
+                .Where(x => x.Description == request.PromoCodeDescription &&
+                !x.IsSent &&
+                x.IsValid &&
+                !x.IsDeleted)
                 .CountAsync();
 
             if (promoCodesCount < subscribersToSendMessage.Count)
@@ -586,6 +653,8 @@ NutriBest
                     To = subscriber
                 });
             }
+
+            await notificationService.SendNotificationToAdmin("success", "Successfully Sent Promo Codes to the Newsletter Subscribers!");
         }
 
         private async Task SendEmail(MimeMessage email)

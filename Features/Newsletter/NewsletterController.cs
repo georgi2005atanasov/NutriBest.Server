@@ -24,6 +24,10 @@
 
                 return Ok(subscribers);
             }
+            catch(NullReferenceException)
+            {
+                return BadRequest();
+            }
             catch (Exception)
             {
                 return BadRequest();
@@ -56,6 +60,25 @@
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("Admin/RemoveFromNewsletter")]
+        public async Task<ActionResult<bool>> RemoveFromNewsletterByAdmin([FromForm] string email)
+        {
+            try
+            {
+                var result = await newsletterService.Remove(email);
+
+                return Ok(new
+                {
+                    Succeeded = result
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete]
+        [Route("RemoveFromNewsletter")]
         public async Task<ActionResult<bool>> RemoveFromNewsletter([FromForm] string email)
         {
             try

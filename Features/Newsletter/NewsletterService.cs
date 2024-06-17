@@ -150,8 +150,8 @@
                 search = search.ToLower();
 
                 subscribersToReturn = subscribersToReturn
-                    .Where(x => x.Name!.ToLower().Contains(search) ||
-                    x.PhoneNumber!.ToLower().Contains(search) ||
+                    .Where(x => (x.Name != null && x.Name.ToLower().Contains(search)) ||
+                    (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
                     x.Email.ToLower().Contains(search))
                     .ToList();
             }

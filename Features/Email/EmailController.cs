@@ -161,7 +161,7 @@
 
         [HttpPost]
         [Route(nameof(SendMessageToSubscribers))]
-        public async Task<ActionResult> SendMessageToSubscribers([FromBody] EmailSubscribersServiceModel request, 
+        public async Task<ActionResult> SendMessageToSubscribers([FromBody] EmailSubscribersServiceModel request,
             [FromQuery] string groupType)
         {
             try
@@ -193,9 +193,19 @@
                     IsSuccess = true,
                 });
             }
-            catch (Exception)
+            catch (InvalidOperationException err)
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    err.Message
+                });
+            }
+            catch (Exception err)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false
+                });
             }
         }
     }
