@@ -4,19 +4,13 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Packages.Models;
-    using NutriBest.Server.Infrastructure.Services;
 
     public class PackageService : IPackageService
     {
         private readonly NutriBestDbContext db;
-        private readonly ICurrentUserService currentUserService;
 
-        public PackageService(NutriBestDbContext db,
-            ICurrentUserService currentUserService)
-        {
-            this.db = db;
-            this.currentUserService = currentUserService;
-        }
+        public PackageService(NutriBestDbContext db)
+            => this.db = db;
 
         public async Task<int> Create(int grams)
         {
@@ -63,8 +57,7 @@
         }
 
         public async Task<List<PackageCountServiceModel>> GetProductsCountByQuantity()
-        {
-            var products = await db.ProductsPackagesFlavours
+            => await db.ProductsPackagesFlavours
                 .GroupBy(ppf => ppf.PackageId)
                 .Select(g => new PackageCountServiceModel
                 {
@@ -78,8 +71,5 @@
                 })
                 .OrderBy(x => x.Grams)
                 .ToListAsync();
-
-            return products;
-        }
     }
 }

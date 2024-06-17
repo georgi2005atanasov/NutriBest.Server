@@ -6,6 +6,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Extensions;
+    using NutriBest.Server.Features.Products.Factories;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Services;
@@ -132,7 +133,6 @@
                     maxPrice = price;
             }
 
-
             var product = new Product
             {
                 Name = name,
@@ -157,8 +157,7 @@
 
             db.Products.Add(product);
 
-            await db.SaveChangesAsync(); // must be aware it is finished before creating the
-                                         // productPackageFlavour entities
+            await db.SaveChangesAsync();
 
             await CreateProductSpecs(product, productSpecs);
 
@@ -189,30 +188,15 @@
                 throw new ArgumentNullException("Invalid product!");
 
             var productPackageFlavours = await db.ProductsPackagesFlavours
-                .Where(x => x.ProductId == id && x.Quantity > 0) // x.Quantity > 0
+                .Where(x => x.ProductId == id && x.Quantity > 0)
                 .ToListAsync();
-
-            //if (!productPackageFlavours.Any())
-            //    throw new InvalidOperationException("Product could not be found!");
 
             var specs = new List<ProductSpecsServiceModel>();
 
             foreach (var productPackageFlavour in productPackageFlavours)
             {
-                var package = await db.Packages
-                    .FirstAsync(x => x.Id == productPackageFlavour.PackageId);
-
-                var flavour = await db.Flavours
-                    .FirstAsync(x => x.Id == productPackageFlavour.FlavourId);
-
-                var spec = new ProductSpecsServiceModel
-                {
-                    Flavour = flavour.FlavourName,
-                    Grams = package.Grams,
-                    Quantity = productPackageFlavour.Quantity,
-                    Price = $"{productPackageFlavour.Price}"
-                };
-
+                var spec = await ProductFactory
+                    .CreateProductSpecsServiceModelAsync(db, productPackageFlavour);
                 specs.Add(spec);
             }
 

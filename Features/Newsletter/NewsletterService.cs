@@ -6,6 +6,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Email.Models;
+    using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Features.Newsletter.Models;
     using static ServicesConstants.PaginationConstants;
 
@@ -31,43 +32,7 @@
                 throw new InvalidOperationException($"'{email}' is already subscribed!");
             }
 
-            bool isAnonymous = false;
-            int ordersCount = 0;
-            string name = "";
-            string phoneNumber = "";
-
-            var user = await userManager.FindByEmailAsync(email);
-
-            if (user == null)
-            {
-                isAnonymous = true;
-
-                var guestOrders = db.GuestsOrders
-                    .Where(x => x.Email == email)
-                    .AsQueryable();
-
-                if (await guestOrders.AnyAsync(x => !string.IsNullOrEmpty(x.PhoneNumber)))
-                {
-                    var orderWithNumber = await guestOrders
-                        .LastAsync(x => x.PhoneNumber != null);
-
-                    phoneNumber = orderWithNumber.PhoneNumber ?? "";
-                }
-
-                ordersCount = await guestOrders.CountAsync();
-            }
-            else
-            {
-                ordersCount = await db.UsersOrders
-                    .Where(x => x.CreatedBy == email)
-                    .CountAsync();
-
-                var profile = await db.Profiles
-                    .FirstAsync(x => x.UserId == user.Id);
-
-                name = profile.Name ?? "";
-                phoneNumber = user.PhoneNumber;
-            }
+            var (isAnonymous, ordersCount, name, phoneNumber) = await this.GetNewsletterData(db, userManager, email);
 
             var subscription = new Newsletter
             {
@@ -159,7 +124,7 @@
             return subscribersToReturn;
         }
 
-        public async Task CheckGroupType(SubscriberServiceModel subscriberModel, List<SubscriberServiceModel> subscribersToReturn, string groupType)
+        private async Task CheckGroupType(SubscriberServiceModel subscriberModel, List<SubscriberServiceModel> subscribersToReturn, string? groupType)
         {
             switch (groupType)
             {

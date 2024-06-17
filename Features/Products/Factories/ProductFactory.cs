@@ -49,5 +49,25 @@ namespace NutriBest.Server.Features.Products.Factories
 
             return productModel;
         }
+
+        public static async Task<ProductSpecsServiceModel> CreateProductSpecsServiceModelAsync(NutriBestDbContext db,
+            ProductPackageFlavour productPackageFlavour)
+        {
+            var package = await db.Packages
+                    .FirstAsync(x => x.Id == productPackageFlavour.PackageId);
+
+            var flavour = await db.Flavours
+                .FirstAsync(x => x.Id == productPackageFlavour.FlavourId);
+
+            var spec = new ProductSpecsServiceModel
+            {
+                Flavour = flavour.FlavourName,
+                Grams = package.Grams,
+                Quantity = productPackageFlavour.Quantity,
+                Price = $"{productPackageFlavour.Price}"
+            };
+
+            return spec;
+        }
     }
 }

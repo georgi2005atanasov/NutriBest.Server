@@ -92,11 +92,6 @@
                 throw new ArgumentException("The promotion is not active!");
             }
 
-            //if (product.Price < promotion.MinimumPrice)
-            //{
-            //    throw new ArgumentException($"The price of the product must be at least {promotion.MinimumPrice}");
-            //}
-
             return (product, promotion);
         }
 

@@ -43,7 +43,11 @@
             ["/my-orders"] = new ConcurrentDictionary<string, bool>(),
             ["/shipping-discounts"] = new ConcurrentDictionary<string, bool>(),
             ["/shipping-discounts/add"] = new ConcurrentDictionary<string, bool>(),
-            ["/shipping-discounts/all"] = new ConcurrentDictionary<string, bool>()
+            ["/shipping-discounts/all"] = new ConcurrentDictionary<string, bool>(),
+            ["/newsletter/list"] = new ConcurrentDictionary<string, bool>(),
+            ["/live/dashboard"] = new ConcurrentDictionary<string, bool>(),
+            ["/notifications"] = new ConcurrentDictionary<string, bool>(),
+            ["/addToNewsletter"] = new ConcurrentDictionary<string, bool>()
         };
         public override async Task OnConnectedAsync()
         {

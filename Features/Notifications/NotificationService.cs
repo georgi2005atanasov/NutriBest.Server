@@ -9,6 +9,7 @@
     using NutriBest.Server.Features.Notifications.Hubs;
     using NutriBest.Server.Features.Notifications.Models;
     using static ServicesConstants.PaginationConstants;
+    using static ServicesConstants.Product;
 
     public class NotificationService : INotificationService
     {
@@ -74,7 +75,7 @@
                 notificationToRemove!.IsDeleted = true;
             }
 
-            if (quantity < 10 && quantity > 0)
+            if (quantity < StockMediumPriority && quantity > 0)
             {
                 notification.Title = "Low in Stock";
                 notification.Message = $"'{productName}' stock levels are critically low! ({quantity} left)";
@@ -84,7 +85,7 @@
                 await db.SaveChangesAsync();
                 await hubContext.Clients.All.SendAsync("NotifyLowStock", notification.Priority.ToString(), notification.Message);
             }
-            else if (quantity < 20 && quantity > 0)
+            else if (quantity < StockLowPriority && quantity > 0)
             {
                 notification.Title = "Stock is running low!";
                 notification.Message = $"Be Aware That Product With Name '{productName}' has Quantity of {quantity}.";
