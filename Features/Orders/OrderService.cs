@@ -4,7 +4,6 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
-    using NutriBest.Server.Features.Invoices.Models;
     using NutriBest.Server.Features.Orders.Models;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Infrastructure.Services;
@@ -12,6 +11,9 @@
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.Notifications;
     using AutoMapper;
+    using NutriBest.Server.Features.Orders.Factories;
+    using NutriBest.Server.Features.Carts.Factories;
+    using NutriBest.Server.Features.Products.Factories;
 
     public class OrderService : IOrderService
     {
@@ -20,6 +22,9 @@
         private readonly IConfiguration config;
         private readonly INotificationService notificationService;
         private readonly IMapper mapper;
+        Func<NutriBestDbContext, OrderDetails, Task<(Address address, City city, Country country)>> getAddressCityCountryFunc;
+        Func<NutriBestDbContext, int, Task<OrderDetails>> getOrderDetailsFunc;
+
 
         public OrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
@@ -32,6 +37,8 @@
             this.config = config;
             this.notificationService = notificationService;
             this.mapper = mapper;
+            this.getAddressCityCountryFunc = this.GetAddressCityCountry;
+            this.getOrderDetailsFunc = this.GetOrderDetails;
         }
 
         public async Task<int> PrepareCart(decimal totalProducts,
@@ -91,342 +98,23 @@
                 TotalOrders = await orders.CountAsync()
             };
 
-            orders = orders
-                .AsQueryable();
-
             foreach (var order in orders)
             {
-                var orderDetails = await this.GetOrderDetails(db, order.OrderDetailsId);
+                var orderListingModel = await OrderFactory.CreateOrderListingServiceModelAsync(order,
+                    db,
+                    getAddressCityCountryFunc,
+                    getOrderDetailsFunc);
 
-                var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
+                allOrders.Orders.Add(orderListingModel);
 
-                var cart = await db.Carts
-                    .FindAsync(order.CartId);
+                var cart = await db.Carts.FindAsync(order!.CartId);
 
-                if (order.GuestOrderId != null)
-                {
-                    var guestOrder = await db.GuestsOrders
-                        .FindAsync(order.GuestOrderId);
-
-                    var orderModel = new OrderListingServiceModel
-                    {
-                        CustomerName = guestOrder!.Name,
-                        City = city != null ? city!.CityName : "",
-                        Country = country != null ? country!.CountryName : "",
-                        IsConfirmed = order.IsConfirmed,
-                        IsFinished = order.IsFinished,
-                        IsShipped = orderDetails.IsShipped,
-                        IsPaid = orderDetails.IsPaid,
-                        OrderId = order.Id,
-                        MadeOn = orderDetails.MadeOn,
-                        PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                        TotalPrice = cart!.TotalProducts + (cart.ShippingPrice ?? 0),
-                        PhoneNumber = guestOrder.PhoneNumber,
-                        Email = guestOrder.Email,
-                        IsAnonymous = true
-                    };
-
-                    allOrders.Orders.Add(orderModel);
-                }
-
-                if (order.UserOrderId != null)
-                {
-                    var userOrder = await db.UsersOrders
-                        .FirstAsync(x => x.Id == order.UserOrderId);
-
-                    var profile = await db.Profiles
-                        .FirstAsync(x => x.UserId == userOrder.ProfileId);
-
-                    var user = await db.Users
-                        .FirstAsync(x => x.Id == userOrder.ProfileId);
-
-                    var orderModel = new OrderListingServiceModel
-                    {
-                        CustomerName = profile.Name ?? "",
-                        City = city != null ? city!.CityName : "",
-                        Country = country != null ? country!.CountryName : "",
-                        IsConfirmed = order.IsConfirmed,
-                        IsFinished = order.IsFinished,
-                        IsShipped = orderDetails.IsShipped,
-                        IsPaid = orderDetails.IsPaid,
-                        OrderId = order.Id,
-                        MadeOn = orderDetails.MadeOn,
-                        PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                        TotalPrice = cart!.TotalProducts + (cart.ShippingPrice ?? 0),
-                        PhoneNumber = user.PhoneNumber,
-                        Email = user.Email,
-                        IsAnonymous = false
-                    };
-
-                    allOrders.Orders.Add(orderModel);
-                }
-
-                allOrders.TotalDiscounts += cart!.TotalSaved; // be aware
-                allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
-                allOrders.TotalProducts += await db.CartProducts
-                                                .Where(x => x.CartId == cart.Id)
-                                                .CountAsync();
-                allOrders.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
+                await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.ToLower();
-
-                allOrders.Orders = allOrders.Orders
-                    .Where(x => $"{x.OrderId}" == search ||
-                    x.PhoneNumber.ToLower().Contains(search) ||
-                    x.CustomerName.ToLower().Contains(search))
-                    .OrderByDescending(x => x.MadeOn)
-                    .ToList();
-            }
-
-            allOrders.Orders = allOrders.Orders
-                .Skip((page - 1) * OrdersPerPage)
-                .Take(OrdersPerPage)
-                .ToList();
+            allOrders = this.FilterAllOrdersModel(allOrders, search, page);
 
             return allOrders;
-        }
-
-        public async Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token)
-        {
-            var orderFromDb = await this.GetOrder(db, orderId);
-
-            string customerName = "";
-            string customerEmail = "";
-            string phoneNumber = "";
-
-            if (orderFromDb == null)
-                return null;
-
-            if (orderFromDb.UserOrderId != null)
-            {
-                var userOrder = await db.UsersOrders
-                    .FirstAsync(x => x.OrderId == orderFromDb.Id);
-
-                var profile = await db.Profiles
-                    .FirstAsync(x => x.UserId == userOrder.ProfileId);
-
-                customerName = profile.Name!;
-
-                var user = await db.Users
-                    .FirstAsync(x => x.Id == userOrder.ProfileId);
-
-                customerEmail = user.Email;
-                phoneNumber = user.PhoneNumber ?? "";
-
-                if (userOrder.ProfileId != currentUserService.GetUserId())
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-
-            if (orderFromDb.GuestOrderId != null)
-            {
-                var guestOrder = await db.GuestsOrders
-                    .FirstAsync(x => x.Id == orderFromDb.GuestOrderId);
-
-                customerName = guestOrder.Name;
-                customerEmail = guestOrder.Email;
-                phoneNumber = guestOrder.PhoneNumber ?? "";
-
-                if (orderFromDb.SessionToken != token)
-                    throw new InvalidOperationException();
-
-                if (currentUserService.GetUserId() != null)
-                    throw new InvalidOperationException();
-            }
-
-            var cart = await db.Carts
-                .FirstAsync(x => x.Id == orderFromDb.CartId);
-
-            var cartProducts = await db.CartProducts
-                .Where(x => x.CartId == orderFromDb.CartId)
-                .Select(x => new CartProductServiceModel
-                {
-                    Count = x.Count,
-                    Grams = db.Packages.First(y => y.Id == x.PackageId).Grams,
-                    Flavour = db.Flavours.First(y => y.Id == x.FlavourId).FlavourName,
-                    ProductId = x.ProductId,
-                    Price = db.ProductsPackagesFlavours
-                        .First(y => y.FlavourId == x.FlavourId &&
-                        y.PackageId == x.PackageId &&
-                        y.ProductId == x.ProductId)
-                        .Price,
-                    Product = new ProductListingServiceModel
-                    {
-                        ProductId = x.Product!.ProductId,
-                        Name = x.Product.Name,
-                        Price = x.Product
-                        .ProductPackageFlavours
-                        .First(y => y.PackageId == x.PackageId &&
-                        y.ProductId == x.Product.ProductId &&
-                        y.FlavourId == x.FlavourId).Price,
-                        Categories = x.Product.ProductsCategories
-                             .Select(c => c.Category.Name)
-                             .ToList(),
-                        Quantity = x.Product.Quantity,
-                        PromotionId = x.Product.PromotionId,
-                        Brand = x.Product.Brand!.Name, // be aware,
-                    }
-                })
-                .ToListAsync();
-
-            await GetDiscountPercentageForTheProducts(cartProducts);
-
-            var cartModel = new CartServiceModel
-            {
-                Code = cart.Code,
-                OriginalPrice = cart.OriginalPrice,
-                TotalProducts = cart.TotalProducts,
-                TotalSaved = cart.TotalSaved,
-                CartProducts = cartProducts
-            };
-
-            var orderDetails = await this.GetOrderDetails(db, orderFromDb.OrderDetailsId);
-            var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
-
-            var order = new OrderServiceModel
-            {
-                Cart = cartModel,
-                IsConfirmed = orderFromDb.IsConfirmed,
-                IsFinished = orderFromDb.IsFinished,
-                MadeOn = orderDetails.MadeOn,
-                PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                IsPaid = orderDetails.IsPaid,
-                IsShipped = orderDetails.IsShipped,
-                Email = customerEmail,
-                CustomerName = customerName,
-                IBAN = config.GetSection("IBAN").Value,
-                City = city.CityName,
-                Country = country.CountryName,
-                Street = address.Street,
-                StreetNumber = address.StreetNumber,
-                ShippingPrice = cart.ShippingPrice ?? 0,
-                PhoneNumber = phoneNumber,
-                Comment = orderFromDb.Comment
-            };
-
-            if (orderDetails.InvoiceId != null)
-            {
-                var invoice = await db.Invoices
-                    .FirstAsync(x => x.Id == orderDetails.InvoiceId);
-
-                order.Invoice = mapper.Map<InvoiceServiceModel>(invoice); 
-                //new InvoiceServiceModel
-                //{
-                //    FirstName = invoice.FirstName,
-                //    LastName = invoice.LastName,
-                //    CompanyName = invoice.CompanyName,
-                //    Bullstat = invoice.Bullstat,
-                //    PersonInCharge = invoice.PersonInCharge,
-                //    PhoneNumber = invoice.PhoneNumber,
-                //    VAT = invoice.VAT
-                //};
-            }
-
-            return order;
-        }
-
-        public async Task<OrderServiceModel?> GetFinishedByAdmin(int orderId)
-        {
-            var orderFromDb = await this.GetOrder(db, orderId);
-
-            if (orderFromDb == null)
-                return null;
-
-            var (customerName, customerEmail, phoneNumber) = await this.GetCurrentOrderUserDetails(db, orderFromDb);
-
-            var cart = await db.Carts
-                .FirstAsync(x => x.Id == orderFromDb.CartId);
-
-            var cartProducts = await db.CartProducts
-                .Where(x => x.CartId == orderFromDb.CartId)
-                .Select(x => new CartProductServiceModel
-                {
-                    Count = x.Count,
-                    Grams = db.Packages.First(y => y.Id == x.PackageId).Grams,
-                    Flavour = db.Flavours.First(y => y.Id == x.FlavourId).FlavourName,
-                    ProductId = x.ProductId,
-                    Price = db.ProductsPackagesFlavours
-                        .First(y => y.FlavourId == x.FlavourId &&
-                        y.PackageId == x.PackageId &&
-                        y.ProductId == x.ProductId)
-                        .Price,
-                    Product = new ProductListingServiceModel
-                    {
-                        ProductId = x.Product!.ProductId,
-                        Name = x.Product.Name,
-                        Price = x.Product
-                        .ProductPackageFlavours
-                        .First(y => y.PackageId == x.PackageId &&
-                        y.ProductId == x.Product.ProductId &&
-                        y.FlavourId == x.FlavourId).Price,
-                        Categories = x.Product.ProductsCategories
-                             .Select(c => c.Category.Name)
-                             .ToList(),
-                        Quantity = x.Product.Quantity,
-                        PromotionId = x.Product.PromotionId,
-                        Brand = x.Product.Brand!.Name, // be aware,
-                    }
-                })
-                .ToListAsync();
-
-            await GetDiscountPercentageForTheProducts(cartProducts);
-
-            var cartModel = new CartServiceModel
-            {
-                Code = cart.Code,
-                OriginalPrice = cart.OriginalPrice,
-                TotalProducts = cart.TotalProducts,
-                TotalSaved = cart.TotalSaved,
-                CartProducts = cartProducts,
-                ShippingPrice = cart.ShippingPrice
-            };
-
-            var orderDetails = await this.GetOrderDetails(db, orderFromDb.OrderDetailsId);
-            var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
-
-            var order = new OrderServiceModel
-            {
-                Cart = cartModel,
-                IsConfirmed = orderFromDb.IsConfirmed,
-                IsFinished = orderFromDb.IsFinished,
-                MadeOn = orderDetails.MadeOn,
-                PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                IsPaid = orderDetails.IsPaid,
-                IsShipped = orderDetails.IsShipped,
-                Email = customerEmail,
-                CustomerName = customerName,
-                IBAN = config.GetSection("IBAN").Value,
-                City = city.CityName,
-                Country = country.CountryName,
-                Street = address.Street,
-                StreetNumber = address.StreetNumber,
-                ShippingPrice = cart.ShippingPrice ?? 0,
-                PhoneNumber = phoneNumber,
-                Comment = orderFromDb.Comment
-            };
-
-            if (orderDetails.InvoiceId != null)
-            {
-                var invoice = await db.Invoices
-                    .FirstAsync(x => x.Id == orderDetails.InvoiceId);
-
-                order.Invoice = new InvoiceServiceModel
-                {
-                    FirstName = invoice.FirstName,
-                    LastName = invoice.LastName,
-                    CompanyName = invoice.CompanyName,
-                    Bullstat = invoice.Bullstat,
-                    PersonInCharge = invoice.PersonInCharge,
-                    PhoneNumber = invoice.PhoneNumber,
-                    VAT = invoice.VAT
-                };
-            }
-
-            return order;
         }
 
         public async Task<AllOrdersServiceModel> Mine(int page, string? search)
@@ -443,67 +131,98 @@
             foreach (var userOrder in userOrders)
             {
                 var order = await this.GetOrder(db, userOrder.OrderId);
-
-                var orderDetails = await this.GetOrderDetails(db, order!.OrderDetailsId);
-
-                var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
-
-                var cart = await db.Carts
-                    .FindAsync(order.CartId);
-
-                var profile = await db.Profiles
-                    .FirstAsync(x => x.UserId == userOrder.ProfileId);
-
-                var user = await db.Users
-                    .FirstAsync(x => x.Id == userOrder.ProfileId);
-
-                var orderModel = new OrderListingServiceModel
-                {
-                    CustomerName = profile.Name ?? "",
-                    City = city != null ? city!.CityName : "",
-                    Country = country != null ? country!.CountryName : "",
-                    IsConfirmed = order.IsConfirmed,
-                    IsFinished = order.IsFinished,
-                    IsShipped = orderDetails.IsShipped,
-                    IsPaid = orderDetails.IsPaid,
-                    OrderId = order.Id,
-                    MadeOn = orderDetails.MadeOn,
-                    PaymentMethod = orderDetails.PaymentMethod.ToString(),
-                    TotalPrice = cart!.TotalProducts + (cart.ShippingPrice ?? 0),
-                    PhoneNumber = user.PhoneNumber,
-                    Email = user.Email,
-                    IsAnonymous = false
-                };
+                var orderModel = await OrderFactory.CreateOrderListingServiceModelAsync(order!,
+                    db,
+                    getAddressCityCountryFunc,
+                    getOrderDetailsFunc);
 
                 allOrders.Orders.Add(orderModel);
 
+                var cart = await db.Carts.FindAsync(order!.CartId);
 
-                allOrders.TotalDiscounts += cart!.TotalSaved; // be aware
-                allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
-                allOrders.TotalProducts += await db.CartProducts
-                                                .Where(x => x.CartId == cart.Id)
-                                                .CountAsync();
-                allOrders.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
+                await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.ToLower();
-
-                allOrders.Orders = allOrders.Orders
-                    .Where(x => $"{x.OrderId}" == search ||
-                    x.PhoneNumber.ToLower().Contains(search) ||
-                    x.CustomerName.ToLower().Contains(search))
-                    .OrderByDescending(x => x.MadeOn)
-                    .ToList();
-            }
-
-            allOrders.Orders = allOrders.Orders
-                .Skip((page - 1) * OrdersPerPage)
-                .Take(OrdersPerPage)
-                .ToList();
+            allOrders = this.FilterAllOrdersModel(allOrders, search, page);
 
             return allOrders;
+        }
+
+        public async Task<OrderServiceModel?> GetFinishedOrder(int orderId, string? token)
+        {
+            var orderFromDb = await this.GetOrder(db, orderId);
+
+            if (orderFromDb == null)
+                return null;
+
+            var (customerName, customerEmail, phoneNumber) = await this.GetCurrentOrderUserDetailsByUser(db,
+                orderFromDb,
+                currentUserService,
+                token);
+
+            var cart = await db.Carts
+                .FirstAsync(x => x.Id == orderFromDb.CartId);
+
+            var cartModel = await CartFactory.CreateCartServiceModelAsync(cart,
+                db,
+                customerName,
+                customerEmail,
+                phoneNumber);
+
+            var orderDetails = await this.GetOrderDetails(db, orderFromDb.OrderDetailsId);
+            var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
+
+            var order = await OrderFactory.CreateOrderServiceModelAsync(db,
+                mapper,
+                cartModel,
+                orderFromDb,
+                orderDetails,
+                city,
+                country,
+                address,
+                customerEmail,
+                customerName,
+                config.GetSection("IBAN").Value,
+                phoneNumber);
+
+            return order;
+        }
+
+        public async Task<OrderServiceModel?> GetFinishedByAdmin(int orderId)
+        {
+            var orderFromDb = await this.GetOrder(db, orderId);
+
+            if (orderFromDb == null)
+                return null;
+
+            var (customerName, customerEmail, phoneNumber) = await this.GetCurrentOrderUserDetailsByAdmin(db, orderFromDb);
+
+            var cart = await db.Carts
+                .FirstAsync(x => x.Id == orderFromDb.CartId);
+
+            var cartModel = await CartFactory.CreateCartServiceModelAsync(cart,
+                db,
+                customerName,
+                customerEmail,
+                phoneNumber);
+
+            var orderDetails = await this.GetOrderDetails(db, orderFromDb.OrderDetailsId);
+            var (address, city, country) = await this.GetAddressCityCountry(db, orderDetails);
+
+            var order = await OrderFactory.CreateOrderServiceModelAsync(db,
+                mapper,
+                cartModel,
+                orderFromDb,
+                orderDetails,
+                city,
+                country,
+                address,
+                customerEmail,
+                customerName,
+                config.GetSection("IBAN").Value,
+                phoneNumber);
+
+            return order;
         }
 
         public async Task<bool> ConfirmOrder(int orderId)
@@ -536,21 +255,10 @@
                     product.Quantity -= cartProduct.Count;
                     productPackageFlavour.Quantity -= cartProduct.Count;
 
-                    if (product.Quantity < 20)
-                    {
-                        lowStocks.Add(new LowInStockServiceModel
-                        {
-                            Name = product.Name,
-                            ProductId = product.ProductId,
-                            Quantity = (int)product.Quantity!
-                        });
-                    }
+                    this.CheckForLowStock(product, lowStocks);
                 }
 
-                foreach (var product in lowStocks)
-                {
-                    await notificationService.SendLowInStockNotification(product.Name, product.ProductId, product.Quantity, $"#000000{orderId}");
-                }
+                await this.SendLowStockNotifications(lowStocks, notificationService, orderId);
 
                 await notificationService.SendNotificationToAdmin("success", $"Order #000000{order.Id} Has Just Been Confirmed!");
 
@@ -608,41 +316,7 @@
             {
                 if (productPackageFlavour.Price >= price)
                 {
-                    var product = await db.Products
-                        .FirstAsync(x => x.ProductId == productPackageFlavour.ProductId);
-
-                    var flavour = await db.Flavours
-                        .FirstAsync(x => x.Id == productPackageFlavour.FlavourId);
-
-                    var package = await db.Packages
-                        .FirstAsync(x => x.Id == productPackageFlavour.PackageId);
-
-                    var promotion = await db.Promotions
-                        .FirstOrDefaultAsync(x => x.PromotionId == product.PromotionId);
-
-                    decimal discountPercentage = 0;
-
-                    if (promotion != null && promotion.DiscountPercentage != null)
-                    {
-                        discountPercentage = (decimal)promotion.DiscountPercentage;
-                    }
-                    else if (promotion != null && promotion.DiscountAmount != null)
-                    {
-                        discountPercentage = (decimal)promotion.DiscountAmount * 100 / productPackageFlavour.Price; ;
-                    }
-
-                    var productModel = new OrderRelatedProductServiceModel
-                    {
-                        ProductId = product.ProductId,
-                        Name = product.Name,
-                        Price = productPackageFlavour.Price,
-                        Flavour = flavour.FlavourName,
-                        Grams = package.Grams,
-                        Quantity = productPackageFlavour.Quantity,
-                        PromotionId = product.PromotionId,
-                        DiscountPercentage = discountPercentage
-                    };
-
+                    var productModel = await ProductFactory.CreateOrderRelatedProductModelAsync(db, productPackageFlavour);
                     relatedProducts.Products.Add(productModel);
                 }
             }
@@ -653,28 +327,6 @@
                 .ToList();
 
             return relatedProducts;
-        }
-
-        private async Task GetDiscountPercentageForTheProducts(List<CartProductServiceModel> cartProducts)
-        {
-            foreach (var product in cartProducts)
-            {
-                if (product.Product!.PromotionId != null)
-                {
-                    var promotion = await db.Promotions
-                        .FirstAsync(x => x.PromotionId == product.Product.PromotionId);
-
-                    if (promotion.DiscountPercentage != null)
-                    {
-                        product.Product.DiscountPercentage = promotion.DiscountPercentage;
-                    }
-
-                    if (promotion.DiscountAmount != null)
-                    {
-                        product.Product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Product.Price;
-                    }
-                }
-            }
         }
 
         public async Task<bool> ChangeStatuses(int orderId, bool isFinished, bool isPaid, bool isShipped, bool isConfirmed)

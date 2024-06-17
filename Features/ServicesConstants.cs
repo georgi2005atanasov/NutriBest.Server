@@ -27,6 +27,9 @@
             public const double MaxPrice = 4000;
             public const double MinQuantity = 0;
             public const double MaxQuantity = 1000;
+            public const double StockLowPriority = 20;
+            public const double StockMediumPriority = 10;
+            public const double StockHighPriority = 5;
         }
 
         public class NutritionFacts

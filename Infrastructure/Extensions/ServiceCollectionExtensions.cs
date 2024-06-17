@@ -29,6 +29,7 @@
     using NutriBest.Server.Features.ShippingDiscounts;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.Newsletter;
+    using NutriBest.Server.Features.Reports;
 
     public static class ServiceCollectionExtensions
     {
@@ -62,7 +63,8 @@
                 .AddTransient<IOrderService, OrderService>()
                 .AddTransient<IShippingDiscountService, ShippingDiscountService>()
                 .AddTransient<INotificationService, NotificationService>()
-                .AddTransient<INewsletterService, NewsletterService>();
+                .AddTransient<INewsletterService, NewsletterService>()
+                .AddTransient<IReportService, ReportService>();
 
             return services;
         }

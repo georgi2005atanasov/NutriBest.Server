@@ -60,6 +60,16 @@
                         StreetNumber = streetNumber
                     };
                 }
+                else
+                {
+                    address.City = city;
+                    address.CityId = city.Id;
+                    address.Country = country;
+                    address.CountryId = country.Id;
+                    address.IsAnonymous = profileId == null;
+                    address.Street = street;
+                    address.StreetNumber = streetNumber;
+                }
 
                 var orderDetails = new OrderDetails
                 {
