@@ -86,7 +86,7 @@
             return cart.Id;
         }
 
-        public async Task<AllOrdersServiceModel> All(int page, string? search)
+        public async Task<AllOrdersServiceModel> All(int page, string? search, string? filters)
         {
             var orders = db.Orders
                 .Where(x => !x.IsDeleted)
@@ -95,7 +95,6 @@
 
             var allOrders = new AllOrdersServiceModel()
             {
-                TotalOrders = await orders.CountAsync()
             };
 
             foreach (var order in orders)
@@ -112,7 +111,8 @@
                 await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            allOrders = this.FilterAllOrdersModel(allOrders, search, page);
+            allOrders.TotalOrders = allOrders.Orders.Count;
+            allOrders = this.FilterAllOrdersModel(allOrders, search, page, filters);
 
             return allOrders;
         }
@@ -143,7 +143,7 @@
                 await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            allOrders = this.FilterAllOrdersModel(allOrders, search, page);
+            allOrders = this.FilterAllOrdersModel(allOrders, search, page, "");
 
             return allOrders;
         }

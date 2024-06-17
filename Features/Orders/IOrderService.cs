@@ -11,7 +11,7 @@
             string? code,
             List<CartProductServiceModel> cartProducts);
 
-        Task<AllOrdersServiceModel> All(int page, string? search);
+        Task<AllOrdersServiceModel> All(int page, string? search, string? filters);
 
         Task<AllOrdersServiceModel> Mine(int page, string? search);
 

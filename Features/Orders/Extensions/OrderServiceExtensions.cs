@@ -123,7 +123,8 @@
         public static AllOrdersServiceModel FilterAllOrdersModel(this IOrderService service,
             AllOrdersServiceModel allOrders,
             string? search,
-            int page)
+            int page,
+            string? filters)
         {
             if (!string.IsNullOrEmpty(search))
             {
@@ -135,6 +136,32 @@
                     x.CustomerName.ToLower().Contains(search))
                     .OrderByDescending(x => x.MadeOn)
                     .ToList();
+            }
+
+            if (!string.IsNullOrEmpty(filters))
+            {
+                List<OrderListingServiceModel> filteredOrders = new List<OrderListingServiceModel>();
+
+                var allFilters = filters.Split(" ");
+
+                if (allFilters.Contains("Finished"))
+                {
+                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsFinished));
+                }
+                if (allFilters.Contains("Confirmed"))
+                {
+                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsConfirmed));
+                }
+                if (allFilters.Contains("Paid"))
+                {
+                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsPaid));
+                }
+                if (allFilters.Contains("Shipped"))
+                {
+                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsAnonymous));
+                }
+
+                allOrders.Orders = filteredOrders;
             }
 
             allOrders.Orders = allOrders.Orders

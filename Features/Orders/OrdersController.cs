@@ -17,11 +17,12 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<AllOrdersServiceModel>> All([FromQuery] string? search,
-            [FromQuery] int page = 1)
+            [FromQuery] int page = 1,
+            [FromQuery] string? filters = "")
         {
             try
             {
-                var allOrders = await orderService.All(page, search);
+                var allOrders = await orderService.All(page, search, filters);
 
                 return Ok(allOrders);
             }
