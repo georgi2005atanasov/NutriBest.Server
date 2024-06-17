@@ -29,7 +29,7 @@
             this.userManager = userManager;
         }
 
-        public async Task<AllProfilesServiceModel> All(int page, string? search)
+        public async Task<AllProfilesServiceModel> All(int page, string? search, string? groupType)
         {
             var profiles = db.Profiles
                 .OrderByDescending(x => x.CreatedOn)
@@ -40,11 +40,6 @@
                 TotalUsers = profiles.Count(),
                 Profiles = new List<ProfileListingServiceModel>()
             };
-
-            profiles = profiles
-                .Skip((page - 1) * UsersPerPage)
-                .Take(UsersPerPage)
-                .AsQueryable();
 
             foreach (var profile in profiles)
             {
@@ -80,7 +75,8 @@
                     IsDeleted = profile.IsDeleted
                 };
 
-                allProfiles.Profiles.Add(profileModel);
+                await CheckGroupType(profileModel, allProfiles.Profiles, groupType); // this also adds the entity to
+                //the colleciton if it is valid
             }
 
             if (search != null)
@@ -93,10 +89,16 @@
                     (x.City != null && x.City.ToLower().Contains(search)) ||
                     (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
                     (x.Name != null && x.Name.ToLower().Contains(search)) ||
+                    x.UserName.ToLower().Contains(search) ||
                     x.Roles.ToLower().Contains(search))
                     .OrderByDescending(x => x.MadeOn)
                     .ToList();
             }
+
+            allProfiles.Profiles = allProfiles.Profiles
+                .Skip((page - 1) * UsersPerPage)
+                .Take(UsersPerPage)
+                .ToList();
 
             return allProfiles;
         }
@@ -235,7 +237,7 @@
                 user.Email = email;
                 user.NormalizedEmail = email.ToUpper();
             }
-            
+
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -365,6 +367,32 @@
             }
 
             return totalSpent;
+        }
+
+        private async Task CheckGroupType(ProfileListingServiceModel profileModel, List<ProfileListingServiceModel> profilesToReturn, string? groupType)
+        {
+            switch (groupType)
+            {
+                case "withOrders":
+                    var userOrder = await db.UsersOrders
+                       .FirstOrDefaultAsync(x => x.CreatedBy == profileModel.UserName);
+                    if (userOrder != null)
+                    {
+                        profilesToReturn.Add(profileModel);
+                    }
+                    break;
+                case "withoutOrders":
+                    userOrder = await db.UsersOrders
+                       .FirstOrDefaultAsync(x => x.CreatedBy == profileModel.UserName);
+                    if (userOrder == null)
+                    {
+                        profilesToReturn.Add(profileModel);
+                    }
+                    break;
+                default:
+                    profilesToReturn.Add(profileModel);
+                    break;
+            }
         }
     }
 }

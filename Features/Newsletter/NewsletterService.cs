@@ -129,47 +129,15 @@
             switch (groupType)
             {
                 case "withOrders":
-                    if (subscriberModel.IsAnonymous)
+                    if (subscriberModel.HasOrders)
                     {
-                        var guestOrder = await db.GuestsOrders
-                            .FirstOrDefaultAsync(x => x.Email == subscriberModel.Email);
-
-                        if (guestOrder != null)
-                        {
-                            subscribersToReturn.Add(subscriberModel);
-                        }
-                    }
-                    else
-                    {
-                        var userOrder = await db.UsersOrders
-                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriberModel.Email);
-
-                        if (userOrder != null)
-                        {
-                            subscribersToReturn.Add(subscriberModel);
-                        }
+                        subscribersToReturn.Add(subscriberModel);
                     }
                     break;
                 case "withoutOrders":
-                    if (subscriberModel.IsAnonymous)
+                    if (!subscriberModel.HasOrders)
                     {
-                        var guestOrder = await db.GuestsOrders
-                            .FirstOrDefaultAsync(x => x.Email == subscriberModel.Email);
-
-                        if (guestOrder == null)
-                        {
-                            subscribersToReturn.Add(subscriberModel);
-                        }
-                    }
-                    else
-                    {
-                        var userOrder = await db.UsersOrders
-                           .FirstOrDefaultAsync(x => x.CreatedBy == subscriberModel.Email);
-
-                        if (userOrder == null)
-                        {
-                            subscribersToReturn.Add(subscriberModel);
-                        }
+                        subscribersToReturn.Add(subscriberModel);
                     }
                     break;
                 case "guests":

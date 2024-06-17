@@ -28,11 +28,13 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/Profiles")]
-        public async Task<ActionResult<AllProfilesServiceModel?>> All([FromQuery] int page, [FromQuery] string? search)
+        public async Task<ActionResult<AllProfilesServiceModel?>> All([FromQuery] int page, 
+            [FromQuery] string? search,
+            [FromQuery] string? groupType)
         {
             try
             {
-                var allProfiles = await profileService.All(page, search);
+                var allProfiles = await profileService.All(page, search, groupType);
                 return allProfiles;
             }
             catch (Exception)

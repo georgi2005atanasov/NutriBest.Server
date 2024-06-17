@@ -93,9 +93,7 @@
                 .OrderByDescending(x => x.OrderDetails!.MadeOn)
                 .AsQueryable();
 
-            var allOrders = new AllOrdersServiceModel()
-            {
-            };
+            var allOrders = new AllOrdersServiceModel();
 
             foreach (var order in orders)
             {

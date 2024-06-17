@@ -4,7 +4,7 @@
 
     public interface IProfileService
     {
-        Task<AllProfilesServiceModel> All(int page, string? search);
+        Task<AllProfilesServiceModel> All(int page, string? search, string? groupType);
 
         Task<ProfileDetailsServiceModel> GetDetailsById(string id);
 
