@@ -4,8 +4,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Packages.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class PackageService : IPackageService
+    public class PackageService : IPackageService, ITransientService
     {
         private readonly NutriBestDbContext db;
 

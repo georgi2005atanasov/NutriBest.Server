@@ -7,11 +7,12 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Profile.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using System.Linq;
     using static ServicesConstants.PaginationConstants;
 
-    public class ProfileService : IProfileService
+    public class ProfileService : IProfileService, ITransientService
     {
         private readonly IIdentityService identityService;
         private readonly ICurrentUserService currentUser;

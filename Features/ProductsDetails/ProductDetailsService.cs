@@ -6,8 +6,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.ProductsDetails.Models;
     using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class ProductDetailsService : IProductDetailsService
+    public class ProductDetailsService : IProductDetailsService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IPromotionService promotionService;

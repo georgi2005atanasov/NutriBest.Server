@@ -4,8 +4,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class ProductPromotionService : IProductPromotionService
+    public class ProductPromotionService : IProductPromotionService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly ICategoryService categoryService;

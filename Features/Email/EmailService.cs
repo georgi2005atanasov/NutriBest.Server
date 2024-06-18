@@ -9,8 +9,9 @@
     using NutriBest.Server.Features.Email.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.PromoCodes;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class EmailService : IEmailService
+    public class EmailService : IEmailService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IConfiguration config;

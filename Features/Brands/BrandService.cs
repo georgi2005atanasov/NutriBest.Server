@@ -6,9 +6,10 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using System.Collections.Generic;
 
-    public class BrandService : IBrandService
+    public class BrandService : IBrandService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IImageService imageService;

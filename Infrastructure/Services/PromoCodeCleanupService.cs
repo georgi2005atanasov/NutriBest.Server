@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
 
-    public class PromoCodeCleanupService : BackgroundService
+    public class PromoCodeCleanupService : BackgroundService, Infrastructure.Extensions.ServicesInterfaces.IHostedService
     {
         //this is background service that ensures the promo codes are valid within 10 days from their creation
         private readonly IServiceProvider serviceProvider;

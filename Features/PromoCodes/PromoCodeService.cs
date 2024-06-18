@@ -5,8 +5,9 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.PromoCodes.Extensions;
     using NutriBest.Server.Features.PromoCodes.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class PromoCodeService : IPromoCodeService
+    public class PromoCodeService : IPromoCodeService, ITransientService
     {
         private readonly NutriBestDbContext db;
 

@@ -8,12 +8,13 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Profile.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
 
-    public class IdentityService : IIdentityService
+    public class IdentityService : IIdentityService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;

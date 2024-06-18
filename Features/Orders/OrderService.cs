@@ -5,17 +5,16 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Orders.Models;
-    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Infrastructure.Services;
-    using static ServicesConstants.PaginationConstants;
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.Notifications;
     using AutoMapper;
     using NutriBest.Server.Features.Orders.Factories;
     using NutriBest.Server.Features.Carts.Factories;
     using NutriBest.Server.Features.Products.Factories;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class OrderService : IOrderService
+    public class OrderService : IOrderService, ITransientService
     {
         protected readonly NutriBestDbContext db;
         private readonly ICurrentUserService currentUserService;

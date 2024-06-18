@@ -3,8 +3,9 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Images.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class ImageService : IImageService
+    public class ImageService : IImageService, ITransientService
     {
         private readonly NutriBestDbContext db;
 

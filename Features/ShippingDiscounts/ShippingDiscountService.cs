@@ -4,8 +4,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class ShippingDiscountService : IShippingDiscountService
+    public class ShippingDiscountService : IShippingDiscountService, ITransientService
     {
         private readonly NutriBestDbContext db;
 

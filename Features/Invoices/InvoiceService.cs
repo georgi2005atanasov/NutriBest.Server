@@ -1,6 +1,8 @@
 ﻿namespace NutriBest.Server.Features.Invoices
 {
-    public class InvoiceService : IInvoiceService
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+
+    public class InvoiceService : IInvoiceService, ITransientService
     {
         public Task<int> Create()
         {

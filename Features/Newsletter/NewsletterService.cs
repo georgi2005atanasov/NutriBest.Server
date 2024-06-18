@@ -5,12 +5,12 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
-    using NutriBest.Server.Features.Email.Models;
     using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Features.Newsletter.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
 
-    public class NewsletterService : INewsletterService
+    public class NewsletterService : INewsletterService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;

@@ -2,7 +2,7 @@
 {
     using NutriBest.Server.Data;
 
-    public class PromotionCleanupService : BackgroundService
+    public class PromotionCleanupService : BackgroundService, Infrastructure.Extensions.ServicesInterfaces.IHostedService
     {
         private readonly IServiceProvider serviceProvider;
         private readonly TimeSpan interval = TimeSpan.FromHours(1);

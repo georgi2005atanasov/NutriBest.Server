@@ -5,8 +5,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Admin.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class AdminService : IAdminService
+    public class AdminService : IAdminService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;

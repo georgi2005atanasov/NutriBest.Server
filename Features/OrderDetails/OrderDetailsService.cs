@@ -5,8 +5,9 @@
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Invoices.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class OrderDetailsService : IOrderDetailsService
+    public class OrderDetailsService : IOrderDetailsService, ITransientService
     {
         private readonly NutriBestDbContext db;
 

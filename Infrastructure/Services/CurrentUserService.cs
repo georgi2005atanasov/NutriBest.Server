@@ -1,10 +1,10 @@
-﻿
-namespace NutriBest.Server.Infrastructure.Services
+﻿namespace NutriBest.Server.Infrastructure.Services
 {
     using NutriBest.Server.Infrastructure.Extensions;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using System.Security.Claims;
 
-    public class CurrentUserService : ICurrentUserService
+    public class CurrentUserService : ICurrentUserService, IScopedService
     {
         private readonly ClaimsPrincipal user;
 

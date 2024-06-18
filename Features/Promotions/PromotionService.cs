@@ -9,9 +9,10 @@
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using System.Collections.Generic;
 
-    public class PromotionService : IPromotionService
+    public class PromotionService : IPromotionService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IMapper mapper;

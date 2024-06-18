@@ -8,10 +8,11 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications.Hubs;
     using NutriBest.Server.Features.Notifications.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
     using static ServicesConstants.Product;
 
-    public class NotificationService : INotificationService
+    public class NotificationService : INotificationService, ITransientService
     {
         private readonly IHubContext<NotificationHub> hubContext;
         private readonly NutriBestDbContext db;

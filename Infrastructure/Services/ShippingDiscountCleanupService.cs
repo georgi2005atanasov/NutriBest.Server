@@ -3,7 +3,7 @@ using NutriBest.Server.Data;
 
 namespace NutriBest.Server.Infrastructure.Services
 {
-    public class ShippingDiscountCleanupService : BackgroundService
+    public class ShippingDiscountCleanupService : BackgroundService, Infrastructure.Extensions.ServicesInterfaces.IHostedService
     {
         private readonly IServiceProvider serviceProvider;
         private readonly TimeSpan interval = TimeSpan.FromHours(1);

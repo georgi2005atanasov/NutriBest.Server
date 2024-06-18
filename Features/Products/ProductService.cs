@@ -9,11 +9,12 @@
     using NutriBest.Server.Features.Products.Factories;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using System.Globalization;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
-    public class ProductService : IProductService
+    public class ProductService : IProductService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IPromotionService promotionService;

@@ -5,8 +5,9 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.NutritionsFacts.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
-    public class NutritionFactsService : INutritionFactsService
+    public class NutritionFactsService : INutritionFactsService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IMapper mapper;

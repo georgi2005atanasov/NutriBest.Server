@@ -30,43 +30,72 @@
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.Newsletter;
     using NutriBest.Server.Features.Reports;
+    using System.Reflection;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
     public static class ServiceCollectionExtensions
     {
+        //public static IServiceCollection AddServices(this IServiceCollection services)
+        //{
+        //    services
+        //        .AddHostedService<PromoCodeCleanupService>()
+        //        .AddHostedService<PromotionCleanupService>()
+        //        .AddHostedService<PromotionActivationService>()
+        //        .AddHostedService<ShippingDiscountCleanupService>()
+        //        .AddScoped<IEmailService, EmailService>()
+        //        .AddScoped<ICurrentUserService, CurrentUserService>()
+        //        .AddTransient<IAdminService, AdminService>()
+        //        .AddTransient<IIdentityService, IdentityService>()
+        //        .AddTransient<IProfileService, ProfileService>()
+        //        .AddTransient<IProductService, ProductService>()
+        //        .AddTransient<IProductDetailsService, ProductDetailsService>()
+        //        .AddTransient<INutritionFactsService, NutritionFactsService>()
+        //        .AddTransient<IPromotionService, PromotionService>()
+        //        .AddTransient<IProductPromotionService, ProductPromotionService>()
+        //        .AddTransient<ICartService, CartService>()
+        //        .AddTransient<IImageService, ImageService>()
+        //        .AddTransient<ICategoryService, CategoryService>()
+        //        .AddTransient<IBrandService, BrandService>()
+        //        .AddTransient<IFlavourService, FlavourService>()
+        //        .AddTransient<IPackageService, PackageService>()
+        //        .AddTransient<IPromoCodeService, PromoCodeService>()
+        //        .AddTransient<IOrderDetailsService, OrderDetailsService>()
+        //        .AddTransient<IGuestOrderService, GuestOrderService>()
+        //        .AddTransient<IUserOrderService, UserOrderService>()
+        //        .AddTransient<IOrderService, OrderService>()
+        //        .AddTransient<IShippingDiscountService, ShippingDiscountService>()
+        //        .AddTransient<INotificationService, NotificationService>()
+        //        .AddTransient<INewsletterService, NewsletterService>()
+        //        .AddTransient<IReportService, ReportService>();
+
+        //    return services;
+        //}
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services
-                .AddHostedService<PromoCodeCleanupService>()
-                .AddHostedService<PromotionCleanupService>()
-                .AddHostedService<PromotionActivationService>()
-                .AddHostedService<ShippingDiscountCleanupService>()
-                .AddScoped<IEmailService, EmailService>()
-                .AddScoped<ICurrentUserService, CurrentUserService>()
-                .AddTransient<IAdminService, AdminService>()
-                .AddTransient<IIdentityService, IdentityService>()
-                .AddTransient<IProfileService, ProfileService>()
-                .AddTransient<IProductService, ProductService>()
-                .AddTransient<IProductDetailsService, ProductDetailsService>()
-                .AddTransient<INutritionFactsService, NutritionFactsService>()
-                .AddTransient<IPromotionService, PromotionService>()
-                .AddTransient<IProductPromotionService, ProductPromotionService>()
-                .AddTransient<ICartService, CartService>()
-                .AddTransient<IImageService, ImageService>()
-                .AddTransient<ICategoryService, CategoryService>()
-                .AddTransient<IBrandService, BrandService>()
-                .AddTransient<IFlavourService, FlavourService>()
-                .AddTransient<IPackageService, PackageService>()
-                .AddTransient<IPromoCodeService, PromoCodeService>()
-                .AddTransient<IOrderDetailsService, OrderDetailsService>()
-                .AddTransient<IGuestOrderService, GuestOrderService>()
-                .AddTransient<IUserOrderService, UserOrderService>()
-                .AddTransient<IOrderService, OrderService>()
-                .AddTransient<IShippingDiscountService, ShippingDiscountService>()
-                .AddTransient<INotificationService, NotificationService>()
-                .AddTransient<INewsletterService, NewsletterService>()
-                .AddTransient<IReportService, ReportService>();
+            var assembly = Assembly.GetExecutingAssembly(); // Or use a specific assembly if needed
+
+            RegisterServices(services, assembly, typeof(IHostedService), ServiceLifetime.Singleton);
+
+            RegisterServices(services, assembly, typeof(IScopedService), ServiceLifetime.Scoped);
+
+            RegisterServices(services, assembly, typeof(ITransientService), ServiceLifetime.Transient);
 
             return services;
+        }
+
+        private static void RegisterServices(IServiceCollection services, Assembly assembly, Type interfaceType, ServiceLifetime lifetime)
+        {
+            var types = assembly.GetTypes()
+                                .Where(t => t.GetInterfaces().Contains(interfaceType) && !t.IsAbstract && !t.IsInterface);
+
+            foreach (var implementationType in types)
+            {
+                var serviceType = implementationType.GetInterfaces().FirstOrDefault(i => i != interfaceType);
+                if (serviceType != null)
+                {
+                    services.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
+                }
+            }
         }
 
         public static IServiceCollection AddIdentity(this IServiceCollection services)
