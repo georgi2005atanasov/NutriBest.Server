@@ -7,7 +7,7 @@
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
 
-    public class GuestOrderService :  OrderService, IGuestOrderService, ITransientService
+    public class GuestOrderService : OrderService, IGuestOrderService, ITransientService
     {
         public GuestOrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,

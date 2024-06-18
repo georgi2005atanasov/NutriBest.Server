@@ -42,22 +42,14 @@
                     Product = new ProductListingServiceModel
                     {
                         ProductId = y.Key,
-                        Name = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ? 
-                        db.Products.First(x => x.ProductId == y.Key).Name :
-                        "",
-                        Price = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).StartingPrice :
-                        0,
+                        Name = db.Products.First(x => x.ProductId == y.Key).Name,
+                        Price = db.Products.First(x => x.ProductId == y.Key).StartingPrice,
                         Categories = db.ProductsCategories
                              .Where(x => x.ProductId == y.Key)
                              .Select(c => c.Category.Name)
                              .ToList(),
-                        Quantity = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).Quantity :
-                        0,
-                        PromotionId = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).PromotionId :
-                        -1,
+                        Quantity = db.Products.First(x => x.ProductId == y.Key).Quantity,
+                        PromotionId = db.Products.First(x => x.ProductId == y.Key).PromotionId
                     },
                     SoldCount = db.CartProducts
                     .Where(x => x.ProductId == y.Key)
@@ -146,22 +138,14 @@
                     Product = new ProductListingServiceModel
                     {
                         ProductId = y.Key,
-                        Name = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).Name :
-                        "",
-                        Price = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).StartingPrice :
-                        0,
+                        Name = db.Products.First(x => x.ProductId == y.Key).Name,
+                        Price = db.Products.First(x => x.ProductId == y.Key).StartingPrice,
                         Categories = db.ProductsCategories
                              .Where(x => x.ProductId == y.Key)
                              .Select(c => c.Category.Name)
                              .ToList(),
-                        Quantity = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).Quantity :
-                        0,
-                        PromotionId = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
-                        db.Products.First(x => x.ProductId == y.Key).PromotionId :
-                        -1,
+                        Quantity = db.Products.First(x => x.ProductId == y.Key).Quantity,
+                        PromotionId = db.Products.First(x => x.ProductId == y.Key).PromotionId
                     },
                     SoldCount = db.CartProducts
                     .Where(x => x.ProductId == y.Key)

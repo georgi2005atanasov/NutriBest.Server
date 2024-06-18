@@ -10,7 +10,7 @@
     using NutriBest.Server.Infrastructure.Services;
     using System.Threading.Tasks;
 
-    public class UserOrderService : OrderService, IUserOrderService, ITransientService
+    public class UserOrderService : OrderService, ITransientService, IUserOrderService
     {
         public UserOrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,

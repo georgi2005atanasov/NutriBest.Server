@@ -72,12 +72,12 @@
         //}
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddTransient<IUserOrderService, UserOrderService>(); // Direct registration for troubleshooting
+
             var assembly = Assembly.GetExecutingAssembly(); // Or use a specific assembly if needed
 
             RegisterServices(services, assembly, typeof(IHostedService), ServiceLifetime.Singleton);
-
             RegisterServices(services, assembly, typeof(IScopedService), ServiceLifetime.Scoped);
-
             RegisterServices(services, assembly, typeof(ITransientService), ServiceLifetime.Transient);
 
             return services;
@@ -86,13 +86,14 @@
         private static void RegisterServices(IServiceCollection services, Assembly assembly, Type interfaceType, ServiceLifetime lifetime)
         {
             var types = assembly.GetTypes()
-                                .Where(t => t.GetInterfaces().Contains(interfaceType) && !t.IsAbstract && !t.IsInterface);
+                                .Where(t => t.GetInterfaces().Any(i => i == interfaceType) && !t.IsAbstract && !t.IsInterface);
 
             foreach (var implementationType in types)
             {
-                var serviceType = implementationType.GetInterfaces().FirstOrDefault(i => i != interfaceType);
+                var serviceType = implementationType.GetInterfaces().LastOrDefault(i => i != interfaceType);
                 if (serviceType != null)
                 {
+                    Console.WriteLine($"Registering service: {serviceType.Name} implemented by {implementationType.Name} as {lifetime}");
                     services.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
                 }
             }
