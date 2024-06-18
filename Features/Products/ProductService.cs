@@ -123,7 +123,6 @@
 
             foreach (var spec in productSpecs)
             {
-
                 if (!decimal.TryParse(spec.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
                     throw new FormatException($"Invalid price format: {spec.Price}");
 
@@ -521,5 +520,14 @@
 
             return priceWithQuantityModel;
         }
+
+        //public Task<bool> BuldEdit(string category, 
+        //    string brand, 
+        //    bool hasPromotion, 
+        //    decimal priceChange, 
+        //    decimal quantityChange)
+        //{
+
+        //}
     }
 }

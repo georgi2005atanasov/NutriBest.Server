@@ -495,6 +495,41 @@
             }
         }
 
+        //[HttpPut]
+        //[Route("BulkEdit")]
+        //public async Task<ActionResult> BulkEdit([FromBody] BulkEditServiceModel bulkModel)
+        //{
+        //    decimal priceChange;
+
+        //    if (!decimal.TryParse(bulkModel.PriceChange, NumberStyles.Any, CultureInfo.InvariantCulture, out priceChange))
+        //        return BadRequest(new
+        //        {
+        //            Key = "PriceChange",
+        //            Message = "Price Change Must Be a Number!"
+        //        });
+
+        //    try
+        //    {
+        //        var result = await productService.BuldEdit(bulkModel.Category,
+        //            bulkModel.Brand,
+        //            bulkModel.HasPromotion,
+        //            priceChange,
+        //            bulkModel.QuantityChange);
+
+        //        return Ok(new
+        //        {
+        //            IsSuccess = true
+        //        });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            IsSuccess = false
+        //        });
+        //    }
+        //}
+
         private bool ProductExists(string productName)
         {
             var products = db.Products

@@ -126,32 +126,35 @@
 
         private async Task CheckGroupType(SubscriberServiceModel subscriberModel, List<SubscriberServiceModel> subscribersToReturn, string? groupType)
         {
-            switch (groupType)
+            await Task.Run(() =>
             {
-                case "withOrders":
-                    if (subscriberModel.HasOrders)
-                    {
+                switch (groupType)
+                {
+                    case "withOrders":
+                        if (subscriberModel.HasOrders)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                        break;
+                    case "withoutOrders":
+                        if (!subscriberModel.HasOrders)
+                        {
+                            subscribersToReturn.Add(subscriberModel);
+                        }
+                        break;
+                    case "guests":
+                        if (subscriberModel.IsAnonymous)
+                            subscribersToReturn.Add(subscriberModel);
+                        break;
+                    case "users":
+                        if (!subscriberModel.IsAnonymous)
+                            subscribersToReturn.Add(subscriberModel);
+                        break;
+                    default:
                         subscribersToReturn.Add(subscriberModel);
-                    }
-                    break;
-                case "withoutOrders":
-                    if (!subscriberModel.HasOrders)
-                    {
-                        subscribersToReturn.Add(subscriberModel);
-                    }
-                    break;
-                case "guests":
-                    if (subscriberModel.IsAnonymous)
-                        subscribersToReturn.Add(subscriberModel);
-                    break;
-                case "users":
-                    if (!subscriberModel.IsAnonymous)
-                        subscribersToReturn.Add(subscriberModel);
-                    break;
-                default:
-                    subscribersToReturn.Add(subscriberModel);
-                    break;
-            }
+                        break;
+                }
+            });
         }
     }
 }

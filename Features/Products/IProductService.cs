@@ -31,7 +31,9 @@
 
         Task<ProductWithPromotionDetailsServiceModel> GetWithPromotion(int productId, int promotionId);
 
-        Task<ProductPriceQuantityServiceModel?> GetCurrentPriceWithQuantity(int productId, string flavour, int grams);
+        Task<ProductPriceQuantityServiceModel?> GetCurrentPriceWithQuantity(int productId, 
+            string flavour, 
+            int grams);
 
         Task<int> Update(int id,
             string name,
@@ -41,6 +43,12 @@
             List<ProductSpecsServiceModel> productSpecs,
             string imageData,
             string contentType);
+
+        //Task<bool> BuldEdit(string category,
+        //    string brand,
+        //    bool hasPromotion,
+        //    decimal priceChange,
+        //    decimal quantityChange);
 
         Task<int> PartialUpdate(int id, string? description);
 

@@ -5,10 +5,11 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Flavours.Models;
     using NutriBest.Server.Features.Products;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using System.Collections.Generic;
 
-    public class FlavourService : IFlavourService
+    public class FlavourService : IFlavourService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IProductService productService;
