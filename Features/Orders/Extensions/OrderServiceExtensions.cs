@@ -50,7 +50,7 @@
             return (customerName, customerEmail, phoneNumber);
         }
 
-        public static async Task<(string customerName, string customerEmail, string phoneNumber)> 
+        public static async Task<(string customerName, string customerEmail, string phoneNumber)>
             GetCurrentOrderUserDetailsByUser(this IOrderService service,
             NutriBestDbContext db,
             Order orderFromDb,
@@ -112,12 +112,16 @@
             Cart cart,
             AllOrdersServiceModel allOrders)
         {
-            allOrders.TotalDiscounts += cart!.TotalSaved; // be aware
-            allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
-            allOrders.TotalProducts += await db.CartProducts
-                                            .Where(x => x.CartId == cart.Id)
-                                            .CountAsync();
-            allOrders.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
+            await Task.Run(() =>
+            {
+                allOrders.TotalDiscounts += cart!.TotalSaved; // be aware
+                allOrders.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
+                allOrders.TotalProducts += db.CartProducts
+                                                .Where(x => x.CartId == cart.Id)
+                                                .Select(x => x.Count)
+                                                .Sum();
+                allOrders.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
+            });
         }
 
         public static AllOrdersServiceModel FilterAllOrdersModel(this IOrderService service,
@@ -187,7 +191,7 @@
             }
         }
 
-        public static async Task  SendLowStockNotifications(this IOrderService service,
+        public static async Task SendLowStockNotifications(this IOrderService service,
             List<LowInStockServiceModel> lowStocks,
             INotificationService notificationService,
             int orderId)

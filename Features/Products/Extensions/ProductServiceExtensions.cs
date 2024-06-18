@@ -96,7 +96,6 @@
 
         public static IQueryable<Product> GetBySearch(this IProductService service, IQueryable<Product> queryProducts, string search)
         {
-            //extend this
             if (search != "")
             {
                 queryProducts = queryProducts
