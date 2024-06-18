@@ -1,8 +1,9 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
 
-    public class CartProduct
+    public class CartProduct : Entity
     {
         [Key]
         [Required]

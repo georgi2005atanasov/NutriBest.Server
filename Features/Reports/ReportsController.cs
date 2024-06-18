@@ -13,64 +13,16 @@
             => this.reportService = reportService;
 
         [HttpGet]
-        [Route(nameof(TopSellingProducts))]
-        public async Task<ActionResult<TopSellingProductsServiceModel>> TopSellingProducts()
+        [Route(nameof(PerformanceInfo))]
+        public async Task<ActionResult<PerformanceInfo>> PerformanceInfo()
         {
             try
             {
-                var topProducts = await reportService.GetTopSellingProducts();
+                var info = await reportService.GetPerformanceInfo();
 
-                return Ok(topProducts);
+                return Ok(info);
             }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpGet]
-        [Route(nameof(TopSellingBrands))]
-        public async Task<ActionResult<TopSellingBrandsServiceModel>> TopSellingBrands()
-        {
-            try
-            {
-                var topBrands = await reportService.GetTopSellingBrands();
-
-                return Ok(topBrands);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpGet]
-        [Route(nameof(TopSellingFlavours))]
-        public async Task<ActionResult<TopSellingProductsServiceModel>> TopSellingFlavours()
-        {
-            try
-            {
-                var topFlavours = await reportService.GetTopSellingFlavours();
-
-                return Ok(topFlavours);
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpGet]
-        [Route(nameof(TopSellingCategories))]
-        public async Task<ActionResult<TopSellingCategoriesServiceModel>> TopSellingCategories()
-        {
-            try
-            {
-                var topCategories = await reportService.GetTopSellingCategories();
-
-                return Ok(topCategories);
-            }
-            catch (Exception)
+            catch (Exception err)
             {
                 return NotFound();
             }

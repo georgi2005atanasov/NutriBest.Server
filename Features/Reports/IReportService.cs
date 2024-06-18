@@ -4,12 +4,23 @@
 
     public interface IReportService
     {
-        Task<TopSellingProductsServiceModel> GetTopSellingProducts();
+        Task<PerformanceInfo> GetPerformanceInfo();
 
-        Task<TopSellingBrandsServiceModel> GetTopSellingBrands();
+        Task<List<SellingProductServiceModel>> GetTopSellingProducts();
 
-        Task<TopSellingFlavoursServiceModel> GetTopSellingFlavours();
+        Task<List<SellingBrandServiceModel>> GetTopSellingBrands();
 
-        Task<TopSellingCategoriesServiceModel> GetTopSellingCategories();
+        Task<List<SellingFlavourServiceModel>> GetTopSellingFlavours();
+
+        Task<List<SellingCategoryServiceModel>> GetTopSellingCategories();
+
+        Task<List<SellingProductServiceModel>> GetWeakProducts();
+
+        Task<List<SellingBrandServiceModel>> GetWeakBrands();
+
+        Task<List<SellingFlavourServiceModel>> GetWeakFlavours();
+
+        Task<List<SellingCategoryServiceModel>> GetWeakCategories();
+
     }
 }

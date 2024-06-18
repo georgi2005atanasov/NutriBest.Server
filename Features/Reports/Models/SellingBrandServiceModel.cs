@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Reports.Models
 {
-    public class TopSellingBrandServiceModel
+    public class SellingBrandServiceModel
     {
         public int SoldCount { get; set; }
 

@@ -15,23 +15,49 @@
             this.db = db;
         }
 
-        public async Task<TopSellingProductsServiceModel> GetTopSellingProducts()
+        public async Task<PerformanceInfo> GetPerformanceInfo()
+        {
+            var performanceInfo = new PerformanceInfo
+            {
+                TopSellingProducts = await GetTopSellingProducts(),
+                TopSellingBrands = await GetTopSellingBrands(),
+                TopSellingCategories = await GetTopSellingCategories(),
+                TopSellingFlavours = await GetTopSellingFlavours(),
+                WeakProducts = await GetWeakProducts(),
+                WeakBrands = await GetWeakBrands(),
+                WeakCategories = await GetWeakCategories(),
+                WeakFlavours = await GetWeakFlavours(),
+            };
+
+            return performanceInfo;
+        }
+
+        public async Task<List<SellingProductServiceModel>> GetTopSellingProducts()
         {
             var products = await db.CartProducts
+                .IgnoreQueryFilters()
                 .GroupBy(x => x.ProductId)
-                .Select(y => new TopSellingProductServiceModel
+                .Select(y => new SellingProductServiceModel
                 {
                     Product = new ProductListingServiceModel
                     {
                         ProductId = y.Key,
-                        Name = db.Products.First(x => x.ProductId == y.Key).Name,
-                        Price = db.Products.First(x => x.ProductId == y.Key).StartingPrice,
+                        Name = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ? 
+                        db.Products.First(x => x.ProductId == y.Key).Name :
+                        "",
+                        Price = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).StartingPrice :
+                        0,
                         Categories = db.ProductsCategories
                              .Where(x => x.ProductId == y.Key)
                              .Select(c => c.Category.Name)
                              .ToList(),
-                        Quantity = db.Products.First(x => x.ProductId == y.Key).Quantity,
-                        PromotionId = db.Products.First(x => x.ProductId == y.Key).PromotionId
+                        Quantity = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).Quantity :
+                        0,
+                        PromotionId = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).PromotionId :
+                        -1,
                     },
                     SoldCount = db.CartProducts
                     .Where(x => x.ProductId == y.Key)
@@ -42,19 +68,15 @@
                 .Take(5)
                 .ToListAsync();
 
-            var topProducts = new TopSellingProductsServiceModel
-            {
-                Products = products
-            };
-
-            return topProducts;
+            return products;
         }
 
-        public async Task<TopSellingBrandsServiceModel> GetTopSellingBrands()
+        public async Task<List<SellingBrandServiceModel>> GetTopSellingBrands()
         {
             var brands = await db.CartProducts
+                .IgnoreQueryFilters()
                 .GroupBy(x => (int)db.Products.First(y => y.ProductId == x.ProductId).BrandId!)
-                .Select(y => new TopSellingBrandServiceModel
+                .Select(y => new SellingBrandServiceModel
                 {
                     BrandName = db.Brands.First(x => x.Id == y.Key).Name,
                     SoldCount = db
@@ -65,23 +87,18 @@
                     .Sum()
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Where(x => x.SoldCount > 0)
                 .Take(5)
                 .ToListAsync();
 
-            var topBrands = new TopSellingBrandsServiceModel
-            {
-                Brands = brands
-            };
-
-            return topBrands;
+            return brands;
         }
 
-        public async Task<TopSellingFlavoursServiceModel> GetTopSellingFlavours()
+        public async Task<List<SellingFlavourServiceModel>> GetTopSellingFlavours()
         {
             var flavours = await db.CartProducts
+                .IgnoreQueryFilters()
                 .GroupBy(x => x.FlavourId)
-                .Select(y => new TopSellingFlavourServiceModel
+                .Select(y => new SellingFlavourServiceModel
                 {
                     FlavourName = db.Flavours.First(x => x.Id == y.Key).FlavourName,
                     SoldCount = db.CartProducts
@@ -93,19 +110,16 @@
                 .Take(5)
                 .ToListAsync();
 
-            var topFlavours = new TopSellingFlavoursServiceModel
-            {
-                Flavours = flavours
-            };
 
-            return topFlavours;
+            return flavours;
         }
 
-        public async Task<TopSellingCategoriesServiceModel> GetTopSellingCategories()
+        public async Task<List<SellingCategoryServiceModel>> GetTopSellingCategories()
         {
             var categories = await db.Categories
+                .IgnoreQueryFilters()
                 .GroupBy(x => x.Id)
-                .Select(y => new TopSellingCategoryServiceModel
+                .Select(y => new SellingCategoryServiceModel
                 {
                     CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
                     SoldCount = db.CartProducts
@@ -119,12 +133,111 @@
                 .Take(5)
                 .ToListAsync();
 
-            var topCategories = new TopSellingCategoriesServiceModel
-            {
-                Categories = categories
-            };
+            return categories;
+        }
 
-            return topCategories;
+        public async Task<List<SellingProductServiceModel>> GetWeakProducts()
+        {
+            var products = await db.CartProducts
+                .IgnoreQueryFilters()
+                .GroupBy(x => x.ProductId)
+                .Select(y => new SellingProductServiceModel
+                {
+                    Product = new ProductListingServiceModel
+                    {
+                        ProductId = y.Key,
+                        Name = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).Name :
+                        "",
+                        Price = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).StartingPrice :
+                        0,
+                        Categories = db.ProductsCategories
+                             .Where(x => x.ProductId == y.Key)
+                             .Select(c => c.Category.Name)
+                             .ToList(),
+                        Quantity = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).Quantity :
+                        0,
+                        PromotionId = db.Products.FirstOrDefault(x => x.ProductId == y.Key) != null ?
+                        db.Products.First(x => x.ProductId == y.Key).PromotionId :
+                        -1,
+                    },
+                    SoldCount = db.CartProducts
+                    .Where(x => x.ProductId == y.Key)
+                    .Select(x => x.Count)
+                    .Sum()
+                })
+                .OrderBy(x => x.SoldCount)
+                .Take(5)
+                .ToListAsync();
+
+            return products;
+        }
+
+        public async Task<List<SellingBrandServiceModel>> GetWeakBrands()
+        {
+            var brands = await db.CartProducts
+                .IgnoreQueryFilters()
+                .GroupBy(x => (int)db.Products.First(y => y.ProductId == x.ProductId).BrandId!)
+                .Select(y => new SellingBrandServiceModel
+                {
+                    BrandName = db.Brands.First(x => x.Id == y.Key).Name,
+                    SoldCount = db
+                    .CartProducts
+                    .Include(x => x.Product)
+                    .Where(x => x.Product!.BrandId == y.Key)
+                    .Select(x => x.Count)
+                    .Sum()
+                })
+                .OrderBy(x => x.SoldCount)
+                .Take(5)
+                .ToListAsync();
+
+            return brands;
+        }
+
+        public async Task<List<SellingFlavourServiceModel>> GetWeakFlavours()
+        {
+            var flavours = await db.CartProducts
+                .IgnoreQueryFilters()
+               .GroupBy(x => x.FlavourId)
+               .Select(y => new SellingFlavourServiceModel
+               {
+                   FlavourName = db.Flavours.First(x => x.Id == y.Key).FlavourName,
+                   SoldCount = db.CartProducts
+                   .Where(x => x.FlavourId == y.Key)
+                   .Select(x => x.Count)
+                   .Sum()
+               })
+               .OrderBy(x => x.SoldCount)
+               .Take(5)
+               .ToListAsync();
+
+
+            return flavours;
+        }
+
+        public async Task<List<SellingCategoryServiceModel>> GetWeakCategories()
+        {
+            var categories = await db.Categories
+                .IgnoreQueryFilters()
+                .GroupBy(x => x.Id)
+                .Select(y => new SellingCategoryServiceModel
+                {
+                    CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
+                    SoldCount = db.CartProducts
+                    .Include(x => x.Product)
+                    .Include(x => x.Product!.ProductsCategories)
+                    .Where(x => x.Product!.ProductsCategories.Any(x => x.CategoryId == y.Key))
+                    .Select(x => x.Count)
+                    .Sum()
+                })
+                .OrderBy(x => x.SoldCount)
+                .Take(5)
+                .ToListAsync();
+
+            return categories;
         }
     }
 }

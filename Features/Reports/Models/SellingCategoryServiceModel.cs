@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Reports.Models
 {
-    public class TopSellingCategoryServiceModel
+    public class SellingCategoryServiceModel
     {
         public string CategoryName { get; set; } = string.Empty;
 

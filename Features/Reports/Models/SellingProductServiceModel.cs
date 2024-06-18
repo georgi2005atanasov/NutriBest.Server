@@ -2,7 +2,7 @@
 {
     using NutriBest.Server.Features.Products.Models;
 
-    public class TopSellingProductServiceModel
+    public class SellingProductServiceModel
     {
         public int SoldCount { get; set; }
 
