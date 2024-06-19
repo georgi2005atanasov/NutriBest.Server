@@ -27,10 +27,16 @@
                 WeakBrands = await GetWeakBrands(),
                 WeakCategories = await GetWeakCategories(),
                 WeakFlavours = await GetWeakFlavours(),
+                OverallSalesVolume = await GetOverallSalesVolume() ?? 0
             };
 
             return performanceInfo;
         }
+
+        public async Task<decimal?> GetOverallSalesVolume()
+            => await db.Orders
+                .Select(x => x.Cart!.TotalProducts + x.Cart.ShippingPrice)
+                .AverageAsync();
 
         public async Task<List<SellingProductServiceModel>> GetTopSellingProducts()
         {
@@ -57,7 +63,7 @@
                     .Sum()
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return products;
@@ -73,13 +79,12 @@
                     BrandName = db.Brands.First(x => x.Id == y.Key).Name,
                     SoldCount = db
                     .CartProducts
-                    .Include(x => x.Product)
                     .Where(x => x.Product!.BrandId == y.Key)
                     .Select(x => x.Count)
                     .Sum()
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return brands;
@@ -99,7 +104,7 @@
                     .Sum()
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
 
@@ -115,14 +120,12 @@
                 {
                     CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
                     SoldCount = db.CartProducts
-                    .Include(x => x.Product)
-                    .Include(x => x.Product!.ProductsCategories)
                     .Where(x => x.Product!.ProductsCategories.Any(x => x.CategoryId == y.Key))
                     .Select(x => x.Count)
                     .Sum()
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return categories;
@@ -153,7 +156,7 @@
                     .Sum()
                 })
                 .OrderBy(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return products;
@@ -169,13 +172,12 @@
                     BrandName = db.Brands.First(x => x.Id == y.Key).Name,
                     SoldCount = db
                     .CartProducts
-                    .Include(x => x.Product)
                     .Where(x => x.Product!.BrandId == y.Key)
                     .Select(x => x.Count)
                     .Sum()
                 })
                 .OrderBy(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return brands;
@@ -195,7 +197,7 @@
                    .Sum()
                })
                .OrderBy(x => x.SoldCount)
-               .Take(5)
+               .Take(10)
                .ToListAsync();
 
 
@@ -211,17 +213,39 @@
                 {
                     CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
                     SoldCount = db.CartProducts
-                    .Include(x => x.Product)
-                    .Include(x => x.Product!.ProductsCategories)
                     .Where(x => x.Product!.ProductsCategories.Any(x => x.CategoryId == y.Key))
                     .Select(x => x.Count)
                     .Sum()
                 })
                 .OrderBy(x => x.SoldCount)
-                .Take(5)
+                .Take(10)
                 .ToListAsync();
 
             return categories;
+        }
+
+        public async Task<List<SellingCityServiceModel>> GetTopCities()
+        {
+            var cities = await db.OrdersDetails
+                .Include(x => x.Address)
+                .GroupBy(x => x.Address!.CityId)
+                .Select(x => new SellingCityServiceModel
+                {
+                    Country = db.Countries
+                                .First(y => y.Cities.Any(z => z.Id == x.Key))
+                                .CountryName,
+                    City = db.Cities
+                                .First(y => y.Id == x.Key)
+                                .CityName,
+                    SoldCount = db.OrdersDetails
+                                .Where(y => y.Address!.CityId == x.Key)
+                                .Count()
+                })
+                .OrderByDescending(x => x.SoldCount)
+                .Take(10)
+                .ToListAsync();
+
+            return cities;
         }
     }
 }

@@ -22,5 +22,8 @@
 
         Task<List<SellingCategoryServiceModel>> GetWeakCategories();
 
+        Task<decimal?> GetOverallSalesVolume();
+
+        Task<List<SellingCityServiceModel>> GetTopCities();
     }
 }

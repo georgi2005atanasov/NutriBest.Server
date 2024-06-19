@@ -1,9 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Reports.Models
 {
-    using NutriBest.Server.Data.Models;
-
     public class PerformanceInfo
     {
+        public decimal OverallSalesVolume { get; set; }
+
         public List<SellingProductServiceModel> TopSellingProducts { get; set; } = new List<SellingProductServiceModel>();
 
         public List<SellingBrandServiceModel> TopSellingBrands { get; set; } = new List<SellingBrandServiceModel>();

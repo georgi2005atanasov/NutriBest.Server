@@ -101,6 +101,8 @@
             {
                 CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
+                await DisablePromoCode(cart, cart.Code ?? "");
+
                 if (cart.CartProducts == null)
                     cart.CartProducts = new List<CartProductServiceModel>();
 
@@ -150,6 +152,8 @@
                     cart,
                     existingProduct!, // be aware
                     productFromDb);
+
+                await EnablePromoCode(cart);
 
                 await SetSessionCart(cart);
                 return Ok();
@@ -437,6 +441,7 @@
 
                 cart.TotalProducts += prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved -= prevPromoCode.DiscountPercentage / 100 * cart.OriginalPrice;
+                return;
             }
 
             if (!string.IsNullOrEmpty(cart.Code))

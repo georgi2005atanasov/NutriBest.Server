@@ -27,5 +27,21 @@
                 return NotFound();
             }
         }
+
+        [HttpGet]
+        [Route(nameof(DemographicsInfo))]
+        public async Task<ActionResult<List<SellingCityServiceModel>>> DemographicsInfo()
+        {
+            try
+            {
+                var cities = await reportService.GetTopCities();
+
+                return Ok(cities);
+            }
+            catch (Exception err)
+            {
+                return NotFound();
+            }
+        }
     }
 }
