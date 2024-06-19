@@ -109,7 +109,7 @@
             }
 
             allOrders.TotalOrders = allOrders.Orders.Count;
-            allOrders = this.FilterAllOrdersModel(allOrders, search, page, filters);
+            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, filters);
 
             return allOrders;
         }
@@ -140,7 +140,7 @@
                 await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            allOrders = this.FilterAllOrdersModel(allOrders, search, page, "");
+            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, "");
 
             return allOrders;
         }

@@ -38,7 +38,6 @@
 
             var allProfiles = new AllProfilesServiceModel
             {
-                TotalUsers = profiles.Count(),
                 Profiles = new List<ProfileListingServiceModel>()
             };
 
@@ -80,6 +79,7 @@
                 //the colleciton if it is valid
             }
 
+            //this may be outsourced in the future, it is not so much so i do it in here
             if (search != null)
             {
                 search = search.ToLower();
@@ -95,6 +95,8 @@
                     .OrderByDescending(x => x.MadeOn)
                     .ToList();
             }
+
+            allProfiles.TotalUsers = profiles.Count();
 
             allProfiles.Profiles = allProfiles.Profiles
                 .Skip((page - 1) * UsersPerPage)

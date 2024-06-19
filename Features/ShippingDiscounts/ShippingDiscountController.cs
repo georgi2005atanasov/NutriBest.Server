@@ -17,7 +17,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("All")]
         public async Task<ActionResult<ShippingDiscountServiceModel>> All()
         {

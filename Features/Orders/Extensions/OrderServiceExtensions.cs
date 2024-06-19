@@ -124,7 +124,7 @@
             });
         }
 
-        public static AllOrdersServiceModel FilterAllOrdersModel(this IOrderService service,
+        public static async Task<AllOrdersServiceModel> FilterAllOrdersModel(this IOrderService service,
             AllOrdersServiceModel allOrders,
             string? search,
             int page,
@@ -144,29 +144,44 @@
 
             if (!string.IsNullOrEmpty(filters))
             {
-                List<OrderListingServiceModel> filteredOrders = new List<OrderListingServiceModel>();
+                var filteredOrders = allOrders.Orders.AsQueryable();
 
                 var allFilters = filters.Split(" ");
 
                 if (allFilters.Contains("Finished"))
                 {
-                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsFinished));
+                    filteredOrders = filteredOrders.Where(x => x.IsFinished).AsQueryable();
                 }
                 if (allFilters.Contains("Confirmed"))
                 {
-                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsConfirmed));
+                    filteredOrders = filteredOrders.Where(x => x.IsConfirmed).AsQueryable();
                 }
                 if (allFilters.Contains("Paid"))
                 {
-                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsPaid));
+                    filteredOrders = filteredOrders.Where(x => x.IsPaid).AsQueryable();
                 }
                 if (allFilters.Contains("Shipped"))
                 {
-                    filteredOrders.AddRange(allOrders.Orders.Where(x => x.IsAnonymous));
+                    filteredOrders = filteredOrders.Where(x => x.IsShipped).AsQueryable();
                 }
 
-                allOrders.Orders = filteredOrders;
+                if (allFilters.Contains("Finished"))
+                {
+                    filteredOrders = filteredOrders.OrderBy(x => x.IsFinished).AsQueryable();
+                }
+                if (allFilters.Contains("Confirmed"))
+                {
+                    filteredOrders = filteredOrders.OrderBy(x => x.IsConfirmed).AsQueryable();
+                }
+                if (allFilters.Contains("Paid"))
+                {
+                    filteredOrders = filteredOrders.OrderBy(x => x.IsPaid).AsQueryable();
+                }
+
+                allOrders.Orders = await Task.Run(() => filteredOrders.ToList());
             }
+
+            allOrders.TotalOrders = allOrders.Orders.Count;
 
             allOrders.Orders = allOrders.Orders
                 .Skip((page - 1) * OrdersPerPage)
@@ -174,6 +189,14 @@
                 .ToList();
 
             return allOrders;
+        }
+
+        private static object OrderOrders(OrderListingServiceModel x, List<string> appliedFilters)
+        {
+            return appliedFilters.Contains("Finished") ? x.IsFinished :
+                    appliedFilters.Contains("Confirmed") ? x.IsConfirmed :
+                    appliedFilters.Contains("Paid") ? x.IsPaid :
+                    appliedFilters.Contains("Shipped") ? x.IsShipped : false;
         }
 
         public static void CheckForLowStock(this IOrderService service,
