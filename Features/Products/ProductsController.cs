@@ -9,7 +9,9 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Utilities;
     using System.Globalization;
+    using System.Text;
     using System.Text.Json;
 
     public class ProductsController : ApiController
@@ -483,7 +485,7 @@
         {
             try
             {
-                var product = await productService.GetCurrentPriceWithQuantity(productModel.ProductId, 
+                var product = await productService.GetCurrentPriceWithQuantity(productModel.ProductId,
                     productModel.Flavour,
                     productModel.Package);
 
@@ -495,40 +497,46 @@
             }
         }
 
-        //[HttpPut]
-        //[Route("BulkEdit")]
-        //public async Task<ActionResult> BulkEdit([FromBody] BulkEditServiceModel bulkModel)
-        //{
-        //    decimal priceChange;
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsvUsers()
+        {
+            try
+            {
+                var products = await productService.All(1, null, null, null, null, null, null, null, null, null);
+                var csv = ConvertToCsv(products);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "products.csv"
+                };
 
-        //    if (!decimal.TryParse(bulkModel.PriceChange, NumberStyles.Any, CultureInfo.InvariantCulture, out priceChange))
-        //        return BadRequest(new
-        //        {
-        //            Key = "PriceChange",
-        //            Message = "Price Change Must Be a Number!"
-        //        });
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
-        //    try
-        //    {
-        //        var result = await productService.BuldEdit(bulkModel.Category,
-        //            bulkModel.Brand,
-        //            bulkModel.HasPromotion,
-        //            priceChange,
-        //            bulkModel.QuantityChange);
+        private string ConvertToCsv(AllProductsServiceModel products)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Name,StartingPrice,Brand,Description,Categories,PromotionId");
 
-        //        return Ok(new
-        //        {
-        //            IsSuccess = true
-        //        });
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            IsSuccess = false
-        //        });
-        //    }
-        //}
+            if (products.ProductsRows == null)
+            {
+                return csv.ToString();
+            }
+
+            foreach (var product in products.ProductsRows.SelectMany(x => x))
+            {
+                //csv.AppendLine($"{CsvHelper.EscapeCsvValue(product.ProductId.ToString())},{CsvHelper.EscapeCsvValue(product.Name)},{CsvHelper.EscapeCsvValue(product.Price.ToString())} BGN,{CsvHelper.EscapeCsvValue(product.Brand)},{CsvHelper.EscapeCsvValue(product.Description)},{CsvHelper.EscapeCsvValue(string.Join(";", product.Categories))},{CsvHelper.EscapeCsvValue(product.PromotionId?.ToString() ?? "-")}");
+            }
+
+            return csv.ToString();
+        }
 
         private bool ProductExists(string productName)
         {

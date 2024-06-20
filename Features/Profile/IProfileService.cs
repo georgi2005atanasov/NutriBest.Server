@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
+    using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Profile.Models;
 
     public interface IProfileService

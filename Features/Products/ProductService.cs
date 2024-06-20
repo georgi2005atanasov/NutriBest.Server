@@ -70,6 +70,7 @@
                              .ToList(),
                              Quantity = x.Quantity,
                              PromotionId = x.PromotionId,
+                             Description = x.Description,
                              Brand = x.Brand!.Name // be aware
                          })
                          .AsQueryable();
@@ -520,14 +521,5 @@
 
             return priceWithQuantityModel;
         }
-
-        //public Task<bool> BuldEdit(string category, 
-        //    string brand, 
-        //    bool hasPromotion, 
-        //    decimal priceChange, 
-        //    decimal quantityChange)
-        //{
-
-        //}
     }
 }

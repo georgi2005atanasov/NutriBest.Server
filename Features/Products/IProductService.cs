@@ -44,12 +44,6 @@
             string imageData,
             string contentType);
 
-        //Task<bool> BuldEdit(string category,
-        //    string brand,
-        //    bool hasPromotion,
-        //    decimal priceChange,
-        //    decimal quantityChange);
-
         Task<int> PartialUpdate(int id, string? description);
 
         Task<bool> Delete(int productId);

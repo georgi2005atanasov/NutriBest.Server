@@ -6,6 +6,8 @@
     using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Utilities;
+    using System.Text;
 
     public class ProfileController : ApiController
     {
@@ -28,7 +30,7 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/Profiles")]
-        public async Task<ActionResult<AllProfilesServiceModel?>> All([FromQuery] int page, 
+        public async Task<ActionResult<AllProfilesServiceModel?>> All([FromQuery] int page,
             [FromQuery] string? search,
             [FromQuery] string? groupType)
         {
@@ -185,6 +187,42 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("/Profiles/CSV")]
+        public async Task<FileContentResult?> GetCsvUsers()
+        {
+            try
+            {
+                var users = await profileService.All(1, null, null); // Assuming this fetches your data
+                var csv = ConvertToCsv(users);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "users.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(AllProfilesServiceModel users)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Name,Email,MadeOn,IsDeleted,PhoneNumber,City,TotalOrders,TotalSpent");
+
+            foreach (var user in users.Profiles)
+            {
+                csv.AppendLine($"{CsvHelper.EscapeCsvValue(user.ProfileId)},{CsvHelper.EscapeCsvValue(user.Name ?? "")},{CsvHelper.EscapeCsvValue(user.Email ?? "")},{CsvHelper.EscapeCsvValue(user.MadeOn.ToString())},{CsvHelper.EscapeCsvValue(user.IsDeleted.ToString())},{CsvHelper.EscapeCsvValue(user.PhoneNumber ?? "")},{CsvHelper.EscapeCsvValue(user.City ?? "")},{CsvHelper.EscapeCsvValue(user.TotalOrders.ToString())},{CsvHelper.EscapeCsvValue(user.TotalSpent.ToString())}");
+            }
+
+            return csv.ToString();
         }
     }
 }

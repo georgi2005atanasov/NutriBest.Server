@@ -300,13 +300,14 @@ namespace NutriBest.Server.Infrastructure.Extensions
 
                 await roleManager.CreateAsync(role);
 
-                string adminEmail = config.GetValue<string>("Admin:UserName");
+                string adminUserName = config.GetValue<string>("Admin:UserName");
                 string adminPassword = config.GetValue<string>("Admin:Password");
+                string email = config.GetValue<string>("Admin:Email");
 
                 var user = new User
                 {
-                    Email = adminEmail,
-                    UserName = adminEmail
+                    Email = email,
+                    UserName = adminUserName,
                 };
 
                 await userManager.CreateAsync(user, adminPassword);
