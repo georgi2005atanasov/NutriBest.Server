@@ -12,8 +12,8 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    [Migration("20240613130758_RemovedLinkFromNotification")]
-    partial class RemovedLinkFromNotification
+    [Migration("20240620102506_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -174,7 +174,13 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProfileUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Street")
@@ -190,9 +196,11 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.HasIndex("ProfileId")
+                    b.HasIndex("ProfileId");
+
+                    b.HasIndex("ProfileUserId")
                         .IsUnique()
-                        .HasFilter("[ProfileId] IS NOT NULL");
+                        .HasFilter("[ProfileUserId] IS NOT NULL");
 
                     b.ToTable("Addresses");
                 });
@@ -279,6 +287,18 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -310,8 +330,20 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("FlavourId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("PackageId")
                         .HasColumnType("int");
@@ -509,6 +541,59 @@ namespace NutriBest.Server.Data.Migrations
                     b.ToTable("Invoices");
                 });
 
+            modelBuilder.Entity("NutriBest.Server.Data.Models.Newsletter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasOrders")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalOrders")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Newsletter");
+                });
+
             modelBuilder.Entity("NutriBest.Server.Data.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -527,6 +612,9 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<string>("Priority")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
@@ -589,6 +677,12 @@ namespace NutriBest.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -606,6 +700,12 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.Property<bool>("IsFinished")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OrderDetailsId")
                         .HasColumnType("int");
@@ -1271,9 +1371,13 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("NutriBest.Server.Data.Models.Profile", null)
-                        .WithOne("Address")
-                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
+                        .WithMany("Addresses")
+                        .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", null)
+                        .WithOne("Address")
+                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileUserId");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Brand", b =>
@@ -1568,6 +1672,8 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
                     b.Navigation("Address");
+
+                    b.Navigation("Addresses");
 
                     b.Navigation("UsersOrders");
                 });
