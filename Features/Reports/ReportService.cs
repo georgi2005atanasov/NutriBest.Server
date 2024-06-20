@@ -15,33 +15,37 @@
             this.db = db;
         }
 
-        public async Task<PerformanceInfo> GetPerformanceInfo()
+        public async Task<PerformanceInfo> GetPerformanceInfo(DateTime? startDate, DateTime? endDate)
         {
             var performanceInfo = new PerformanceInfo
             {
-                TopSellingProducts = await GetTopSellingProducts(),
-                TopSellingBrands = await GetTopSellingBrands(),
-                TopSellingCategories = await GetTopSellingCategories(),
-                TopSellingFlavours = await GetTopSellingFlavours(),
-                WeakProducts = await GetWeakProducts(),
-                WeakBrands = await GetWeakBrands(),
-                WeakCategories = await GetWeakCategories(),
-                WeakFlavours = await GetWeakFlavours(),
-                OverallSalesVolume = await GetOverallSalesVolume() ?? 0
+                TopSellingProducts = await GetTopSellingProducts(startDate, endDate),
+                TopSellingBrands = await GetTopSellingBrands(startDate, endDate),
+                TopSellingCategories = await GetTopSellingCategories(startDate, endDate),
+                TopSellingFlavours = await GetTopSellingFlavours(startDate, endDate),
+                WeakProducts = await GetWeakProducts(startDate, endDate),
+                WeakBrands = await GetWeakBrands(startDate, endDate),
+                WeakCategories = await GetWeakCategories(startDate, endDate),
+                WeakFlavours = await GetWeakFlavours(startDate, endDate),
+                OverallSalesVolume = await GetOverallSalesVolume(startDate, endDate) ?? 0
             };
 
             return performanceInfo;
         }
 
-        public async Task<decimal?> GetOverallSalesVolume()
+        public async Task<decimal?> GetOverallSalesVolume(DateTime? startDate, DateTime? endDate)
             => await db.Orders
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .Select(x => x.Cart!.TotalProducts + x.Cart.ShippingPrice)
                 .AverageAsync();
 
-        public async Task<List<SellingProductServiceModel>> GetTopSellingProducts()
+        public async Task<List<SellingProductServiceModel>> GetTopSellingProducts(DateTime? startDate, DateTime? endDate)
         {
             var products = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .GroupBy(x => x.ProductId)
                 .Select(y => new SellingProductServiceModel
                 {
@@ -69,10 +73,12 @@
             return products;
         }
 
-        public async Task<List<SellingBrandServiceModel>> GetTopSellingBrands()
+        public async Task<List<SellingBrandServiceModel>> GetTopSellingBrands(DateTime? startDate, DateTime? endDate)
         {
             var brands = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .GroupBy(x => (int)db.Products.First(y => y.ProductId == x.ProductId).BrandId!)
                 .Select(y => new SellingBrandServiceModel
                 {
@@ -90,10 +96,12 @@
             return brands;
         }
 
-        public async Task<List<SellingFlavourServiceModel>> GetTopSellingFlavours()
+        public async Task<List<SellingFlavourServiceModel>> GetTopSellingFlavours(DateTime? startDate, DateTime? endDate)
         {
             var flavours = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .GroupBy(x => x.FlavourId)
                 .Select(y => new SellingFlavourServiceModel
                 {
@@ -111,7 +119,7 @@
             return flavours;
         }
 
-        public async Task<List<SellingCategoryServiceModel>> GetTopSellingCategories()
+        public async Task<List<SellingCategoryServiceModel>> GetTopSellingCategories(DateTime? startDate, DateTime? endDate)
         {
             var categories = await db.Categories
                 .IgnoreQueryFilters()
@@ -120,6 +128,8 @@
                 {
                     CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
                     SoldCount = db.CartProducts
+                    .Where(x => startDate == null || x.CreatedOn >= startDate)
+                    .Where(x => endDate == null || x.CreatedOn <= endDate)
                     .Where(x => x.Product!.ProductsCategories.Any(x => x.CategoryId == y.Key))
                     .Select(x => x.Count)
                     .Sum()
@@ -131,10 +141,12 @@
             return categories;
         }
 
-        public async Task<List<SellingProductServiceModel>> GetWeakProducts()
+        public async Task<List<SellingProductServiceModel>> GetWeakProducts(DateTime? startDate, DateTime? endDate)
         {
             var products = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .GroupBy(x => x.ProductId)
                 .Select(y => new SellingProductServiceModel
                 {
@@ -162,10 +174,12 @@
             return products;
         }
 
-        public async Task<List<SellingBrandServiceModel>> GetWeakBrands()
+        public async Task<List<SellingBrandServiceModel>> GetWeakBrands(DateTime? startDate, DateTime? endDate)
         {
             var brands = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                 .GroupBy(x => (int)db.Products.First(y => y.ProductId == x.ProductId).BrandId!)
                 .Select(y => new SellingBrandServiceModel
                 {
@@ -183,10 +197,12 @@
             return brands;
         }
 
-        public async Task<List<SellingFlavourServiceModel>> GetWeakFlavours()
+        public async Task<List<SellingFlavourServiceModel>> GetWeakFlavours(DateTime? startDate, DateTime? endDate)
         {
             var flavours = await db.CartProducts
                 .IgnoreQueryFilters()
+                .Where(x => startDate == null || x.CreatedOn >= startDate)
+                .Where(x => endDate == null || x.CreatedOn <= endDate)
                .GroupBy(x => x.FlavourId)
                .Select(y => new SellingFlavourServiceModel
                {
@@ -204,7 +220,7 @@
             return flavours;
         }
 
-        public async Task<List<SellingCategoryServiceModel>> GetWeakCategories()
+        public async Task<List<SellingCategoryServiceModel>> GetWeakCategories(DateTime? startDate, DateTime? endDate)
         {
             var categories = await db.Categories
                 .IgnoreQueryFilters()
@@ -213,6 +229,8 @@
                 {
                     CategoryName = db.Categories.First(x => x.Id == y.Key).Name,
                     SoldCount = db.CartProducts
+                    .Where(x => startDate == null || x.CreatedOn >= startDate)
+                    .Where(x => endDate == null || x.CreatedOn <= endDate)
                     .Where(x => x.Product!.ProductsCategories.Any(x => x.CategoryId == y.Key))
                     .Select(x => x.Count)
                     .Sum()
@@ -224,25 +242,33 @@
             return categories;
         }
 
-        public async Task<List<SellingCityServiceModel>> GetTopCities()
+        public async Task<List<SellingCityServiceModel>> GetTopCities(DateTime? startDate, DateTime? endDate)
         {
-            var cities = await db.OrdersDetails
-                .Include(x => x.Address)
-                .GroupBy(x => x.Address!.CityId)
+            var query = from orderDetail in db.OrdersDetails
+                        join order in db.Orders on orderDetail.Id equals order.Id
+                        join address in db.Addresses on orderDetail.AddressId equals address.Id
+                        where (startDate == null || order.CreatedOn >= startDate) &&
+                              (endDate == null || order.CreatedOn <= endDate)
+                        group orderDetail by address.CityId into g
+                        select new
+                        {
+                            CityId = g.Key,
+                            SoldCount = g.Count()
+                        };
+
+            var cities = await query
                 .Select(x => new SellingCityServiceModel
                 {
                     Country = db.Countries
-                                .First(y => y.Cities.Any(z => z.Id == x.Key))
-                                .CountryName,
+                        .First(y => y.Cities.Any(z => z.Id == x.CityId))
+                        .CountryName,
                     City = db.Cities
-                                .First(y => y.Id == x.Key)
-                                .CityName,
-                    SoldCount = db.OrdersDetails
-                                .Where(y => y.Address!.CityId == x.Key)
-                                .Count()
+                        .First(y => y.Id == x.CityId)
+                        .CityName,
+                    SoldCount = x.SoldCount
                 })
                 .OrderByDescending(x => x.SoldCount)
-                .Take(10)
+                .Take(30)
                 .ToListAsync();
 
             return cities;

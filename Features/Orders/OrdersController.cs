@@ -3,6 +3,9 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Orders.Models;
+    using NutriBest.Server.Utilities;
+    using System.Globalization;
+    using System.Web;
 
     public class OrdersController : ApiController
     {
@@ -18,11 +21,15 @@
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<AllOrdersServiceModel>> All([FromQuery] string? search,
             [FromQuery] int page = 1,
-            [FromQuery] string? filters = "")
+            [FromQuery] string? filters = "",
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
         {
             try
             {
-                var allOrders = await orderService.All(page, search, filters);
+                var (parsedStartDate, parsedEndDate) = DateTimeHelper.ParseDates(startDate, endDate);
+
+                var allOrders = await orderService.All(page, search, filters, parsedStartDate, parsedEndDate);
 
                 return Ok(allOrders);
             }

@@ -27,5 +27,7 @@
         public Cart? Cart { get; set; } = new Cart();
 
         public List<UserOrder> UsersOrders { get; set; } = new List<UserOrder>();
+
+        public List<Address> Addresses { get; set; } = new List<Address>();
     }
 }

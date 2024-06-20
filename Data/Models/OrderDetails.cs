@@ -1,8 +1,8 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
     using NutriBest.Server.Data.Enums;
+    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
 
     public class OrderDetails
     {

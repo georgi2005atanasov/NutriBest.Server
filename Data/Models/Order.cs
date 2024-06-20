@@ -1,9 +1,10 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
     using static Validation.GuestOrder;
 
-    public class Order
+    public class Order : Entity
     {
         [Key]
         [Required]

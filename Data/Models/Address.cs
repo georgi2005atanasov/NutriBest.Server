@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
+    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Address
     {
@@ -28,5 +28,7 @@
         public City? City { get; set; }
 
         public bool IsAnonymous { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

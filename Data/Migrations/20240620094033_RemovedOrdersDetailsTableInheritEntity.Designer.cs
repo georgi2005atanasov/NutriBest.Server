@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240620094033_RemovedOrdersDetailsTableInheritEntity")]
+    partial class RemovedOrdersDetailsTableInheritEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,13 +174,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ProfileId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProfileUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Street")
@@ -194,11 +190,9 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.HasIndex("ProfileId");
-
-                    b.HasIndex("ProfileUserId")
+                    b.HasIndex("ProfileId")
                         .IsUnique()
-                        .HasFilter("[ProfileUserId] IS NOT NULL");
+                        .HasFilter("[ProfileId] IS NOT NULL");
 
                     b.ToTable("Addresses");
                 });
@@ -1369,13 +1363,9 @@ namespace NutriBest.Server.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("NutriBest.Server.Data.Models.Profile", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("NutriBest.Server.Data.Models.Profile", null)
                         .WithOne("Address")
-                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileUserId");
+                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Brand", b =>
@@ -1670,8 +1660,6 @@ namespace NutriBest.Server.Data.Migrations
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
                     b.Navigation("Address");
-
-                    b.Navigation("Addresses");
 
                     b.Navigation("UsersOrders");
                 });

@@ -11,7 +11,7 @@
             string? code,
             List<CartProductServiceModel> cartProducts);
 
-        Task<AllOrdersServiceModel> All(int page, string? search, string? filters);
+        Task<AllOrdersServiceModel> All(int page, string? search, string? filters, DateTime? startDate, DateTime? endDate);
 
         Task<AllOrdersServiceModel> Mine(int page, string? search);
 

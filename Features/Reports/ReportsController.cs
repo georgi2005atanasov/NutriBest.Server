@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Reports.Models;
+    using NutriBest.Server.Utilities;
 
     [Authorize(Roles = "Administrator")]
     public class ReportsController : ApiController
@@ -14,15 +15,18 @@
 
         [HttpGet]
         [Route(nameof(PerformanceInfo))]
-        public async Task<ActionResult<PerformanceInfo>> PerformanceInfo()
+        public async Task<ActionResult<PerformanceInfo>> PerformanceInfo([FromQuery] string? startDate,
+            [FromQuery] string? endDate)
         {
             try
             {
-                var info = await reportService.GetPerformanceInfo();
+                var (parsedStartDate, parsedEndDate) = DateTimeHelper.ParseDates(startDate, endDate);
+
+                var info = await reportService.GetPerformanceInfo(parsedStartDate, parsedEndDate);
 
                 return Ok(info);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return NotFound();
             }
@@ -30,15 +34,18 @@
 
         [HttpGet]
         [Route(nameof(DemographicsInfo))]
-        public async Task<ActionResult<List<SellingCityServiceModel>>> DemographicsInfo()
+        public async Task<ActionResult<List<SellingCityServiceModel>>> DemographicsInfo([FromQuery] string? startDate,
+            [FromQuery] string? endDate)
         {
             try
             {
-                var cities = await reportService.GetTopCities();
+                var (parsedStartDate, parsedEndDate) = DateTimeHelper.ParseDates(startDate, endDate);
+
+                var cities = await reportService.GetTopCities(parsedStartDate, parsedEndDate);
 
                 return Ok(cities);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return NotFound();
             }

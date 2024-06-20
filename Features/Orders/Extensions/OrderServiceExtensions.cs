@@ -128,7 +128,9 @@
             AllOrdersServiceModel allOrders,
             string? search,
             int page,
-            string? filters)
+            string? filters,
+            DateTime? startDate,
+            DateTime? endDate)
         {
             if (!string.IsNullOrEmpty(search))
             {
@@ -142,10 +144,32 @@
                     .ToList();
             }
 
+            var filteredOrders = allOrders.Orders.AsQueryable();
+
+            if (startDate != null && endDate != null)
+            {
+                filteredOrders = allOrders.Orders
+                    .Where(x => x.MadeOn >= startDate && x.MadeOn <= endDate)
+                    .OrderByDescending(x => x.MadeOn)
+                    .AsQueryable();
+            }
+            else if (startDate != null)
+            {
+                filteredOrders = allOrders.Orders
+                    .Where(x => x.MadeOn >= startDate)
+                    .OrderByDescending(x => x.MadeOn)
+                    .AsQueryable();
+            }
+            else if (endDate != null)
+            {
+                filteredOrders = allOrders.Orders
+                    .Where(x => x.MadeOn <= endDate)
+                    .OrderByDescending(x => x.MadeOn)
+                    .AsQueryable();
+            }
+
             if (!string.IsNullOrEmpty(filters))
             {
-                var filteredOrders = allOrders.Orders.AsQueryable();
-
                 var allFilters = filters.Split(" ");
 
                 if (allFilters.Contains("Finished"))
@@ -177,13 +201,13 @@
                 {
                     filteredOrders = filteredOrders.OrderBy(x => x.IsPaid).AsQueryable();
                 }
-
-                allOrders.Orders = await Task.Run(() => filteredOrders.ToList());
             }
+            allOrders.Orders = await Task.Run(() => filteredOrders.ToList());
 
             allOrders.TotalOrders = allOrders.Orders.Count;
 
             allOrders.Orders = allOrders.Orders
+                .OrderByDescending(x => x.OrderId)
                 .Skip((page - 1) * OrdersPerPage)
                 .Take(OrdersPerPage)
                 .ToList();

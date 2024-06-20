@@ -47,30 +47,22 @@
                 var address = await db.Addresses
                     .FirstOrDefaultAsync(x => x.ProfileId == profileId);
 
-                if (address == null)
+                if (address != null)
                 {
-                    address = new Address
-                    {
-                        City = city,
-                        CityId = city.Id,
-                        Country = country,
-                        CountryId = country.Id,
-                        IsAnonymous = profileId == null,
-                        ProfileId = profileId,
-                        Street = street,
-                        StreetNumber = streetNumber
-                    };
+                    address.IsDeleted = true;
                 }
-                else
+
+                address = new Address
                 {
-                    address.City = city;
-                    address.CityId = city.Id;
-                    address.Country = country;
-                    address.CountryId = country.Id;
-                    address.IsAnonymous = profileId == null;
-                    address.Street = street;
-                    address.StreetNumber = streetNumber;
-                }
+                    City = city,
+                    CityId = city.Id,
+                    Country = country,
+                    CountryId = country.Id,
+                    IsAnonymous = profileId == null,
+                    ProfileId = profileId,
+                    Street = street,
+                    StreetNumber = streetNumber
+                };
 
                 var orderDetails = new OrderDetails
                 {

@@ -24,7 +24,7 @@
         [Required]
         public List<string> Categories { get; set; } = null!;
 
-        public string? ProductSpecs { get; set; }
+        public string ProductSpecs { get; set; } = null!;
 
         public IFormFile Image { get; set; } = null!;
     }

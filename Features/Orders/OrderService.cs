@@ -24,7 +24,6 @@
         Func<NutriBestDbContext, OrderDetails, Task<(Address address, City city, Country country)>> getAddressCityCountryFunc;
         Func<NutriBestDbContext, int, Task<OrderDetails>> getOrderDetailsFunc;
 
-
         public OrderService(NutriBestDbContext db,
             ICurrentUserService currentUserService,
             IConfiguration config,
@@ -85,7 +84,11 @@
             return cart.Id;
         }
 
-        public async Task<AllOrdersServiceModel> All(int page, string? search, string? filters)
+        public async Task<AllOrdersServiceModel> All(int page, 
+            string? search, 
+            string? filters,
+            DateTime? startDate,
+            DateTime? endDate)
         {
             var orders = db.Orders
                 .Where(x => !x.IsDeleted)
@@ -109,7 +112,7 @@
             }
 
             allOrders.TotalOrders = allOrders.Orders.Count;
-            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, filters);
+            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, filters, startDate, endDate);
 
             return allOrders;
         }
@@ -118,6 +121,7 @@
         {
             var userOrders = db.UsersOrders
                 .Where(x => x.ProfileId == currentUserService.GetUserId())
+                .OrderByDescending(x => x.CreatedOn)
                 .AsQueryable();
 
             var allOrders = new AllOrdersServiceModel()
@@ -140,7 +144,7 @@
                 await this.UpdateAllOrdersModel(db, cart!, allOrders);
             }
 
-            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, "");
+            allOrders = await this.FilterAllOrdersModel(allOrders, search, page, "", null, null);
 
             return allOrders;
         }

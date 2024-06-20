@@ -32,9 +32,9 @@
                 .HasConversion(genderConverter);
 
             builder.Entity<Profile>()
-                .HasOne(x => x.Address)
+                .HasMany(x => x.Addresses)
                 .WithOne()
-                .HasForeignKey<Address>(x => x.ProfileId)
+                .HasForeignKey(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
