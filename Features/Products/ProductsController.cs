@@ -527,7 +527,7 @@
             }
         }
 
-        private string ConvertToCsv(List<ProductListingServiceModel> products)
+        public static string ConvertToCsv(List<ProductListingServiceModel> products)
         {
             var csv = new StringBuilder();
             csv.AppendLine("Id,Name,StartingPrice,Brand,Description,Categories,PromotionId");

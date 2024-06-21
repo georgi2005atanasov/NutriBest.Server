@@ -117,6 +117,29 @@
             return allOrders;
         }
 
+        public async Task<List<OrderListingServiceModel>> AllForExport(string? search, string? filters, DateTime? startDate, DateTime? endDate)
+        {
+            var allOrders = new List<OrderListingServiceModel>();
+
+            int currentPage = 1;
+            while (true)
+            {
+                var data = await this.All(currentPage, search, filters, startDate, endDate);
+
+                if (!data.Orders.Any())
+                {
+                    return allOrders;
+                }
+
+                foreach (var order in data.Orders)
+                {
+                    allOrders.Add(order);
+                }
+
+                currentPage++;
+            }
+        }
+
         public async Task<AllOrdersServiceModel> Mine(int page, string? search)
         {
             var userOrders = db.UsersOrders
@@ -399,6 +422,33 @@
             await db.SaveChangesAsync();
 
             return;
+        }
+
+        public async Task<SummaryServiceModel> Summary()
+        {
+            var summary = new SummaryServiceModel();
+
+            var orders = db.Orders
+                .AsQueryable();
+
+            summary.TotalOrders = await orders.CountAsync();
+            foreach (var order in orders)
+            {
+                var cart = await db.Carts.FirstAsync(x => x.Id == order.CartId);
+
+                await Task.Run(() =>
+                {
+                    summary.TotalDiscounts += cart!.TotalSaved; // be aware
+                    summary.TotalPriceWithoutDiscount += cart.TotalSaved + cart.TotalProducts + (cart.ShippingPrice ?? 0);
+                    summary.TotalProducts += db.CartProducts
+                                                    .Where(x => x.CartId == cart.Id)
+                                                    .Select(x => x.Count)
+                                                    .Sum();
+                    summary.TotalPrice += cart.TotalProducts + (cart.ShippingPrice ?? 0);
+                });
+            }
+
+            return summary;
         }
     }
 }

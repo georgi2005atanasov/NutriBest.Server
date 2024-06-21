@@ -215,14 +215,6 @@
             return allOrders;
         }
 
-        private static object OrderOrders(OrderListingServiceModel x, List<string> appliedFilters)
-        {
-            return appliedFilters.Contains("Finished") ? x.IsFinished :
-                    appliedFilters.Contains("Confirmed") ? x.IsConfirmed :
-                    appliedFilters.Contains("Paid") ? x.IsPaid :
-                    appliedFilters.Contains("Shipped") ? x.IsShipped : false;
-        }
-
         public static void CheckForLowStock(this IOrderService service,
             Product product,
             List<LowInStockServiceModel> lowStocks)

@@ -11,5 +11,8 @@
         public Task<AllSubscribersServiceModel> AllSubscribers(int page,
             string? search,
             string? groupType);
+
+        public Task<List<SubscriberServiceModel>> AllExportSubscribers(string? search,
+            string? groupType);
     }
 }

@@ -160,7 +160,8 @@
                              .Select(c => c.Category.Name)
                              .ToList(),
                         Quantity = db.Products.First(x => x.ProductId == y.Key).Quantity,
-                        PromotionId = db.Products.First(x => x.ProductId == y.Key).PromotionId
+                        PromotionId = db.Products.First(x => x.ProductId == y.Key).PromotionId,
+                        Brand =  db.Products.First(x => x.ProductId == y.Key).Brand!.Name
                     },
                     SoldCount = db.CartProducts
                     .Where(x => x.ProductId == y.Key)

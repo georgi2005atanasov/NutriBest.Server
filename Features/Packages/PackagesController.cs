@@ -5,6 +5,8 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Packages.Models;
+    using NutriBest.Server.Utilities;
+    using System.Text;
 
     public class PackagesController : ApiController
     {
@@ -23,12 +25,7 @@
         {
             try
             {
-                var packages = await db.Packages
-                    .Select(x => new PackageServiceModel
-                    {
-                        Grams = x.Grams
-                    })
-                    .ToListAsync();
+                var packages = await packageService.All();
 
                 return Ok(packages);
             }
@@ -103,6 +100,42 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsv()
+        {
+            try
+            {
+                var flavours = await packageService.All();
+                var csv = ConvertToCsv(flavours);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "packages.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(IEnumerable<PackageServiceModel> packages)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("Grams");
+
+            foreach (var package in packages)
+            {
+                csv.AppendLine(CsvHelper.EscapeCsvValue(package.Grams.ToString()));
+            }
+
+            return csv.ToString();
         }
     }
 }

@@ -72,6 +72,29 @@
             return allSubscribersModel;
         }
 
+        public async Task<List<SubscriberServiceModel>> AllExportSubscribers(string? search, string? groupType)
+        {
+            var allSubscribers = new List<SubscriberServiceModel>();
+
+            int currentPage = 1;
+            while (true)
+            {
+                var data = await AllSubscribers(currentPage, search, groupType);
+
+                if (!data.Subscribers.Any())
+                {
+                    return allSubscribers;
+                }
+
+                foreach (var subscriber in data.Subscribers)
+                {
+                    allSubscribers.Add(subscriber);
+                }
+
+                currentPage++;
+            }
+        }
+
         public async Task<bool> Remove(string email)
         {
             var newsletter = await db.Newsletter

@@ -13,6 +13,14 @@
         public PackageService(NutriBestDbContext db)
             => this.db = db;
 
+        public async Task<List<PackageServiceModel>> All()
+            => await db.Packages
+                    .Select(x => new PackageServiceModel
+                    {
+                        Grams = x.Grams
+                    })
+                    .ToListAsync();
+
         public async Task<int> Create(int grams)
         {
             if (await db.Packages.AnyAsync(x => x.Grams == grams))

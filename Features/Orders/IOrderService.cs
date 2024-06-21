@@ -13,6 +13,10 @@
 
         Task<AllOrdersServiceModel> All(int page, string? search, string? filters, DateTime? startDate, DateTime? endDate);
 
+        Task<List<OrderListingServiceModel>> AllForExport(string? search, string? filters, DateTime? startDate, DateTime? endDate);
+
+        Task<SummaryServiceModel> Summary();
+
         Task<AllOrdersServiceModel> Mine(int page, string? search);
 
         Task<OrderRelatedProductsServiceModel> GetOrderRelatedProducts(decimal price);
