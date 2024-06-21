@@ -98,6 +98,38 @@
             };
         }
 
+        public async Task<List<ProductListingServiceModel>> AllForExport(string? categories,
+            string? brand,
+            string? priceFilter,
+            string? alphaFilter,
+            string? search,
+            string? priceRange,
+            string? quantities,
+            string? flavours)
+        {
+            var allProducts = new List<ProductListingServiceModel>();
+
+            int currentPage = 1;
+            while (true)
+            {
+                var products = await All(currentPage, categories, brand, priceFilter, alphaFilter, null, search, priceRange, quantities, flavours);
+
+                if (products.ProductsRows == null || products.ProductsRows.Count() == 0)
+                {
+                    return allProducts;
+                }
+
+                var productsToAdd = products.ProductsRows.SelectMany(x => x);
+
+                foreach (var product in productsToAdd)
+                {
+                    allProducts.Add(product);
+                }
+
+                currentPage++;
+            }
+        }
+
         public async Task<int> Create(string name,
             string description,
             string brandName,

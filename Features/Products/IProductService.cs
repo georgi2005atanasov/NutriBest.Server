@@ -23,6 +23,15 @@
             string? quantities,
             string? flavours);
 
+        Task<List<ProductListingServiceModel>> AllForExport(string? categories,
+            string? brand,
+            string? priceFilter,
+            string? alphaFilter,
+            string? search,
+            string? priceRange,
+            string? quantities,
+            string? flavours);
+
         Task<ProductServiceModel> Get(int id);
 
         Task<List<ProductSpecsServiceModel>> GetSpecs(int id, string name);

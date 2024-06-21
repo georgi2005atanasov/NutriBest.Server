@@ -500,11 +500,18 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("CSV")]
-        public async Task<FileContentResult?> GetCsvUsers()
+        public async Task<FileContentResult?> GetCsvUsers([FromQuery] string? categories = "",
+            [FromQuery] string? brand = "",
+            [FromQuery] string? price = "",
+            [FromQuery] string? alpha = "",
+            [FromQuery] string? search = "",
+            [FromQuery] string? priceRange = "",
+            [FromQuery] string? quantities = "",
+            [FromQuery] string? flavours = "")
         {
             try
-            {
-                var products = await productService.All(1, null, null, null, null, null, null, null, null, null);
+            { 
+                var products = await productService.AllForExport(categories, brand, price, alpha, search, priceRange, quantities, flavours);
                 var csv = ConvertToCsv(products);
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
@@ -520,19 +527,19 @@
             }
         }
 
-        private string ConvertToCsv(AllProductsServiceModel products)
+        private string ConvertToCsv(List<ProductListingServiceModel> products)
         {
             var csv = new StringBuilder();
             csv.AppendLine("Id,Name,StartingPrice,Brand,Description,Categories,PromotionId");
 
-            if (products.ProductsRows == null)
+            if (products == null)
             {
                 return csv.ToString();
             }
 
-            foreach (var product in products.ProductsRows.SelectMany(x => x))
+            foreach (var product in products)
             {
-                //csv.AppendLine($"{CsvHelper.EscapeCsvValue(product.ProductId.ToString())},{CsvHelper.EscapeCsvValue(product.Name)},{CsvHelper.EscapeCsvValue(product.Price.ToString())} BGN,{CsvHelper.EscapeCsvValue(product.Brand)},{CsvHelper.EscapeCsvValue(product.Description)},{CsvHelper.EscapeCsvValue(string.Join(";", product.Categories))},{CsvHelper.EscapeCsvValue(product.PromotionId?.ToString() ?? "-")}");
+                csv.AppendLine($"{CsvHelper.EscapeCsvValue(product.ProductId.ToString())},{CsvHelper.EscapeCsvValue(product.Name)},{CsvHelper.EscapeCsvValue($"{product.Price} BGN")},{CsvHelper.EscapeCsvValue(product.Brand)},{CsvHelper.EscapeCsvValue(product.Description)},{CsvHelper.EscapeCsvValue(string.Join(";", product.Categories))},{CsvHelper.EscapeCsvValue(product.PromotionId?.ToString() ?? "-")}");
             }
 
             return csv.ToString();
