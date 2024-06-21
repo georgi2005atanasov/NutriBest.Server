@@ -5,6 +5,8 @@
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Categories.Models;
+    using NutriBest.Server.Utilities;
+    using System.Text;
 
     public class CategoriesController : ApiController
     {
@@ -23,12 +25,7 @@
         {
             try
             {
-                var categories = await db.Categories
-                    .Select(x => new CategoryServiceModel
-                    {
-                        Name = x.Name
-                    })
-                    .ToListAsync();
+                var categories = await categoryService.All();
 
                 return Ok(categories);
             }
@@ -79,6 +76,42 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsv()
+        {
+            try
+            {
+                var categories = await categoryService.All();
+                var csv = ConvertToCsv(categories);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "categories.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(IEnumerable<CategoryServiceModel> categories)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("CategoryName");
+
+            foreach (var category in categories)
+            {
+                csv.AppendLine(CsvHelper.EscapeCsvValue(category.Name ?? ""));
+            }
+
+            return csv.ToString();
         }
     }
 }

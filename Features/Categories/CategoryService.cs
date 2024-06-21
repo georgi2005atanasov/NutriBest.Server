@@ -38,7 +38,7 @@
                     Id = x.Id,
                     Name = x.Name,
                 })
-                .OrderBy(x => x.Id)
+                .OrderBy(x => x.Name)
                 .ToListAsync();
 
             var categoriesIds = new List<int>();
@@ -98,9 +98,19 @@
                     Count = x.ProductsCategories
                     .Where(y => y.CategoryId == x.Id).Count(),
                 })
+                .OrderBy(x => x.Category)
                 .ToListAsync();
 
             return categoriesCount;
         }
+
+        public async Task<List<CategoryServiceModel>> All()
+            => await db.Categories
+                    .Select(x => new CategoryServiceModel
+                    {
+                        Name = x.Name
+                    })
+                    .OrderBy(x => x.Name)
+                    .ToListAsync();
     }
 }

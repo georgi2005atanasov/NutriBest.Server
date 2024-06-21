@@ -5,6 +5,8 @@
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Brands.Models;
+    using NutriBest.Server.Utilities;
+    using System.Text;
 
     public class BrandsController : ApiController
     {
@@ -126,6 +128,42 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsv()
+        {
+            try
+            {
+                var brands = await brandService.All();
+                var csv = ConvertToCsv(brands);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "brands.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(IEnumerable<BrandServiceModel> brands)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("BrandName,Description");
+
+            foreach (var brand in brands)
+            {
+                csv.AppendLine($"{CsvHelper.EscapeCsvValue(brand.Name ?? "")},{CsvHelper.EscapeCsvValue(brand.Description ?? "-")}");
+            }
+
+            return csv.ToString();
         }
     }
 }
