@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriBest.Server.Data;
 using NutriBest.Server.Features.Flavours.Models;
+using NutriBest.Server.Utilities;
+using System.Text;
 
 namespace NutriBest.Server.Features.Flavours
 {
@@ -19,17 +21,11 @@ namespace NutriBest.Server.Features.Flavours
 
         [HttpGet]
         //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
-        public async Task<ActionResult<FlavourServiceModel>> All()
+        public async Task<ActionResult<List<FlavourServiceModel>>> All()
         {
             try
             {
-                var flavours = await db.Flavours
-                    .Select(x => new FlavourServiceModel
-                    {
-                        Name = x.FlavourName
-                    })
-                    .OrderBy(x => x.Name)
-                    .ToListAsync();
+                var flavours = await flavourService.All();
 
                 return Ok(flavours);
             }
@@ -96,6 +92,43 @@ namespace NutriBest.Server.Features.Flavours
             {
                 return BadRequest();
             }
+        }
+
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsv()
+        {
+            try
+            {
+                var flavours = await flavourService.All();
+                var csv = ConvertToCsv(flavours);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "flavours.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(IEnumerable<FlavourServiceModel> flavours)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("FlavourName");
+
+            foreach (var flavour in flavours)
+            {
+                csv.AppendLine(CsvHelper.EscapeCsvValue(flavour.Name));
+            }
+
+            return csv.ToString();
         }
     }
 }

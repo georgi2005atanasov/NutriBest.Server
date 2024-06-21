@@ -1,7 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
@@ -11,7 +10,6 @@
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using System.Linq;
-    using System.Text;
     using static ServicesConstants.PaginationConstants;
 
     public class ProfileService : IProfileService, ITransientService
@@ -81,7 +79,7 @@
                 //the colleciton if it is valid
             }
 
-            //this may be outsourced in the future, it is not so much so i do it in here
+            //this may be outsourced in the future, it is not so much so I do it in here
             if (search != null)
             {
                 search = search.ToLower();
@@ -106,6 +104,29 @@
                 .ToList();
 
             return allProfiles;
+        }
+
+        public async Task<List<ProfileListingServiceModel>> AllForExport(string? search, string? groupType)
+        {
+            var allProfiles = new List<ProfileListingServiceModel>();
+
+            int currentPage = 1;
+            while (true)
+            {
+                var profiles = await All(currentPage, search, groupType);
+
+                if (!profiles.Profiles.Any())
+                {
+                    return allProfiles;
+                }
+
+                foreach (var profile in profiles.Profiles)
+                {
+                    allProfiles.Add(profile);
+                }
+
+                currentPage++;
+            }
         }
 
         public async Task<ProfileAddressServiceModel> GetAddress()

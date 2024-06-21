@@ -500,7 +500,7 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("CSV")]
-        public async Task<FileContentResult?> GetCsvUsers([FromQuery] string? categories = "",
+        public async Task<FileContentResult?> GetCsv([FromQuery] string? categories = "",
             [FromQuery] string? brand = "",
             [FromQuery] string? price = "",
             [FromQuery] string? alpha = "",

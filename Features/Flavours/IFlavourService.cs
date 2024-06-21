@@ -4,6 +4,8 @@
 
     public interface IFlavourService
     {
+        Task<List<FlavourServiceModel>> All();
+
         Task<int> Create(string name);
 
         Task<bool> Remove(string name);

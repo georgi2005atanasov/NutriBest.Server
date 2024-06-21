@@ -38,7 +38,7 @@
             else
             {
                 ordersCount = await db.UsersOrders
-                    .Where(x => x.CreatedBy == email)
+                    .Where(x => x.CreatedBy == user.UserName)
                     .CountAsync();
 
                 var profile = await db.Profiles

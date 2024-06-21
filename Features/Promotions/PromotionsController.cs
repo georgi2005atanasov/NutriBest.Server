@@ -4,7 +4,9 @@
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Utilities;
     using System.Globalization;
+    using System.Text;
 
     public class PromotionsController : ApiController
     {
@@ -269,6 +271,42 @@
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator,Employee")]
+        [Route("CSV")]
+        public async Task<FileContentResult?> GetCsv()
+        {
+            try
+            {
+                var promotions = await promotionService.All();
+                var csv = ConvertToCsv(promotions);
+                var bytes = Encoding.UTF8.GetBytes(csv);
+                var result = new FileContentResult(bytes, "text/csv")
+                {
+                    FileDownloadName = "products.csv"
+                };
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string ConvertToCsv(IEnumerable<PromotionServiceModel> promotions)
+        {
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Description,Brand,Category,DiscountAmount,DiscountPercentage,IsActive,StartDate,EndDate");
+
+            foreach (var promotion in promotions)
+            {
+                csv.AppendLine($"{CsvHelper.EscapeCsvValue(promotion.PromotionId.ToString() ?? "-")},{CsvHelper.EscapeCsvValue(promotion.Description ?? "-")},{CsvHelper.EscapeCsvValue(promotion.Brand ?? "-")},{CsvHelper.EscapeCsvValue(promotion.Category ?? "-")},{CsvHelper.EscapeCsvValue(promotion.DiscountAmount != null ? $"{promotion.DiscountAmount} BGN" : "-")},{CsvHelper.EscapeCsvValue(promotion.DiscountPercentage != null ? $"{promotion.DiscountPercentage}%" : "-")},{CsvHelper.EscapeCsvValue(promotion.IsActive.ToString())},{CsvHelper.EscapeCsvValue(promotion.StartDate.ToString())},{CsvHelper.EscapeCsvValue(promotion.EndDate != null ? $"{promotion.EndDate}" : "")}");
+            }
+
+            return csv.ToString();
         }
 
         private (decimal? discountAmount, decimal? discountPercentage)

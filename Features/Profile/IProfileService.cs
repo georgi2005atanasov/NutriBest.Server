@@ -7,6 +7,8 @@
     {
         Task<AllProfilesServiceModel> All(int page, string? search, string? groupType);
 
+        Task<List<ProfileListingServiceModel>> AllForExport(string? search, string? groupType);
+
         Task<ProfileDetailsServiceModel> GetDetailsById(string id);
 
         Task<string> UpdateProfile(string? name,

@@ -7,6 +7,7 @@
     using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Features.Newsletter.Models;
+    using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
 
@@ -15,14 +16,17 @@
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
         private readonly IEmailService emailService;
+        private readonly INotificationService notificationService;
 
         public NewsletterService(NutriBestDbContext db,
             UserManager<User> userManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            INotificationService notificationService)
         {
             this.db = db;
             this.userManager = userManager;
             this.emailService = emailService;
+            this.notificationService = notificationService;
         }
 
         public async Task<int> Add(string email)
@@ -45,6 +49,9 @@
             };
 
             db.Newsletter.Add(subscription);
+
+            // can be stopped anytime
+            await notificationService.SendNotificationToAdmin("success", $"'{email}' Has Just Signed up For the Newsletter");
 
             await db.SaveChangesAsync();
 
@@ -90,20 +97,27 @@
 
             foreach (var subscriber in subscribers)
             {
+                var (isAnonymous, ordersCount, name, phoneNumber) = await this.GetNewsletterData(db, userManager, subscriber.Email);
+
+                if (subscriber.TotalOrders != ordersCount)
+                {
+                    subscriber.TotalOrders = ordersCount;
+                    subscriber.HasOrders = true;
+                }
+
                 var subscriberModel = new SubscriberServiceModel
                 {
                     Email = subscriber.Email,
-                    HasOrders = subscriber.HasOrders,
-                    TotalOrders = subscriber.TotalOrders,
-                    IsAnonymous = subscriber.IsAnonymous,
-                    Name = subscriber.Name,
-                    PhoneNumber = subscriber.PhoneNumber,
+                    HasOrders = ordersCount != 0,
+                    TotalOrders = ordersCount,
+                    IsAnonymous = isAnonymous,
+                    Name = name,
+                    PhoneNumber = phoneNumber,
                     RegisteredOn = subscriber.CreatedOn
                 };
 
                 await CheckGroupType(subscriberModel, subscribersToReturn, groupType);
             }
-
 
             subscribersToReturn = subscribersToReturn
                 .Skip((page - 1) * UsersPerPage)
@@ -120,6 +134,8 @@
                     x.Email.ToLower().Contains(search))
                     .ToList();
             }
+
+            await db.SaveChangesAsync();
 
             return subscribersToReturn;
         }

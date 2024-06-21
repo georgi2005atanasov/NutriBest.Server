@@ -192,16 +192,17 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/Profiles/CSV")]
-        public async Task<FileContentResult?> GetCsvUsers()
+        public async Task<FileContentResult?> GetCsv([FromQuery] string? search,
+            [FromQuery] string? groupType)
         {
             try
             {
-                var users = await profileService.All(1, null, null); // Assuming this fetches your data
+                var users = await profileService.All(1, search, groupType); // Assuming this fetches your data
                 var csv = ConvertToCsv(users);
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
-                    FileDownloadName = "users.csv"
+                    FileDownloadName = "profiles.csv"
                 };
 
                 return result;
@@ -219,7 +220,7 @@
 
             foreach (var user in users.Profiles)
             {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(user.ProfileId)},{CsvHelper.EscapeCsvValue(user.Name ?? "")},{CsvHelper.EscapeCsvValue(user.Email ?? "")},{CsvHelper.EscapeCsvValue(user.MadeOn.ToString())},{CsvHelper.EscapeCsvValue(user.IsDeleted.ToString())},{CsvHelper.EscapeCsvValue(user.PhoneNumber ?? "")},{CsvHelper.EscapeCsvValue(user.City ?? "")},{CsvHelper.EscapeCsvValue(user.TotalOrders.ToString())},{CsvHelper.EscapeCsvValue(user.TotalSpent.ToString())}");
+                csv.AppendLine($"{CsvHelper.EscapeCsvValue(user.ProfileId)},{CsvHelper.EscapeCsvValue(user.Name ?? "-")},{CsvHelper.EscapeCsvValue(user.Email ?? "-")},{CsvHelper.EscapeCsvValue(user.MadeOn.ToString())},{CsvHelper.EscapeCsvValue(user.IsDeleted.ToString())},{CsvHelper.EscapeCsvValue(user.PhoneNumber ?? "-")},{CsvHelper.EscapeCsvValue(user.City ?? "-")},{CsvHelper.EscapeCsvValue(user.TotalOrders.ToString())},{CsvHelper.EscapeCsvValue(user.TotalSpent.ToString())}");
             }
 
             return csv.ToString();

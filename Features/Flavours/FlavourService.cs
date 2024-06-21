@@ -87,5 +87,14 @@
 
             return products;
         }
+
+        public async Task<List<FlavourServiceModel>> All()
+        => await db.Flavours
+                    .Select(x => new FlavourServiceModel
+                    {
+                        Name = x.FlavourName
+                    })
+                    .OrderBy(x => x.Name)
+                    .ToListAsync();
     }
 }
