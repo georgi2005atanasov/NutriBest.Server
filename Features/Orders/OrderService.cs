@@ -424,9 +424,9 @@
             return;
         }
 
-        public async Task<SummaryServiceModel> Summary()
+        public async Task<OrdersSummaryServiceModel> Summary()
         {
-            var summary = new SummaryServiceModel();
+            var summary = new OrdersSummaryServiceModel();
 
             var orders = db.Orders
                 .AsQueryable();

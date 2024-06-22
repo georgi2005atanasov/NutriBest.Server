@@ -3,8 +3,6 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.PromoCodes.Models;
-    using NutriBest.Server.Utilities;
-    using System.Text;
     using static ServicesConstants.PromoCodes;
 
     public class PromoCodeController : ApiController
@@ -167,42 +165,6 @@
                     Result = false
                 });
             }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv()
-        {
-            try
-            {
-                var promoCodes = await promoCodeService.All();
-                var csv = ConvertToCsv(promoCodes);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "promoCodes.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(IEnumerable<PromoCodeByDescriptionServiceModel> promoCodes)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("Description,ExpiresIn,Codes");
-
-            foreach (var promoCode in promoCodes)
-            {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(promoCode.Description)},{CsvHelper.EscapeCsvValue(promoCode.ExpireIn.ToString())},{CsvHelper.EscapeCsvValue(string.Join("; ", promoCode.PromoCodes ?? new List<string>()))}");
-            }
-
-            return csv.ToString();
         }
     }
 }

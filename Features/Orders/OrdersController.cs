@@ -4,9 +4,6 @@
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Orders.Models;
     using NutriBest.Server.Utilities;
-    using System.Globalization;
-    using System.Text;
-    using System.Web;
 
     public class OrdersController : ApiController
     {
@@ -191,89 +188,6 @@
             {
                 return BadRequest();
             }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv([FromQuery] string? search,
-             [FromQuery] string? filters = "",
-            [FromQuery] string? startDate = null,
-            [FromQuery] string? endDate = null)
-        {
-            try
-            {
-                var (parsedStartDate, parsedEndDate) = DateTimeHelper.ParseDates(startDate, endDate);
-
-                var products = await orderService.AllForExport(search, filters, parsedStartDate, parsedEndDate);
-                var csv = ConvertToCsv(products);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "orders.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(List<OrderListingServiceModel> orders)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("Id,IsFinished,IsConfirmed,MadeOn,CustomerName,City,Country,Email,PhoneNumber,IsPaid,IsShipped,PaymentMethod,IsAnonymous,TotalPrice");
-
-            if (orders == null)
-            {
-                return csv.ToString();
-            }
-
-            foreach (var order in orders)
-            {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(order.OrderId.ToString())},{CsvHelper.EscapeCsvValue(order.IsFinished.ToString())},{CsvHelper.EscapeCsvValue(order.IsConfirmed.ToString())},{CsvHelper.EscapeCsvValue(order.MadeOn.ToString())},{CsvHelper.EscapeCsvValue(order.CustomerName)},{CsvHelper.EscapeCsvValue(order.City)},{CsvHelper.EscapeCsvValue(order.Country)},{CsvHelper.EscapeCsvValue(order.Email)},{CsvHelper.EscapeCsvValue(order.PhoneNumber ?? "-")},{CsvHelper.EscapeCsvValue(order.IsPaid.ToString())},{CsvHelper.EscapeCsvValue(order.IsShipped.ToString())},{CsvHelper.EscapeCsvValue(order.PaymentMethod)},{CsvHelper.EscapeCsvValue(order.IsAnonymous.ToString())},{CsvHelper.EscapeCsvValue(order.TotalPrice.ToString())}");
-            }
-
-            return csv.ToString();
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV/Summary")]
-        public async Task<FileContentResult?> GetCsvSummary()
-        {
-            try
-            {
-                var summary = await orderService.Summary();
-                var csv = ConvertToCsvSummary(summary);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "orders.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsvSummary(SummaryServiceModel summary)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("TotalProducts,TotalOrders,TotalDiscounts,TotalPriceWithoutDiscount,TotalPrice");
-
-            if (summary == null)
-            {
-                return csv.ToString();
-            }
-            csv.AppendLine($"{CsvHelper.EscapeCsvValue($"{summary.TotalProducts}")},{CsvHelper.EscapeCsvValue($"{summary.TotalOrders}")},{CsvHelper.EscapeCsvValue($"{summary.TotalDiscounts} BGN")},{CsvHelper.EscapeCsvValue($"{summary.TotalPriceWithoutDiscount} BGN")},{CsvHelper.EscapeCsvValue($"{summary.TotalPrice} BGN")}");
-
-            return csv.ToString();
         }
 
         private string? GetSessionOrder()

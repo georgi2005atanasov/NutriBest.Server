@@ -2,11 +2,8 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Data;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
-    using NutriBest.Server.Utilities;
     using System.Globalization;
-    using System.Text;
     using static ServicesConstants.Promotion;
 
     public class ShippingDiscountController : ApiController
@@ -150,42 +147,6 @@
             {
                 return BadRequest();
             }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv()
-        {
-            try
-            {
-                var shippingDiscounts = await shippingDiscountService.All();
-                var csv = ConvertToCsv(shippingDiscounts.ShippingDiscounts);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "categories.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(IEnumerable<ShippingDiscountServiceModel> discounts)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("DiscountPercentage,Country,Description,MinimumPrice,EndDate");
-
-            foreach (var shippingDiscount in discounts)
-            {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(shippingDiscount.DiscountPercentage.ToString())},{CsvHelper.EscapeCsvValue(shippingDiscount.CountryName)},{CsvHelper.EscapeCsvValue(shippingDiscount.Description)},{CsvHelper.EscapeCsvValue(shippingDiscount.MinimumPrice != null ? $"{shippingDiscount.MinimumPrice} BGN" : "-")},{CsvHelper.EscapeCsvValue(shippingDiscount.EndDate.ToString() ?? "-")}");
-            }
-
-            return csv.ToString();
         }
     }
 }

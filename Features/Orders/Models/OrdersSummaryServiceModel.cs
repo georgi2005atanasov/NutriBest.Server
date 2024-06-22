@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Orders.Models
 {
-    public class SummaryServiceModel
+    public class OrdersSummaryServiceModel
     {
         public int TotalOrders { get; set; }
 

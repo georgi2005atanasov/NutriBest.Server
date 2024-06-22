@@ -9,9 +9,7 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Utilities;
     using System.Globalization;
-    using System.Text;
     using System.Text.Json;
 
     public class ProductsController : ApiController
@@ -495,54 +493,6 @@
             {
                 return BadRequest();
             }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv([FromQuery] string? categories = "",
-            [FromQuery] string? brand = "",
-            [FromQuery] string? price = "",
-            [FromQuery] string? alpha = "",
-            [FromQuery] string? search = "",
-            [FromQuery] string? priceRange = "",
-            [FromQuery] string? quantities = "",
-            [FromQuery] string? flavours = "")
-        {
-            try
-            { 
-                var products = await productService.AllForExport(categories, brand, price, alpha, search, priceRange, quantities, flavours);
-                var csv = ConvertToCsv(products);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "products.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public static string ConvertToCsv(List<ProductListingServiceModel> products)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("Id,Name,StartingPrice,Brand,Description,Categories,PromotionId");
-
-            if (products == null)
-            {
-                return csv.ToString();
-            }
-
-            foreach (var product in products)
-            {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(product.ProductId.ToString())},{CsvHelper.EscapeCsvValue(product.Name)},{CsvHelper.EscapeCsvValue($"{product.Price} BGN")},{CsvHelper.EscapeCsvValue(product.Brand)},{CsvHelper.EscapeCsvValue(product.Description)},{CsvHelper.EscapeCsvValue(string.Join(";", product.Categories))},{CsvHelper.EscapeCsvValue(product.PromotionId?.ToString() ?? "-")}");
-            }
-
-            return csv.ToString();
         }
 
         private bool ProductExists(string productName)

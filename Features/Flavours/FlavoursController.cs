@@ -1,21 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-using NutriBest.Server.Features.Flavours.Models;
-using NutriBest.Server.Utilities;
-using System.Text;
-
-namespace NutriBest.Server.Features.Flavours
+﻿namespace NutriBest.Server.Features.Flavours
 {
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using NutriBest.Server.Features.Flavours.Models;
+
     public class FlavoursController : ApiController
     {
-        private readonly NutriBestDbContext db;
         private readonly IFlavourService flavourService;
 
-        public FlavoursController(NutriBestDbContext db, IFlavourService flavourService)
+        public FlavoursController(IFlavourService flavourService)
         {
-            this.db = db;
             this.flavourService = flavourService;
         }
 
@@ -92,43 +86,6 @@ namespace NutriBest.Server.Features.Flavours
             {
                 return BadRequest();
             }
-        }
-
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv()
-        {
-            try
-            {
-                var flavours = await flavourService.All();
-                var csv = ConvertToCsv(flavours);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "flavours.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(IEnumerable<FlavourServiceModel> flavours)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("FlavourName");
-
-            foreach (var flavour in flavours)
-            {
-                csv.AppendLine(CsvHelper.EscapeCsvValue(flavour.Name));
-            }
-
-            return csv.ToString();
         }
     }
 }

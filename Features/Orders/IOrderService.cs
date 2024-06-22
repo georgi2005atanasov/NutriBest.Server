@@ -15,7 +15,7 @@
 
         Task<List<OrderListingServiceModel>> AllForExport(string? search, string? filters, DateTime? startDate, DateTime? endDate);
 
-        Task<SummaryServiceModel> Summary();
+        Task<OrdersSummaryServiceModel> Summary();
 
         Task<AllOrdersServiceModel> Mine(int page, string? search);
 

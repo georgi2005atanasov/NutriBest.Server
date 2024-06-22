@@ -2,25 +2,19 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Packages.Models;
-    using NutriBest.Server.Utilities;
-    using System.Text;
 
     public class PackagesController : ApiController
     {
-        private readonly NutriBestDbContext db;
         private readonly IPackageService packageService;
 
-        public PackagesController(NutriBestDbContext db, IPackageService packageService)
+        public PackagesController(IPackageService packageService)
         {
-            this.db = db;
             this.packageService = packageService;
         }
 
         [HttpGet]
-        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<PackageServiceModel>> All()
         {
             try
@@ -100,42 +94,6 @@
             {
                 return BadRequest();
             }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv()
-        {
-            try
-            {
-                var flavours = await packageService.All();
-                var csv = ConvertToCsv(flavours);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "packages.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(IEnumerable<PackageServiceModel> packages)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("Grams");
-
-            foreach (var package in packages)
-            {
-                csv.AppendLine(CsvHelper.EscapeCsvValue(package.Grams.ToString()));
-            }
-
-            return csv.ToString();
         }
     }
 }

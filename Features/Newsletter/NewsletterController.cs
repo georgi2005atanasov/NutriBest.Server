@@ -3,8 +3,6 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using NutriBest.Server.Features.Newsletter.Models;
-    using NutriBest.Server.Utilities;
-    using System.Text;
 
     public class NewsletterController : ApiController
     {
@@ -97,44 +95,6 @@
             {
                 return BadRequest();
             }
-        }
-
-
-        [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("CSV")]
-        public async Task<FileContentResult?> GetCsv([FromQuery] string? search,
-            [FromQuery] string? groupType)
-        {
-            try
-            {
-                var subscribers = await newsletterService.AllExportSubscribers(search, groupType); 
-                var csv = ConvertToCsv(subscribers);
-                var bytes = Encoding.UTF8.GetBytes(csv);
-                var result = new FileContentResult(bytes, "text/csv")
-                {
-                    FileDownloadName = "newsletter.csv"
-                };
-
-                return result;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private string ConvertToCsv(List<SubscriberServiceModel> subscribers)
-        {
-            var csv = new StringBuilder();
-            csv.AppendLine("Email,Name,MadeOn,RegisteredOn,PhoneNumber,IsAnonymous,HasOrders,TotalOrders");
-
-            foreach (var subscriber in subscribers)
-            {
-                csv.AppendLine($"{CsvHelper.EscapeCsvValue(subscriber.Email)},{CsvHelper.EscapeCsvValue(subscriber.Name ?? "-")},{CsvHelper.EscapeCsvValue(subscriber.RegisteredOn.ToString())},{CsvHelper.EscapeCsvValue(subscriber.PhoneNumber ?? "")},{CsvHelper.EscapeCsvValue(subscriber.IsAnonymous.ToString())},{CsvHelper.EscapeCsvValue(subscriber.HasOrders.ToString())},{CsvHelper.EscapeCsvValue(subscriber.TotalOrders.ToString())}");
-            }
-
-            return csv.ToString();
         }
     }
 }
