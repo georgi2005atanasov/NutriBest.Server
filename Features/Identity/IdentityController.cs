@@ -37,14 +37,14 @@
             try
             {
                 if (userModel.ConfirmPassword != userModel.Password)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "Password",
                         Message = "Both passwords should match!"
                     });
 
                 if (userModel.UserName.Contains(" "))
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "UserName",
                         Message = "Username must not contain white spaces!"
@@ -61,7 +61,7 @@
 
                     await notificationService.SendNotificationToAdmin("success", $"'{user.UserName}' Has Just Registered!");
 
-                    return Ok(new
+                    return Ok(new SuccessResponse
                     {
                         Message = "Successfully added new user!"
                     });
@@ -71,7 +71,7 @@
             }
             catch (Exception err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = err.Message
                 });
@@ -116,7 +116,7 @@
             try
             {
                 if (resetModel.NewPassword != resetModel.ConfirmPassword)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "NewPassword",
                         Message = "Both passwords should match!"
@@ -124,21 +124,29 @@
 
                 var user = await userManager.FindByEmailAsync(resetModel.Email);
                 if (user == null)
-                {
-                    return Ok(new { Message = "Password reset successful." });
-                }
+                    return Ok(new SuccessResponse
+                    {
+                        Message = "Password reset successful."
+                    });
 
                 var result = await userManager.ResetPasswordAsync(user, resetModel.Token, resetModel.NewPassword);
                 if (result.Succeeded)
-                {
-                    return Ok(new { Message = "Password reset successful." });
-                }
+                    return Ok(new SuccessResponse
+                    {
+                        Message = "Password reset successful."
+                    });
 
-                return BadRequest(new { Message = "Error resetting password." });
+                return BadRequest(new FailResponse
+                { 
+                    Message = "Error resetting password." 
+                });
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
         }
 
@@ -158,7 +166,10 @@
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Error occured when fetching the roles!"
+                });
             }
         }
     }

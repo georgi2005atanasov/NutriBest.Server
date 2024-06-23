@@ -12,16 +12,10 @@
     public class FlavourService : IFlavourService, ITransientService
     {
         private readonly NutriBestDbContext db;
-        private readonly IProductService productService;
-        private readonly ICurrentUserService currentUserService;
 
-        public FlavourService(NutriBestDbContext db,
-            IProductService productService,
-            ICurrentUserService currentUserService)
+        public FlavourService(NutriBestDbContext db)
         {
             this.db = db;
-            this.productService = productService;
-            this.currentUserService = currentUserService;
         }
 
         public async Task<int> Create(string name)

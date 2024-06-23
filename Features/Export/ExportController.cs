@@ -110,7 +110,7 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
-        [Route("'/Flavours/CSV")]
+        [Route("/Flavours/CSV")]
         public async Task<FileContentResult?> GetCsvFlavours()
         {
             try

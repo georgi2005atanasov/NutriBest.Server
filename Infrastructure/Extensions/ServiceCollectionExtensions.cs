@@ -6,77 +6,23 @@
     using Microsoft.IdentityModel.Tokens;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Admin;
-    using NutriBest.Server.Features.Brands;
-    using NutriBest.Server.Features.Carts;
-    using NutriBest.Server.Features.Categories;
-    using NutriBest.Server.Features.Flavours;
-    using NutriBest.Server.Features.Identity;
-    using NutriBest.Server.Features.Images;
-    using NutriBest.Server.Features.NutritionsFacts;
-    using NutriBest.Server.Features.OrderDetails;
-    using NutriBest.Server.Features.Orders;
-    using NutriBest.Server.Features.Packages;
-    using NutriBest.Server.Features.Products;
-    using NutriBest.Server.Features.ProductsDetails;
-    using NutriBest.Server.Features.ProductsPromotions;
-    using NutriBest.Server.Features.PromoCodes;
-    using NutriBest.Server.Features.Promotions;
-    using NutriBest.Server.Features.UserOrders;
     using NutriBest.Server.Infrastructure.Filters;
     using NutriBest.Server.Infrastructure.Services;
-    using NutriBest.Server.Features.Email;
-    using NutriBest.Server.Features.ShippingDiscounts;
-    using NutriBest.Server.Features.Notifications;
-    using NutriBest.Server.Features.Newsletter;
-    using NutriBest.Server.Features.Reports;
     using System.Reflection;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
     public static class ServiceCollectionExtensions
     {
-        //public static IServiceCollection AddServices(this IServiceCollection services)
-        //{
-        //    services
-        //        .AddHostedService<PromoCodeCleanupService>()
-        //        .AddHostedService<PromotionCleanupService>()
-        //        .AddHostedService<PromotionActivationService>()
-        //        .AddHostedService<ShippingDiscountCleanupService>()
-        //        .AddScoped<IEmailService, EmailService>()
-        //        .AddScoped<ICurrentUserService, CurrentUserService>()
-        //        .AddTransient<IAdminService, AdminService>()
-        //        .AddTransient<IIdentityService, IdentityService>()
-        //        .AddTransient<IProfileService, ProfileService>()
-        //        .AddTransient<IProductService, ProductService>()
-        //        .AddTransient<IProductDetailsService, ProductDetailsService>()
-        //        .AddTransient<INutritionFactsService, NutritionFactsService>()
-        //        .AddTransient<IPromotionService, PromotionService>()
-        //        .AddTransient<IProductPromotionService, ProductPromotionService>()
-        //        .AddTransient<ICartService, CartService>()
-        //        .AddTransient<IImageService, ImageService>()
-        //        .AddTransient<ICategoryService, CategoryService>()
-        //        .AddTransient<IBrandService, BrandService>()
-        //        .AddTransient<IFlavourService, FlavourService>()
-        //        .AddTransient<IPackageService, PackageService>()
-        //        .AddTransient<IPromoCodeService, PromoCodeService>()
-        //        .AddTransient<IOrderDetailsService, OrderDetailsService>()
-        //        .AddTransient<IGuestOrderService, GuestOrderService>()
-        //        .AddTransient<IUserOrderService, UserOrderService>()
-        //        .AddTransient<IOrderService, OrderService>()
-        //        .AddTransient<IShippingDiscountService, ShippingDiscountService>()
-        //        .AddTransient<INotificationService, NotificationService>()
-        //        .AddTransient<INewsletterService, NewsletterService>()
-        //        .AddTransient<IReportService, ReportService>();
-
-        //    return services;
-        //}
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddTransient<IUserOrderService, UserOrderService>(); // Direct registration for troubleshooting
+            services
+                .AddHostedService<PromoCodeCleanupService>()
+                .AddHostedService<PromotionCleanupService>()
+                .AddHostedService<PromotionActivationService>()
+                .AddHostedService<ShippingDiscountCleanupService>();
 
-            var assembly = Assembly.GetExecutingAssembly(); // Or use a specific assembly if needed
+            var assembly = Assembly.GetExecutingAssembly(); 
 
-            RegisterServices(services, assembly, typeof(IHostedService), ServiceLifetime.Singleton);
             RegisterServices(services, assembly, typeof(IScopedService), ServiceLifetime.Scoped);
             RegisterServices(services, assembly, typeof(ITransientService), ServiceLifetime.Transient);
 
@@ -104,10 +50,10 @@
             services.AddIdentity<User, IdentityRole>(options =>
              {
                  options.Password.RequireNonAlphanumeric = false;
-                 options.Password.RequireLowercase = false;
-                 options.Password.RequiredLength = 6;
-                 options.Password.RequireDigit = false;
-                 options.Password.RequireUppercase = false;
+                 options.Password.RequireLowercase = true;
+                 options.Password.RequiredLength = 9;
+                 options.Password.RequireDigit = true;
+                 options.Password.RequireUppercase = true;
                  options.User.RequireUniqueEmail = true;
              })
             .AddEntityFrameworkStores<NutriBestDbContext>()

@@ -12,11 +12,12 @@
     using NutriBest.Server.Features.Promotions.Models;
     using NutriBest.Server.Features.Reports.Models;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Utilities;
     using System.Collections.Generic;
     using System.Text;
 
-    public class ExportService : IExportService
+    public class ExportService : IExportService, ITransientService
     {
         public string BrandsCsv(IEnumerable<BrandServiceModel> brands)
         {
@@ -60,7 +61,7 @@
         public string NewsletterCsv(IEnumerable<SubscriberServiceModel> subscribers)
         {
             var csv = new StringBuilder();
-            csv.AppendLine("Email,Name,MadeOn,RegisteredOn,PhoneNumber,IsAnonymous,HasOrders,TotalOrders");
+            csv.AppendLine("Email,Name,RegisteredOn,PhoneNumber,IsAnonymous,HasOrders,TotalOrders");
 
             foreach (var subscriber in subscribers)
             {

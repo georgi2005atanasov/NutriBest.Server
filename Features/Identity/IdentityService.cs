@@ -20,20 +20,16 @@
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationSettings appSettings;
-        private readonly IEmailService emailService;
 
         public IdentityService(UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
             RoleManager<IdentityRole> roleManager,
-            NutriBestDbContext db,
-            ICurrentUserService currentUser,
-            IEmailService emailService)
+            NutriBestDbContext db)
         {
             this.db = db;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.appSettings = appSettings.Value;
-            this.emailService = emailService;
         }
 
         public async Task<List<string>> AllRoles()
