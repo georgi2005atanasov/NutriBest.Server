@@ -6,10 +6,8 @@
     using Microsoft.IdentityModel.Tokens;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using NutriBest.Server.Infrastructure.Services;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
