@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutriBest.Server.Data;
 
@@ -11,9 +12,10 @@ using NutriBest.Server.Data;
 namespace NutriBest.Server.Data.Migrations
 {
     [DbContext(typeof(NutriBestDbContext))]
-    partial class NutriBestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240623211535_ReturnAddresMappingProp")]
+    partial class ReturnAddresMappingProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,6 +180,9 @@ namespace NutriBest.Server.Data.Migrations
                     b.Property<string>("ProfileId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Street")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -192,6 +197,10 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("CountryId");
 
                     b.HasIndex("ProfileId");
+
+                    b.HasIndex("ProfileUserId")
+                        .IsUnique()
+                        .HasFilter("[ProfileUserId] IS NOT NULL");
 
                     b.ToTable("Addresses");
                 });
@@ -1365,6 +1374,10 @@ namespace NutriBest.Server.Data.Migrations
                         .WithMany("Addresses")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NutriBest.Server.Data.Models.Profile", null)
+                        .WithOne("Address")
+                        .HasForeignKey("NutriBest.Server.Data.Models.Address", "ProfileUserId");
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Brand", b =>
@@ -1658,6 +1671,8 @@ namespace NutriBest.Server.Data.Migrations
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
                 {
+                    b.Navigation("Address");
+
                     b.Navigation("Addresses");
 
                     b.Navigation("UsersOrders");

@@ -167,32 +167,31 @@
                 throw new InvalidOperationException("Invalid city/country!");
 
             var address = await db.Addresses
-                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+                .FirstOrDefaultAsync(x => x.ProfileId == userId && !x.IsDeleted);
 
-            if (address == null)
+            if (address != null)
             {
-                address = new Address();
-                city.PostalCode = postalCode;
-                address.Street = street;
-                address.StreetNumber = streetNumber;
-                address.CityId = city.Id;
-                address.CountryId = country.Id;
-                address.ProfileId = userId;
-                db.Addresses.Add(address);
+                address.IsDeleted = true;
             }
-            else
+
+            var newAddress = new Address
             {
-                city.PostalCode = postalCode;
-                address.Street = street;
-                address.StreetNumber = streetNumber;
-                address.CityId = city.Id;
-                address.ProfileId = userId;
-                address.CountryId = country.Id;
-            }
+                ProfileId = userId,
+                CountryId = country.Id,
+                Country = country,
+                CityId = city.Id,
+                City = city,
+                Street = street,
+                StreetNumber = streetNumber,
+                IsDeleted = false
+            };
+
+            db.Addresses.Add(newAddress);
+            city.PostalCode = postalCode;
 
             await db.SaveChangesAsync();
 
-            return address.Id;
+            return newAddress.Id;
         }
 
         public async Task<string> UpdateProfile(string? name,
@@ -360,7 +359,7 @@
         private async Task<(Address? address, City? city, Country? country)> GetAddressWithCityAndCountry(string userId)
         {
             var address = await db.Addresses
-                .FirstOrDefaultAsync(x => x.ProfileId == userId);
+                .FirstOrDefaultAsync(x => x.ProfileId == userId && !x.IsDeleted);
 
             if (address == null)
                 return (null, null, null);

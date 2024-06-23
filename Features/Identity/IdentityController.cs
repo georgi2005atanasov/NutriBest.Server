@@ -111,7 +111,7 @@
 
         [HttpPut]
         [Route(nameof(ResetPassword))]
-        public async Task<ActionResult<bool>> ResetPassword([FromBody] ResetPasswordServiceModel resetModel)
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordServiceModel resetModel)
         {
             try
             {

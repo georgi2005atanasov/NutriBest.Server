@@ -19,8 +19,6 @@
 
         public Gender? Gender { get; set; }
 
-        public Address? Address { get; set; }
-
         public int? CartId { get; set; }
 
         [NotMapped]

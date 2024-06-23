@@ -45,7 +45,7 @@
             if (!string.IsNullOrEmpty(profileId))
             {
                 var address = await db.Addresses
-                    .FirstOrDefaultAsync(x => x.ProfileId == profileId);
+                    .FirstOrDefaultAsync(x => x.ProfileId == profileId && !x.IsDeleted);
 
                 if (address != null)
                 {
@@ -63,6 +63,8 @@
                     Street = street,
                     StreetNumber = streetNumber
                 };
+
+                city.PostalCode = postalCode;
 
                 var orderDetails = new OrderDetails
                 {

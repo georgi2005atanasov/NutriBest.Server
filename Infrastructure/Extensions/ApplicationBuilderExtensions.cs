@@ -303,11 +303,15 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 string adminUserName = config.GetValue<string>("Admin:UserName");
                 string adminPassword = config.GetValue<string>("Admin:Password");
                 string email = config.GetValue<string>("Admin:Email");
+                string phoneNumber = config.GetValue<string>("Admin:PhoneNumber");
 
                 var user = new User
                 {
                     Email = email,
                     UserName = adminUserName,
+                    PhoneNumber = phoneNumber,
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true
                 };
 
                 await userManager.CreateAsync(user, adminPassword);

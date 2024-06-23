@@ -1,6 +1,5 @@
 ﻿namespace NutriBest.Server.Data.Models
 {
-    using NutriBest.Server.Data.Models.Base;
     using System.ComponentModel.DataAnnotations;
 
     public class Address
