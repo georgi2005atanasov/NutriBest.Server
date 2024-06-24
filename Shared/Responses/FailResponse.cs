@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.Identity.Models
+﻿namespace NutriBest.Server.Shared.Responses
 {
     public class FailResponse
     {

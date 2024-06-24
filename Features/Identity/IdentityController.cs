@@ -8,6 +8,7 @@
     using NutriBest.Server.Features.Identity.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Shared.Responses;
 
     public class IdentityController : ApiController
     {
@@ -69,11 +70,18 @@
 
                 return BadRequest(result.Errors);
             }
-            catch (Exception err)
+            catch (InvalidOperationException err)
             {
                 return BadRequest(new FailResponse
                 {
                     Message = err.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
                 });
             }
         }
@@ -103,9 +111,19 @@
 
                 return encryptedToken;
             }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.Message
+                });
+            }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
         }
 
@@ -152,21 +170,21 @@
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        [Route("Roles")]
-        public async Task<ActionResult<List<string>>> AllRoles()
+        [Route(nameof(Roles))]
+        public async Task<ActionResult<RolesServiceModel>> Roles()
         {
             try
             {
                 var roles = await identityService.AllRoles();
 
-                return Ok(new
+                return Ok(new RolesServiceModel
                 {
                     Roles = roles
                 });
             }
             catch (Exception)
             {
-                return BadRequest(new FailResponse
+                return NotFound(new FailResponse
                 {
                     Message = "Error occured when fetching the roles!"
                 });

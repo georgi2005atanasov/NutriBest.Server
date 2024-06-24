@@ -34,6 +34,7 @@
         => await roleManager.Roles
                 .Select(x => x.Name)
                 .Where(x => x != "Administrator")
+                .OrderBy(x => x)
                 .ToListAsync();
 
         public async Task<bool> CheckUserPassword(User user, string password)
@@ -54,14 +55,14 @@
 
             if (!result.Succeeded)
             {
-                throw new Exception(String.Join(", ", result.Errors.Select(x => x.Description)));
+                throw new InvalidOperationException(String.Join(", ", result.Errors.Select(x => x.Description)));
             }
 
             var roleResult = await userManager.AddToRoleAsync(user, "User");
 
             if (!roleResult.Succeeded)
             {
-                throw new Exception("Could not add the role");
+                throw new InvalidOperationException("Could not add the role");
             }
 
             return result;
