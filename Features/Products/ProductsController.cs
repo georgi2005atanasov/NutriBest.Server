@@ -208,29 +208,18 @@
                     !User.IsInRole("Administrator") && !User.IsInRole("Employee"))
                     return BadRequest();
 
-                string cacheKey = $"products_page_{page}_categories_{categories}_price_{price}_alpha_{alpha}_search_{search}";
+                var products = await productService.All(page,
+                    categories,
+                    brand,
+                    price,
+                    alpha,
+                    productsView,
+                    search,
+                    priceRange,
+                    quantities,
+                    flavours);
 
-                if (!memoryCache.TryGetValue(cacheKey, out IEnumerable<IEnumerable<ProductListingServiceModel>> cachedProducts))
-                {
-                    var products = await productService.All(page,
-                        categories,
-                        brand,
-                        price,
-                        alpha,
-                        productsView,
-                        search,
-                        priceRange,
-                        quantities,
-                        flavours);
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
-                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
-
-                    memoryCache.Set(cacheKey, products, cacheEntryOptions);
-                    return Ok(products);
-                }
-
-                return Ok(cachedProducts);
+                return Ok(products);
             }
             catch (Exception)
             {

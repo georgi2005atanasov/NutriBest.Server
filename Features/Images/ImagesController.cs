@@ -32,8 +32,8 @@
                         return BadRequest();
 
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
-                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(15)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(2)); // Sets a fixed time to live for the cache entry
 
                     memoryCache.Set(cacheKey, image, cacheEntryOptions);
                     return Ok(image);
@@ -63,8 +63,8 @@
                         return BadRequest();
 
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
-                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Sets a fixed time to live for the cache entry
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(15)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(2)); // Sets a fixed time to live for the cache entry
 
                     memoryCache.Set(cacheKey, image, cacheEntryOptions);
                     return Ok(image);
