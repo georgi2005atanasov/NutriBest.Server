@@ -14,14 +14,14 @@
         private readonly ICurrentUserService currentUserService;
         private readonly IProfileService profileService;
 
-        public ProfileController(IIdentityService identityService,
+        public ProfileController(NutriBestDbContext db,
+            IIdentityService identityService,
             ICurrentUserService currentUserService,
-            NutriBestDbContext db,
             IProfileService profileService)
         {
+            this.db = db;
             this.identityService = identityService;
             this.currentUserService = currentUserService;
-            this.db = db;
             this.profileService = profileService;
         }
 
@@ -85,8 +85,8 @@
                 if (currentUserId == null)
                     return BadRequest();
 
-                Task<ProfileServiceModel> task = identityService.FindUserById(currentUserId);
-                return await task!;
+                var user = await identityService.FindUserById(currentUserId);
+                return user;
             }
             catch (Exception)
             {

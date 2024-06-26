@@ -20,17 +20,21 @@ namespace NutriBest.Server.Infrastructure.Extensions
 
             var dbContext = services.ServiceProvider.GetService<NutriBestDbContext>()!;
 
-            dbContext.Database.Migrate();
+            if (dbContext.Database.ProviderName != null &&
+               dbContext.Database.IsRelational())
+            {
+                dbContext.Database.Migrate();
 
-            SeedAdministrator(services.ServiceProvider);
-            SeedCategories(dbContext);
-            SeedBrands(dbContext);
-            SeedFlavours(dbContext);
-            SeedPackages(dbContext);
-            SeedEmployeeRole(services.ServiceProvider);
-            SeedUserRole(services.ServiceProvider);
-            SeedBgCities(dbContext);
-            SeedDeCities(dbContext);
+                SeedAdministrator(services.ServiceProvider);
+                SeedCategories(dbContext);
+                SeedBrands(dbContext);
+                SeedFlavours(dbContext);
+                SeedPackages(dbContext);
+                SeedEmployeeRole(services.ServiceProvider);
+                SeedUserRole(services.ServiceProvider);
+                SeedBgCities(dbContext);
+                SeedDeCities(dbContext);
+            }
         }
 
         private static void SeedDeCities(NutriBestDbContext db)

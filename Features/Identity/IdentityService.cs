@@ -19,10 +19,10 @@
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationSettings appSettings;
 
-        public IdentityService(UserManager<User> userManager,
+        public IdentityService(NutriBestDbContext db,
+            UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
-            RoleManager<IdentityRole> roleManager,
-            NutriBestDbContext db)
+            RoleManager<IdentityRole> roleManager)
         {
             this.db = db;
             this.userManager = userManager;
@@ -68,7 +68,7 @@
             return result;
         }
 
-        public async Task<ProfileServiceModel> FindUserById(string id)
+        public async Task<ProfileServiceModel?> FindUserById(string id)
             => await db.Users
                 .Where(x => x.Id == id)
                 .Select(x => new ProfileServiceModel
@@ -81,7 +81,7 @@
                     Email = x.Email,
                     UserName = x.UserName
                 })
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
         public async Task<User> FindUserByUserName(string userName)
         {
