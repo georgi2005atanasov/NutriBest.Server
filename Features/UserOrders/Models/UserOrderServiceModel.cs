@@ -1,10 +1,10 @@
 ﻿namespace NutriBest.Server.Features.UserOrders.Models
 {
     using System.ComponentModel.DataAnnotations;
+    using NutriBest.Server.Features.Invoices.Models;
     using static ServicesConstants.GuestOrder;
     using static ServicesConstants.City;
     using static ServicesConstants.Country;
-    using NutriBest.Server.Features.Invoices.Models;
 
     public class UserOrderServiceModel
     {

@@ -2,14 +2,14 @@
 
 namespace NutriBest.Server.Infrastructure.Extensions
 {
+    using System;
+    using System.Globalization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Infrastructure.Middlewares;
-    using System;
-    using System.Globalization;
     using static ServicesConstants.Shipping;
 
     public static class ApplicationBuilderExtensions
@@ -139,7 +139,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
         {
             if (db.Packages != null && db.Packages.Any())
                 return;
-
+            
             Task.Run(async () =>
             {
                 db.Packages!.Add(new Package { Grams = 100 });

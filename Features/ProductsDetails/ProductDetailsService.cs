@@ -1,8 +1,8 @@
 ﻿namespace NutriBest.Server.Features.ProductsDetails
 {
+    using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.ProductsDetails.Models;
     using NutriBest.Server.Features.Promotions;

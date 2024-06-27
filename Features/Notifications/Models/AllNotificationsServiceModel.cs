@@ -2,8 +2,8 @@
 {
     public class AllNotificationsServiceModel
     {
-        public List<NotificationServiceModel> Notifications { get; set; } = new List<NotificationServiceModel>();
-
         public int TotalNotifications { get; set; }
+
+        public List<NotificationServiceModel> Notifications { get; set; } = new List<NotificationServiceModel>();
     }
 }

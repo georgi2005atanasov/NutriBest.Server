@@ -1,14 +1,14 @@
 ﻿namespace NutriBest.Server.Features.Identity
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
-    using NutriBest.Server.Features.Identity.Models;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Services;
-    using NutriBest.Server.Shared.Responses;
+    using NutriBest.Server.Features.Identity.Models;
 
     public class IdentityController : ApiController
     {

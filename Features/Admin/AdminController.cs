@@ -1,10 +1,11 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Admin.Models;
 
     [Authorize(Roles = "Administrator")]
@@ -45,33 +46,36 @@
                 var existingRole = await roleManager.FindByNameAsync(role);
 
                 if (user == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = "User could not be found!"
                     });
 
                 if (existingRole == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = "Invalid role!"
                     });
 
                 if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = $"'{user.UserName}' is already in the role of '{role}'!"
                     });
 
                 await userManager.AddToRoleAsync(user, role);
 
-                return Ok(new
+                return Ok(new SuccessResponse
                 {
                     Message = $"Successfully added role '{role}' to '{user.UserName}'!"
                 });
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
         }
 

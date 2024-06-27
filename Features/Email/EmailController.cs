@@ -1,8 +1,8 @@
 ﻿namespace NutriBest.Server.Features.Email
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email.Models;
 

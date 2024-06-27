@@ -4,13 +4,13 @@
     {
         public string CustomerName { get; set; } = null!;
 
-        public string? Subject { get; set; }
-
         public string CustomerEmail { get; set; } = null!;
 
-        public int OrderId { get; set; }
-
         public string? PhoneNumber { get; set; }
+
+        public string? Subject { get; set; }
+
+        public int OrderId { get; set; }
 
         public string TotalPrice { get; set; } = null!;
 

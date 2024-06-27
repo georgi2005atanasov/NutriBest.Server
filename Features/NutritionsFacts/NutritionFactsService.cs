@@ -1,8 +1,8 @@
 ﻿namespace NutriBest.Server.Features.NutritionsFacts
 {
+    using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.NutritionsFacts.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;

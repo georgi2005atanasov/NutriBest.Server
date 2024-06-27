@@ -1,12 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Carts.Models;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.Products.Factories
+﻿namespace NutriBest.Server.Features.Products.Factories
 {
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data;
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Products.Models;
+
     public class ProductFactory
     {
         public static async Task<OrderRelatedProductServiceModel> CreateOrderRelatedProductModelAsync(NutriBestDbContext db,

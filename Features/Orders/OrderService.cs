@@ -1,6 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
     using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Carts.Models;
@@ -8,7 +9,6 @@
     using NutriBest.Server.Infrastructure.Services;
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.Notifications;
-    using AutoMapper;
     using NutriBest.Server.Features.Orders.Factories;
     using NutriBest.Server.Features.Carts.Factories;
     using NutriBest.Server.Features.Products.Factories;

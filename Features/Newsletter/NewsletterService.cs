@@ -5,9 +5,9 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email;
-    using NutriBest.Server.Features.Newsletter.Extensions;
-    using NutriBest.Server.Features.Newsletter.Models;
     using NutriBest.Server.Features.Notifications;
+    using NutriBest.Server.Features.Newsletter.Models;
+    using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
 

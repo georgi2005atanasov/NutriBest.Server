@@ -1,9 +1,8 @@
-﻿
-namespace NutriBest.Server.Features.Carts.Factories
+﻿namespace NutriBest.Server.Features.Carts.Factories
 {
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
 

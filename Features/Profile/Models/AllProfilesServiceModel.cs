@@ -2,8 +2,8 @@
 {
     public class AllProfilesServiceModel
     {
-        public List<ProfileListingServiceModel> Profiles { get; set; } = new List<ProfileListingServiceModel>();
-
         public int TotalUsers { get; set; }
+
+        public List<ProfileListingServiceModel> Profiles { get; set; } = new List<ProfileListingServiceModel>();
     }
 }

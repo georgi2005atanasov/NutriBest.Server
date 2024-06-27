@@ -4,8 +4,8 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications;
-    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
     public class GuestOrderService : OrderService, IGuestOrderService, ITransientService
     {

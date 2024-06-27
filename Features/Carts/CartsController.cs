@@ -1,15 +1,15 @@
 ﻿namespace NutriBest.Server.Features.Carts
 {
-    using AutoMapper;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Features.PromoCodes;
 
     public class CartsController : ApiController
     {

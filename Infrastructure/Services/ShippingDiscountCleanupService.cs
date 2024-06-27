@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NutriBest.Server.Data;
-
-namespace NutriBest.Server.Infrastructure.Services
+﻿namespace NutriBest.Server.Infrastructure.Services
 {
+    using Microsoft.EntityFrameworkCore;
+    using NutriBest.Server.Data;
+
     public class ShippingDiscountCleanupService : BackgroundService, Infrastructure.Extensions.ServicesInterfaces.IHostedService
     {
         private readonly IServiceProvider serviceProvider;

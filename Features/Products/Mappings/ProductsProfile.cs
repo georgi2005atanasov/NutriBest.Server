@@ -1,9 +1,9 @@
-﻿using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.Images.Models;
-using NutriBest.Server.Features.Products.Models;
-
-namespace NutriBest.Server.Features.Products.Mappings
+﻿namespace NutriBest.Server.Features.Products.Mappings
 {
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Images.Models;
+    using NutriBest.Server.Features.Products.Models;
+
     public class ProductsProfile : AutoMapper.Profile
     {
         public ProductsProfile()
@@ -19,19 +19,6 @@ namespace NutriBest.Server.Features.Products.Mappings
                     ImageData = x.ProductImage!.ImageData, //be aware
                     ContentType = x.ProductImage.ContentType
                 }));
-
-            //CreateMap<Product, ProductListingServiceModel>()
-            //    .ForMember(dest => dest.Categories, src => src.MapFrom(x => x.ProductsCategories
-            //                 .Select(c => c.Category.Name)
-            //                 .ToList()))
-            //    .ForMember(dest => dest.Brand, src => src.MapFrom(x => x.Brand!.Name)) // be aware
-            //    .ForMember(dest => dest.Image, src => src.MapFrom(x => new ImageListingServiceModel
-            //    {
-            //        ImageData = x.ProductImage!.ImageData, //be aware
-            //        ContentType = x.ProductImage.ContentType
-            //    }))
-            //    .ForMember(dest => dest.PromotionId, src => src.MapFrom(x => x.PromotionId))
-            //    .ForMember(dest => dest.DiscountPercentage, src => src.MapFrom(x => x.Promotion.DiscountPercentage ?? null));
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Notifications
 {
-    using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications.Hubs;

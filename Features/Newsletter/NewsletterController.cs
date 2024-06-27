@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Newsletter
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Newsletter.Models;
 
     public class NewsletterController : ApiController

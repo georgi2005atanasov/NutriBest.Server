@@ -1,8 +1,8 @@
 ﻿namespace NutriBest.Server.Infrastructure.Services
 {
+    using System.Security.Claims;
     using NutriBest.Server.Infrastructure.Extensions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using System.Security.Claims;
 
     public class CurrentUserService : ICurrentUserService, IScopedService
     {

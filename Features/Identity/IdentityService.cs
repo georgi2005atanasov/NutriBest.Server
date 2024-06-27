@@ -1,16 +1,16 @@
 ﻿namespace NutriBest.Server.Features.Identity
 {
+    using System.Text;
+    using System.Security.Claims;
+    using System.IdentityModel.Tokens.Jwt;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.Extensions.Options;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Security.Claims;
-    using System.Text;
 
     public class IdentityService : IIdentityService, ITransientService
     {

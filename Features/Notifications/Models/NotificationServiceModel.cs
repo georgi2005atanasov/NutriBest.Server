@@ -1,6 +1,4 @@
-﻿using NutriBest.Server.Data.Enums;
-
-namespace NutriBest.Server.Features.Notifications.Models
+﻿namespace NutriBest.Server.Features.Notifications.Models
 {
     public class NotificationServiceModel
     {

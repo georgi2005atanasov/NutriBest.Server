@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.ProductsDetails.Models
 {
-    using NutriBest.Server.Features.Images.Models;
     using System.ComponentModel.DataAnnotations;
+    using NutriBest.Server.Features.Images.Models;
     using static ServicesConstants.Product;
 
     public class ProductDetailsServiceModel

@@ -2,9 +2,9 @@
 {
     public class LowInStockServiceModel
     {
-        public string Name { get; set; } = null!;
-
         public int ProductId { get; set; }
+
+        public string Name { get; set; } = null!;
 
         public int Quantity { get; set; }
     }

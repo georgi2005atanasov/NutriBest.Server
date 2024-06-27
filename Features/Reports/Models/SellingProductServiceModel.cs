@@ -4,8 +4,8 @@
 
     public class SellingProductServiceModel
     {
-        public int SoldCount { get; set; }
-
         public ProductListingServiceModel Product { get; set; } = new ProductListingServiceModel();
+
+        public int SoldCount { get; set; }
     }
 }

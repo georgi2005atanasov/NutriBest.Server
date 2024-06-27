@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.PromoCodes
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.PromoCodes.Models;
     using static ServicesConstants.PromoCodes;
 

@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Packages
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Packages.Models;
 

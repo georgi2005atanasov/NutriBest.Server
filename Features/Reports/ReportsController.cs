@@ -1,9 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Reports
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.Reports.Models;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Utilities;
+    using NutriBest.Server.Features.Reports.Models;
 
     [Authorize(Roles = "Administrator")]
     public class ReportsController : ApiController

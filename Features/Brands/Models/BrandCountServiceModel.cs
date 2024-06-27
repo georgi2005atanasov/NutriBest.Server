@@ -3,6 +3,7 @@
     public class BrandCountServiceModel
     {
         public string Name { get; set; } = null!;
+
         public int Count { get; set; }
     }
 }

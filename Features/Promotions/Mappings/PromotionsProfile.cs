@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Promotions.Mappings
 {
-    using NutriBest.Server.Features.Promotions.Models;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.Promotions.Models;
 
     public class PromotionsProfile : AutoMapper.Profile
     {

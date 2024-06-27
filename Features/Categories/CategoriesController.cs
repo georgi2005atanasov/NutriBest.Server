@@ -1,8 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Categories
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Data;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Categories.Models;
 
     public class CategoriesController : ApiController

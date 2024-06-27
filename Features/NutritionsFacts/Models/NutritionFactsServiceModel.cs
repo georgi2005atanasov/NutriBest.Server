@@ -1,5 +1,4 @@
-﻿
-namespace NutriBest.Server.Features.NutritionsFacts.Models
+﻿namespace NutriBest.Server.Features.NutritionsFacts.Models
 {
     using System.ComponentModel.DataAnnotations;
     using static ServicesConstants.NutritionFacts;

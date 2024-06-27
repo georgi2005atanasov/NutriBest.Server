@@ -4,8 +4,8 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Features.NutritionsFacts.Models;
     using NutriBest.Server.Features.Products;
+    using NutriBest.Server.Features.NutritionsFacts.Models;
 
     public class NutritionFactsController : ApiController
     {

@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Flavours
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Flavours.Models;
 
     public class FlavoursController : ApiController

@@ -1,21 +1,21 @@
 ﻿namespace NutriBest.Server.Features.Export
 {
-    using Microsoft.AspNetCore.Authorization;
+    using System.Text;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
+    using NutriBest.Server.Utilities;
     using NutriBest.Server.Features.Admin;
     using NutriBest.Server.Features.Brands;
-    using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Flavours;
-    using NutriBest.Server.Features.Newsletter;
     using NutriBest.Server.Features.Orders;
     using NutriBest.Server.Features.Packages;
     using NutriBest.Server.Features.Products;
     using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Features.Reports;
+    using NutriBest.Server.Features.Newsletter;
+    using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.ShippingDiscounts;
-    using NutriBest.Server.Utilities;
-    using System.Text;
 
     public class ExportController
     {

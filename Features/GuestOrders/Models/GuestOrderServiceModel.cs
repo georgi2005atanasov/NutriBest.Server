@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.GuestOrders.Models
 {
-    using NutriBest.Server.Features.Invoices.Models;
     using System.ComponentModel.DataAnnotations;
+    using NutriBest.Server.Features.Invoices.Models;
     using static ServicesConstants.GuestOrder;
     using static ServicesConstants.City;
     using static ServicesConstants.Country;

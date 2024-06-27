@@ -13,7 +13,7 @@
         public Startup(IConfiguration configuration)
             => this.Configuration = configuration;
 
-        public virtual void Configure(IServiceCollection services)
+        public void Configure(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
 

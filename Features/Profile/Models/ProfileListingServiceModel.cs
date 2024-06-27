@@ -4,6 +4,8 @@
     {
         public string ProfileId { get; set; } = null!;
 
+        public string? Name { get; set; }
+
         public string UserName { get; set; } = null!;
 
         public string? Email { get; set; }
@@ -17,8 +19,6 @@
         public int TotalOrders { get; set; }
 
         public decimal TotalSpent { get; set; }
-
-        public string? Name { get; set; }
 
         public string Roles { get; set; } = null!;
 

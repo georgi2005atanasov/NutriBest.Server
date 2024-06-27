@@ -13,7 +13,5 @@
         public bool? IsDeleted { get; set; }
 
         public IList<string>? Roles { get; set; }
-
-        //public List<Order> Orders { get; set; } in the future
     }
 }

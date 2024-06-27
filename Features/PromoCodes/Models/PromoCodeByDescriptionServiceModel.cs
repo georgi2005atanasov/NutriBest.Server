@@ -2,10 +2,10 @@
 {
     public class PromoCodeByDescriptionServiceModel
     {
-        public List<string>? PromoCodes { get; set; }
-
         public int ExpireIn { get; set; } // days
 
         public string Description { get; set; } = null!;
+
+        public List<string>? PromoCodes { get; set; }
     }
 }

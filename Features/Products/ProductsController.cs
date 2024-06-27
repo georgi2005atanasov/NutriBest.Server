@@ -1,5 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Products
 {
+    using System.Text.Json;
+    using System.Globalization;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -9,8 +11,6 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
-    using System.Globalization;
-    using System.Text.Json;
 
     public class ProductsController : ApiController
     {

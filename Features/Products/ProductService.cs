@@ -1,8 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Products
 {
+    using System.Globalization;
+    using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Extensions;
@@ -11,7 +12,6 @@
     using NutriBest.Server.Features.Promotions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
-    using System.Globalization;
     using static ServicesConstants.PaginationConstants; // make separate constants class
 
     public class ProductService : IProductService, ITransientService

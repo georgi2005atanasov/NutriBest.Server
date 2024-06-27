@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Notifications
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Notifications.Models;
 
     public class NotificationsController : ApiController

@@ -1,7 +1,7 @@
-﻿using NutriBest.Server.Features.Invoices.Models;
-
-namespace NutriBest.Server.Features.OrderDetails
+﻿namespace NutriBest.Server.Features.OrderDetails
 {
+    using NutriBest.Server.Features.Invoices.Models;
+
     public interface IOrderDetailsService
     {
         Task<int> Create(string countryName,

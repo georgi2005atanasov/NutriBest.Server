@@ -4,12 +4,12 @@
     {
         public string Country { get; set; } = null!;
 
-        public List<CityServiceModel>? Cities { get; set; }
-
         public decimal ShippingPrice { get; set; }
         
         public decimal? MinimumPriceForDiscount { get; set; }
 
         public decimal ShippingPriceWithDiscount { get; set; }
+
+        public List<CityServiceModel>? Cities { get; set; }
     }
 }

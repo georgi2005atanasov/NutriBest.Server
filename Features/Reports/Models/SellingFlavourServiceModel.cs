@@ -2,8 +2,8 @@
 {
     public class SellingFlavourServiceModel
     {
-        public int SoldCount { get; set; }
-
         public string FlavourName { get; set; } = string.Empty;
+
+        public int SoldCount { get; set; }
     }
 }

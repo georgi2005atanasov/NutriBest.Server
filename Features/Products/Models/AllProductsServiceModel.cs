@@ -2,10 +2,10 @@
 {
     public class AllProductsServiceModel
     {
-        public IEnumerable<IEnumerable<ProductListingServiceModel>>? ProductsRows { get; set; }
-
         public int Count { get; set; }
 
         public int MaxPrice { get; set; }
+
+        public IEnumerable<IEnumerable<ProductListingServiceModel>>? ProductsRows { get; set; }
     }
 }

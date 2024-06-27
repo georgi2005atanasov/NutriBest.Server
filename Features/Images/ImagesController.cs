@@ -3,7 +3,6 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images.Models;
 
     public class ImagesController : ApiController

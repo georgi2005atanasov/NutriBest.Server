@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Infrastructure.Services
 {
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
+    using Microsoft.EntityFrameworkCore;
 
     public class PromoCodeCleanupService : BackgroundService, Infrastructure.Extensions.ServicesInterfaces.IHostedService
     {

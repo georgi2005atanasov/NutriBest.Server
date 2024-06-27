@@ -1,12 +1,12 @@
 ﻿namespace NutriBest.Server.Features.Home
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Home.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using System.Threading.Tasks;
 
     public class HomeService : IHomeService, ITransientService
     {

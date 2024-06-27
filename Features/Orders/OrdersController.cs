@@ -1,9 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Orders
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.Orders.Models;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Utilities;
+    using NutriBest.Server.Features.Orders.Models;
 
     public class OrdersController : ApiController
     {

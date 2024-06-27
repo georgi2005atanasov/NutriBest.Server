@@ -1,8 +1,8 @@
-﻿using NutriBest.Server.Data.Models;
-using NutriBest.Server.Features.NutritionsFacts.Models;
-
-namespace NutriBest.Server.Features.NutritionsFacts.Mappings
+﻿namespace NutriBest.Server.Features.NutritionsFacts.Mappings
 {
+    using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Features.NutritionsFacts.Models;
+
     public class NutritionFactsProfile : AutoMapper.Profile
     {
         public NutritionFactsProfile()

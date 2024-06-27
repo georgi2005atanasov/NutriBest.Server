@@ -1,21 +1,21 @@
 ﻿namespace NutriBest.Server.Features.Export
 {
+    using System.Text;
+    using System.Collections.Generic;
+    using NutriBest.Server.Utilities;
     using NutriBest.Server.Features.Brands.Models;
-    using NutriBest.Server.Features.Categories.Models;
-    using NutriBest.Server.Features.Flavours.Models;
-    using NutriBest.Server.Features.Newsletter.Models;
     using NutriBest.Server.Features.Orders.Models;
-    using NutriBest.Server.Features.Packages.Models;
-    using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Reports.Models;
     using NutriBest.Server.Features.Profile.Models;
+    using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Packages.Models;
+    using NutriBest.Server.Features.Flavours.Models;
     using NutriBest.Server.Features.PromoCodes.Models;
     using NutriBest.Server.Features.Promotions.Models;
-    using NutriBest.Server.Features.Reports.Models;
+    using NutriBest.Server.Features.Categories.Models;
+    using NutriBest.Server.Features.Newsletter.Models;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using NutriBest.Server.Utilities;
-    using System.Collections.Generic;
-    using System.Text;
 
     public class ExportService : IExportService, ITransientService
     {

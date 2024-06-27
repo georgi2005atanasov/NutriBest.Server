@@ -4,10 +4,10 @@
 
     public class EmailConfirmOrderModel : EmailModel
     {
+        public int OrderId { get; set; }
+
         [Required]
         public string ConfirmationUrl { get; set; } = null!;
-
-        public int OrderId { get; set; }
 
         public string CustomerName { get; set; } = null!;
     }

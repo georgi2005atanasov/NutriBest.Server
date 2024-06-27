@@ -1,14 +1,14 @@
 ﻿namespace NutriBest.Server.Features.UserOrders
 {
-    using AutoMapper;
+    using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.Orders;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
-    using System.Threading.Tasks;
 
     public class UserOrderService : OrderService, ITransientService, IUserOrderService
     {

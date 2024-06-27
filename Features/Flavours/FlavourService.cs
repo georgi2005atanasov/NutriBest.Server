@@ -1,13 +1,11 @@
 ﻿namespace NutriBest.Server.Features.Flavours
 {
+    using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Flavours.Models;
-    using NutriBest.Server.Features.Products;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using NutriBest.Server.Infrastructure.Services;
-    using System.Collections.Generic;
 
     public class FlavourService : IFlavourService, ITransientService
     {

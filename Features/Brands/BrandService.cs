@@ -1,13 +1,13 @@
 ﻿namespace NutriBest.Server.Features.Brands
 {
+    using System.Collections.Generic;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Features.Images;
+    using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using System.Collections.Generic;
 
     public class BrandService : IBrandService, ITransientService
     {

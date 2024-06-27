@@ -1,14 +1,14 @@
 ﻿namespace NutriBest.Server.Features.Email
 {
-    using MailKit.Net.Smtp;
-    using MailKit.Security;
     using Microsoft.EntityFrameworkCore;
     using MimeKit;
     using MimeKit.Text;
+    using MailKit.Net.Smtp;
+    using MailKit.Security;
     using NutriBest.Server.Data;
+    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Email.Models;
     using NutriBest.Server.Features.Notifications;
-    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
     public class EmailService : IEmailService, ITransientService

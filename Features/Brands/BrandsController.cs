@@ -1,7 +1,7 @@
 ﻿namespace NutriBest.Server.Features.Brands
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Brands.Models;
 
     public class BrandsController : ApiController
@@ -14,7 +14,6 @@
         }
 
         [HttpGet]
-        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<IEnumerable<BrandServiceModel>>> All()
         {
             try
@@ -34,7 +33,6 @@
 
         [HttpGet]
         [Route("{name}")]
-        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<BrandServiceModel>> Get(string name)
         {
             try

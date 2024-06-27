@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NutriBest.Server.Features.Images.Models
+﻿namespace NutriBest.Server.Features.Images.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class ImageListingServiceModel
     {
         [Required]

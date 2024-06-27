@@ -1,12 +1,8 @@
 ﻿namespace NutriBest.Server.Features.Products.Extensions
 {
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
-    using System.Collections.Concurrent;
-    using System.Text;
-    using System.Text.Json;
 
     public static class ProductServiceExtensions
     {

@@ -1,8 +1,9 @@
 ﻿namespace NutriBest.Server.Features.Promotions
 {
+    using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
@@ -10,7 +11,6 @@
     using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Features.Promotions.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using System.Collections.Generic;
 
     public class PromotionService : IPromotionService, ITransientService
     {

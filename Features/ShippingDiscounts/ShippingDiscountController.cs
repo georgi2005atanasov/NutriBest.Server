@@ -1,9 +1,9 @@
 ﻿namespace NutriBest.Server.Features.ShippingDiscounts
 {
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using NutriBest.Server.Features.ShippingDiscounts.Models;
     using System.Globalization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
+    using NutriBest.Server.Features.ShippingDiscounts.Models;
     using static ServicesConstants.Promotion;
 
     public class ShippingDiscountController : ApiController

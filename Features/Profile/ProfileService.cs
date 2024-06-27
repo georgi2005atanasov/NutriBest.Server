@@ -1,5 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Admin
 {
+    using System.Linq;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
@@ -9,7 +10,6 @@
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
-    using System.Linq;
     using static ServicesConstants.PaginationConstants;
 
     public class ProfileService : IProfileService, ITransientService
