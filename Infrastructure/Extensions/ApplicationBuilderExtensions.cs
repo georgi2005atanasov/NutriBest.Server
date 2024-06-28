@@ -31,13 +31,21 @@ namespace NutriBest.Server.Infrastructure.Extensions
 
         public static void SeedDatabase(this NutriBestDbContext dbContext, IServiceScope services)
         {
-            SeedAdministrator(services.ServiceProvider);
+            // I do this check since i need to ensure that
+            // the integration tests don't seed again the roles
+            // and the Administrator
+            if (dbContext.Database.ProviderName != null &&
+               dbContext.Database.IsRelational())
+            {
+                SeedAdministrator(services.ServiceProvider);
+                SeedEmployeeRole(services.ServiceProvider);
+                SeedUserRole(services.ServiceProvider);
+            }
+
             SeedCategories(dbContext);
             SeedBrands(dbContext);
             SeedFlavours(dbContext);
             SeedPackages(dbContext);
-            SeedEmployeeRole(services.ServiceProvider);
-            SeedUserRole(services.ServiceProvider);
             SeedBgCities(dbContext);
             SeedDeCities(dbContext);
         }
@@ -144,7 +152,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
         {
             if (db.Packages != null && db.Packages.Any())
                 return;
-            
+
             Task.Run(async () =>
             {
                 db.Packages!.Add(new Package { Grams = 100 });

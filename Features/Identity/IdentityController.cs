@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Identity
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Identity
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Identity;
@@ -9,6 +11,8 @@
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Infrastructure.Services;
     using NutriBest.Server.Features.Identity.Models;
+    using static ErrorMessages.IdentityController;
+    using static SuccessMessages.IdentityController;
 
     public class IdentityController : ApiController
     {
@@ -41,14 +45,14 @@
                     return BadRequest(new FailResponse
                     {
                         Key = "Password",
-                        Message = "Both passwords should match!"
+                        Message = BothPasswordsShouldMatch
                     });
 
                 if (userModel.UserName.Contains(" "))
                     return BadRequest(new FailResponse
                     {
                         Key = "UserName",
-                        Message = "Username must not contain white spaces!"
+                        Message = UserNameWithWhiteSpaces
                     });
 
                 var result = await identityService
@@ -64,7 +68,7 @@
 
                     return Ok(new SuccessResponse
                     {
-                        Message = "Successfully added new user!"
+                        Message = SuccessfullyAddedUser
                     });
                 }
 
@@ -81,7 +85,7 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -122,7 +126,7 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -137,33 +141,33 @@
                     return BadRequest(new FailResponse
                     {
                         Key = "NewPassword",
-                        Message = "Both passwords should match!"
+                        Message = BothPasswordsShouldMatch
                     });
 
                 var user = await userManager.FindByEmailAsync(resetModel.Email);
                 if (user == null)
                     return Ok(new SuccessResponse
                     {
-                        Message = "Password reset successful."
+                        Message = PasswordResetSuccessful
                     });
 
                 var result = await userManager.ResetPasswordAsync(user, resetModel.Token, resetModel.NewPassword);
                 if (result.Succeeded)
                     return Ok(new SuccessResponse
                     {
-                        Message = "Password reset successful."
+                        Message = PasswordResetSuccessful
                     });
 
                 return BadRequest(new FailResponse
                 { 
-                    Message = "Error resetting password." 
+                    Message = ErrorResetingPassword
                 });
             }
             catch (Exception)
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -186,7 +190,7 @@
             {
                 return NotFound(new FailResponse
                 {
-                    Message = "Error occured when fetching the roles!"
+                    Message = ErrorWhenFetchingRoles
                 });
             }
         }

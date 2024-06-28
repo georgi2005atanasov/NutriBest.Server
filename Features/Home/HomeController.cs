@@ -1,8 +1,12 @@
-﻿namespace NutriBest.Server.Features.Home
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Home
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Features.Home.Models;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages;
 
     public class HomeController : ApiController
     {
@@ -28,7 +32,10 @@
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = ErrorMessages.Exception
+                });
             }
         }
     }
