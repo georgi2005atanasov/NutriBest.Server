@@ -5,6 +5,7 @@
     using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Cities.Models;
+    using NutriBest.Server.Shared.Responses;
 
     public class CitiesController : ApiController
     {
@@ -16,14 +17,14 @@
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AllCitiesServiceModel>>> AllCitiesWithCountry()
+        public async Task<ActionResult<List<AllCitiesWithCountryServiceModel>>> AllCitiesWithCountries()
         {
             try
             {
                 var cities = await db.Cities
                         .Include(c => c.Country)
                         .GroupBy(c => c.Country!.CountryName) // be aware
-                        .Select(x => new AllCitiesServiceModel
+                        .Select(x => new AllCitiesWithCountryServiceModel
                         {
                             Country = x.Key,
                             Cities = x.Select(y => new CityServiceModel
@@ -67,7 +68,10 @@
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
         }
     }

@@ -24,10 +24,6 @@
             try
             {
                 var contactUsInfo = await homeService.ContactUsDetails();
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Sets the time the cache entry can be inactive (not accessed) before it will be removed.
-                    .SetAbsoluteExpiration(TimeSpan.FromDays(100)); // Sets a fixed time to live for the cache entry
-
                 return Ok(contactUsInfo);
             }
             catch (Exception)

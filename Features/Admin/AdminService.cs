@@ -19,7 +19,7 @@
             this.userManager = userManager;
         }
 
-        public async Task<bool> DeleteProfile(string id)
+        public async Task<bool> DeleteUser(string id)
         {
             var user = await db.Users
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -66,7 +66,7 @@
             return usersModels;
         }
 
-        public async Task<string> RestoreProfile(string id)
+        public async Task<string> RestoreUser(string id)
         {
             var user = await db.Users
                 .FirstOrDefaultAsync(x => x.Id == id);

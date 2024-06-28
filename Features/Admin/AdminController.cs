@@ -42,20 +42,7 @@
         {
             try
             {
-                var user = await userManager.FindByIdAsync(id);
-                var existingRole = await roleManager.FindByNameAsync(role);
-
-                if (user == null)
-                    return BadRequest(new FailResponse
-                    {
-                        Message = "User could not be found!"
-                    });
-
-                if (existingRole == null)
-                    return BadRequest(new FailResponse
-                    {
-                        Message = "Invalid role!"
-                    });
+                var (user, existingRole) = await CheckUserAndRole(id, role);
 
                 if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
                     return BadRequest(new FailResponse
@@ -68,6 +55,13 @@
                 return Ok(new SuccessResponse
                 {
                     Message = $"Successfully added role '{role}' to '{user.UserName}'!"
+                });
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName!
                 });
             }
             catch (Exception)
@@ -85,58 +79,55 @@
         {
             try
             {
-                var user = await userManager.FindByIdAsync(id);
-                var existingRole = await roleManager.FindByNameAsync(role);
-
-                if (user == null)
-                    return BadRequest(new
-                    {
-                        Message = "User could not be found!"
-                    });
-
-                if (existingRole == null)
-                    return BadRequest(new
-                    {
-                        Message = "Invalid role!"
-                    });
+                var (user, existingRole) = await CheckUserAndRole(id, role);
 
                 if (!db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = "The user does not have this role!"
                     });
 
                 await userManager.RemoveFromRoleAsync(user, role);
 
-                return Ok(new
+                return Ok(new FailResponse
                 {
                     Message = $"Successfully removed role '{role}' from '{user.UserName}'!"
                 });
             }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName!
+                });
+            }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
         }
 
         [HttpPost]
         [Route("Restore/{userId}")]
-        public async Task<ActionResult> RestoreProfile([FromRoute] string userId)
+        public async Task<ActionResult> Restore([FromRoute] string userId)
         {
             try
             {
-                var restoredProfileEmail = await adminService.RestoreProfile(userId);
+                var restoredProfileEmail = await adminService.RestoreUser(userId);
 
-                return Ok(new
+                return Ok(new FailResponse
                 {
                     Message = $"Successfully restored profile with email '{restoredProfileEmail}'!"
                 });
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName!
                 });
             }
             catch (Exception)
@@ -149,18 +140,42 @@
         }
 
         [HttpDelete]
-        [Route("DeleteProfile/{id}")]
-        public async Task<ActionResult<bool>> DeleteProfile([FromRoute] string id) 
+        [Route("DeleteUser/{id}")]
+        public async Task<ActionResult<bool>> DeleteUser([FromRoute] string id)
         {
             try
             {
-                var result = await adminService.DeleteProfile(id);
+                var result = await adminService.DeleteUser(id);
                 return Ok(result);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName!
+                });
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = "Something went wrong!"
+                });
             }
+        }
+
+        private async Task<(User user, IdentityRole existingRole)> CheckUserAndRole(string id, string role)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            var existingRole = await roleManager.FindByNameAsync(role);
+
+            if (user == null)
+                throw new ArgumentNullException("User could not be found!");
+
+            if (existingRole == null)
+                throw new ArgumentNullException("Invalid role!");
+
+            return (user, existingRole);
         }
     }
 }

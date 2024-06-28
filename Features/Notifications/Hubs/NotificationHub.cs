@@ -54,7 +54,8 @@
             await base.OnConnectedAsync();
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
+        // I HAVE PUT QUESTION MARK BELOW ON EXCEPTION WITHOUT TESTING IT!!!
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connections = PageConnections.Values;
 

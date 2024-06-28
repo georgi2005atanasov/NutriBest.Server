@@ -1,6 +1,6 @@
 ﻿namespace NutriBest.Server.Features.Cities.Models
 {
-    public class AllCitiesServiceModel
+    public class AllCitiesWithCountryServiceModel
     {
         public string Country { get; set; } = null!;
 

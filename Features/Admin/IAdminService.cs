@@ -6,8 +6,8 @@
     {
         Task<IEnumerable<UserServiceModel>> GetAllUsers();
 
-        Task<string> RestoreProfile(string id);
+        Task<string> RestoreUser(string id);
 
-        Task<bool> DeleteProfile(string id);
+        Task<bool> DeleteUser(string id);
     }
 }

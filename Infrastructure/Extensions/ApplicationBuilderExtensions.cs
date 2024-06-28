@@ -25,16 +25,21 @@ namespace NutriBest.Server.Infrastructure.Extensions
             {
                 dbContext.Database.Migrate();
 
-                SeedAdministrator(services.ServiceProvider);
-                SeedCategories(dbContext);
-                SeedBrands(dbContext);
-                SeedFlavours(dbContext);
-                SeedPackages(dbContext);
-                SeedEmployeeRole(services.ServiceProvider);
-                SeedUserRole(services.ServiceProvider);
-                SeedBgCities(dbContext);
-                SeedDeCities(dbContext);
+                dbContext.SeedDatabase(services);
             }
+        }
+
+        public static void SeedDatabase(this NutriBestDbContext dbContext, IServiceScope services)
+        {
+            SeedAdministrator(services.ServiceProvider);
+            SeedCategories(dbContext);
+            SeedBrands(dbContext);
+            SeedFlavours(dbContext);
+            SeedPackages(dbContext);
+            SeedEmployeeRole(services.ServiceProvider);
+            SeedUserRole(services.ServiceProvider);
+            SeedBgCities(dbContext);
+            SeedDeCities(dbContext);
         }
 
         private static void SeedDeCities(NutriBestDbContext db)
