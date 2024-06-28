@@ -62,9 +62,11 @@ namespace NutriBest.Server.Features.Identity
 
                 if (result.Succeeded)
                 {
-                    var user = await userManager.FindByEmailAsync(userModel.Email);
+                    var user = await userManager
+                                    .FindByEmailAsync(userModel.Email);
 
-                    await notificationService.SendNotificationToAdmin("success", $"'{user.UserName}' Has Just Registered!");
+                    await notificationService
+                        .SendNotificationToAdmin("success", string.Format(UserHasJustRegistered, user.UserName));
 
                     return Ok(new SuccessResponse
                     {
@@ -96,7 +98,8 @@ namespace NutriBest.Server.Features.Identity
         {
             try
             {
-                var user = await identityService.FindUserByUserName(userModel.UserName);
+                var user = await identityService
+                    .FindUserByUserName(userModel.UserName);
 
                 if (user == null)
                     return Unauthorized();
@@ -104,14 +107,17 @@ namespace NutriBest.Server.Features.Identity
                 if (user.IsDeleted)
                     return Unauthorized();
 
-                var passwordValid = await identityService.CheckUserPassword(user, userModel.Password);
+                var passwordValid = await identityService
+                    .CheckUserPassword(user, userModel.Password);
 
                 if (!passwordValid)
                     return Unauthorized();
 
-                var encryptedToken = await identityService.GetEncryptedToken(user);
+                var encryptedToken = await identityService
+                    .GetEncryptedToken(user);
 
-                await notificationService.SendNotificationToAdmin("success", $"'{user.UserName}' Has Just Logged In!");
+                await notificationService
+                    .SendNotificationToAdmin("success", string.Format(UserHasJustLoggedIn, user.UserName));
 
                 return encryptedToken;
             }
@@ -144,14 +150,20 @@ namespace NutriBest.Server.Features.Identity
                         Message = BothPasswordsShouldMatch
                     });
 
-                var user = await userManager.FindByEmailAsync(resetModel.Email);
+                var user = await userManager
+                                .FindByEmailAsync(resetModel.Email);
+
                 if (user == null)
                     return Ok(new SuccessResponse
                     {
                         Message = PasswordResetSuccessful
                     });
 
-                var result = await userManager.ResetPasswordAsync(user, resetModel.Token, resetModel.NewPassword);
+                var result = await userManager
+                    .ResetPasswordAsync(user,
+                                        resetModel.Token,
+                                        resetModel.NewPassword);
+
                 if (result.Succeeded)
                     return Ok(new SuccessResponse
                     {
@@ -159,7 +171,7 @@ namespace NutriBest.Server.Features.Identity
                     });
 
                 return BadRequest(new FailResponse
-                { 
+                {
                     Message = ErrorResetingPassword
                 });
             }
@@ -179,7 +191,8 @@ namespace NutriBest.Server.Features.Identity
         {
             try
             {
-                var roles = await identityService.AllRoles();
+                var roles = await identityService
+                            .AllRoles();
 
                 return Ok(new RolesServiceModel
                 {

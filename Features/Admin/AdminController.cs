@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Admin
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Admin
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Identity;
@@ -7,6 +9,8 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Admin.Models;
+    using static ErrorMessages.AdminController;
+    using static SuccessMessages.AdminController;
 
     [Authorize(Roles = "Administrator")]
     public class AdminController : ApiController
@@ -27,15 +31,6 @@
             this.roleManager = roleManager;
         }
 
-        [HttpGet]
-        [Route(nameof(AllUsers))]
-        public async Task<ActionResult<IEnumerable<UserServiceModel>>> AllUsers()
-        {
-            var users = await adminService.GetAllUsers();
-
-            return Ok(users);
-        }
-
         [HttpPatch]
         [Route("Grant/{id}")]
         public async Task<ActionResult> GrantUser([FromRoute] string id, [FromQuery] string role)
@@ -47,14 +42,14 @@
                 if (db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
                     return BadRequest(new FailResponse
                     {
-                        Message = $"'{user.UserName}' is already in the role of '{role}'!"
+                        Message = string.Format(UserIsAlreadyInThisRole, user.UserName, role)
                     });
 
                 await userManager.AddToRoleAsync(user, role);
 
                 return Ok(new SuccessResponse
                 {
-                    Message = $"Successfully added role '{role}' to '{user.UserName}'!"
+                    Message = string.Format(SuccessfullyAddedRole, role, user.UserName)
                 });
             }
             catch (ArgumentNullException err)
@@ -68,7 +63,7 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -84,14 +79,14 @@
                 if (!db.UserRoles.Any(x => x.UserId == user.Id && x.RoleId == existingRole.Id))
                     return BadRequest(new FailResponse
                     {
-                        Message = "The user does not have this role!"
+                        Message = UserDoesNotHaveThisRole
                     });
 
                 await userManager.RemoveFromRoleAsync(user, role);
 
                 return Ok(new FailResponse
                 {
-                    Message = $"Successfully removed role '{role}' from '{user.UserName}'!"
+                    Message = SuccessfullyRemovedRole
                 });
             }
             catch (ArgumentNullException err)
@@ -105,7 +100,7 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -120,7 +115,7 @@
 
                 return Ok(new FailResponse
                 {
-                    Message = $"Successfully restored profile with email '{restoredProfileEmail}'!"
+                    Message = string.Format(SuccessfullyRestoredProfile, restoredProfileEmail)
                 });
             }
             catch (ArgumentNullException err)
@@ -134,7 +129,7 @@
             {
                 return BadRequest(new
                 {
-                    Message = "User not Found!"
+                    Message = ErrorMessages.UserNotFound
                 });
             }
         }
@@ -159,7 +154,7 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -170,10 +165,10 @@
             var existingRole = await roleManager.FindByNameAsync(role);
 
             if (user == null)
-                throw new ArgumentNullException("User could not be found!");
+                throw new ArgumentNullException(ErrorMessages.UserNotFound);
 
             if (existingRole == null)
-                throw new ArgumentNullException("Invalid role!");
+                throw new ArgumentNullException(InvalidRole);
 
             return (user, existingRole);
         }

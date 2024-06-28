@@ -1,23 +1,18 @@
-﻿namespace NutriBest.Server.Features.Admin
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Admin
 {
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Admin.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.AdminController;
 
     public class AdminService : IAdminService, ITransientService
     {
         private readonly NutriBestDbContext db;
-        private readonly UserManager<User> userManager;
 
-        public AdminService(NutriBestDbContext db,
-            UserManager<User> userManager)
-        {
-            this.db = db;
-            this.userManager = userManager;
-        }
+        public AdminService(NutriBestDbContext db)
+            => this.db = db;
 
         public async Task<bool> DeleteUser(string id)
         {
@@ -28,42 +23,16 @@
                .FirstOrDefaultAsync(x => x.UserId == id);
 
             if (profile == null || user == null)
-                throw new ArgumentNullException("Invalid user!");
+                throw new ArgumentNullException(InvalidUser);
 
-            db.Profiles.Remove(profile);
-            db.Users.Remove(user);
+            db.Profiles
+                .Remove(profile);
+            db.Users
+                .Remove(user);
 
             await db.SaveChangesAsync();
 
             return true;
-        }
-
-        public async Task<IEnumerable<UserServiceModel>> GetAllUsers()
-        {
-            var users = db.Users
-                .Include(x => x.Profile)
-                .AsQueryable();
-
-            var usersModels = new List<UserServiceModel>();
-
-            foreach (var user in users)
-            {
-                var roles = await userManager.GetRolesAsync(user);
-
-                var userModel = new UserServiceModel
-                {
-                    IsDeleted = user.IsDeleted,
-                    Age = user.Profile.Age,
-                    Gender = user.Profile.Gender.ToString(),
-                    Name = user.Profile.Name,
-                    UserName = user.UserName,
-                    Roles = roles
-                };
-
-                usersModels.Add(userModel);
-            }
-
-            return usersModels;
         }
 
         public async Task<string> RestoreUser(string id)
@@ -75,7 +44,7 @@
                .FirstOrDefaultAsync(x => x.UserId == id);
 
             if (profile == null || user == null)
-                throw new ArgumentNullException("Invalid user!");
+                throw new ArgumentNullException(InvalidUser);
 
             user.IsDeleted = false;
             profile.IsDeleted = false;

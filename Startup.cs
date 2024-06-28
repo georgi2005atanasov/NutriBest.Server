@@ -11,7 +11,17 @@
         public IConfiguration Configuration { get; private set; }
 
         public Startup(IConfiguration configuration)
-            => this.Configuration = configuration;
+        {
+            Configuration = configuration;
+
+            var jwtKey = Configuration["ApplicationSettings:Secret"];
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                jwtKey = KeyGenerator.GenerateRandomKey(32); // 32 bytes for a 256-bit key
+                                                             // Store this key in the configuration (example shows in-memory update)
+                Configuration["ApplicationSettings:Secret"] = jwtKey;
+            }
+        }
 
         public void Configure(IServiceCollection services)
         {
@@ -30,14 +40,6 @@
             var mapper = mapperConfiguration.CreateMapper();
 
             services
-                .AddSingleton(mapper)
-                .AddServices()
-                .AddHttpContextAccessor()
-                .AddMemoryCache()
-                .AddResponseCaching()
-                .AddDatabase(connectionString)
-                .AddDatabaseDeveloperPageExceptionFilter()
-                .AddIdentity()
                 .AddCors(options =>
                 {
                     options.AddPolicy("MyCorsPolicy", builder =>
@@ -49,6 +51,14 @@
                                .AllowCredentials();
                     });
                 })
+                .AddSingleton(mapper)
+                .AddServices()
+                .AddHttpContextAccessor()
+                .AddMemoryCache()
+                .AddResponseCaching()
+                .AddDatabase(connectionString)
+                .AddDatabaseDeveloperPageExceptionFilter()
+                .AddIdentity()
                 .AddJwtAuthentication(secret)
                 .Configure<ApplicationSettings>(applicationSettings)
                 .AddApiControllers();
@@ -68,6 +78,8 @@
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("MyCorsPolicy");
+
             app.UseHttpsRedirection()
                 .UseStaticFiles()
                 .UseRouting()
@@ -75,8 +87,6 @@
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseCors("MyCorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {

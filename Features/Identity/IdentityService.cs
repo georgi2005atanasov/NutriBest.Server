@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Identity
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Identity
 {
     using System.Text;
     using System.Security.Claims;
@@ -11,6 +13,9 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.AdminController;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
 
     public class IdentityService : IIdentityService, ITransientService
     {
@@ -18,16 +23,19 @@
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationSettings appSettings;
+        private readonly IMapper mapper;
 
         public IdentityService(NutriBestDbContext db,
             UserManager<User> userManager,
             IOptions<ApplicationSettings> appSettings,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IMapper mapper)
         {
             this.db = db;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.appSettings = appSettings.Value;
+            this.mapper = mapper;
         }
 
         public async Task<List<string>> AllRoles()
@@ -38,59 +46,57 @@
                 .ToListAsync();
 
         public async Task<bool> CheckUserPassword(User user, string password)
-        {
-            return await userManager.CheckPasswordAsync(user, password);
-        }
+            => await userManager
+                    .CheckPasswordAsync(user, password);
+
+        public async Task<User> FindUserByUserName(string userName)
+            => await userManager
+                    .FindByNameAsync(userName);
 
         public async Task<IdentityResult> CreateUser(string userName, string email, string password)
         {
-            var user = new User
+            using (var transaction = await db.Database.BeginTransactionAsync())
             {
-                UserName = userName,
-                Email = email,
-                EmailConfirmed = true,
-            };
+                var user = new User
+                {
+                    UserName = userName,
+                    Email = email,
+                    EmailConfirmed = true,
+                };
 
-            var result = await userManager.CreateAsync(user, password);
+                var result = await userManager
+                    .CreateAsync(user, password);
 
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException(String.Join(", ", result.Errors.Select(x => x.Description)));
+                if (!result.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(x => x.Description)));
+                }
+
+                var roleResult = await userManager
+                                .AddToRoleAsync(user, "User");
+
+                if (!roleResult.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException(CouldNotAddRole);
+                }
+
+                await transaction.CommitAsync();
+                return result;
             }
-
-            var roleResult = await userManager.AddToRoleAsync(user, "User");
-
-            if (!roleResult.Succeeded)
-            {
-                throw new InvalidOperationException("Could not add the role");
-            }
-
-            return result;
         }
 
         public async Task<ProfileServiceModel?> FindUserById(string id)
             => await db.Users
                 .Where(x => x.Id == id)
-                .Select(x => new ProfileServiceModel
-                {
-                    Gender = x.Profile.Gender.ToString(),
-                    Name = x.Profile.Name,
-                    Age = x.Profile.Age,
-                    ModifiedOn = x.ModifiedOn,
-                    CreatedOn = x.CreatedOn,
-                    Email = x.Email,
-                    UserName = x.UserName
-                })
+                .ProjectTo<ProfileServiceModel>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
-
-        public async Task<User> FindUserByUserName(string userName)
-        {
-            return await userManager.FindByNameAsync(userName);
-        }
 
         public async Task<string> GetEncryptedToken(User user)
         {
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = await userManager
+                            .GetRolesAsync(user);
 
             var claims = new List<Claim>
             {
@@ -104,16 +110,24 @@
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            var key = Encoding.ASCII
+                .GetBytes(appSettings.Secret);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow
+                .AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                                         SecurityAlgorithms.HmacSha256Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var encryptedToken = tokenHandler.WriteToken(token);
+
+            var token = tokenHandler
+                .CreateToken(tokenDescriptor);
+
+            var encryptedToken = tokenHandler
+                .WriteToken(token);
 
             return encryptedToken;
         }
