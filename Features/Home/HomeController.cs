@@ -11,13 +11,10 @@ namespace NutriBest.Server.Features.Home
     public class HomeController : ApiController
     {
         private readonly IHomeService homeService;
-        private readonly IMemoryCache memoryCache;
 
-        public HomeController(IHomeService homeService,
-            IMemoryCache memoryCache)
+        public HomeController(IHomeService homeService)
         {
             this.homeService = homeService;
-            this.memoryCache = memoryCache;
         }
 
         [HttpGet]

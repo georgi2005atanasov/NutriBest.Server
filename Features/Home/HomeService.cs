@@ -26,22 +26,20 @@
         public async Task<ContactUsInfoServiceModel> ContactUsDetails()
         {
             var contactUsInfo = new ContactUsInfoServiceModel();
+
             var user = await userManager
                 .FindByEmailAsync(config.GetSection("Admin:Email").Value);
 
             var profile = await db.Profiles
                 .FirstAsync(x => x.UserId == user.Id);
 
-            contactUsInfo.PhoneNumber = user.PhoneNumber ?? "";
-            contactUsInfo.Email = user.Email;
-
             var address = await db.Addresses
                 .FirstOrDefaultAsync(x => x.ProfileId == profile.UserId);
 
+            contactUsInfo.PhoneNumber = user.PhoneNumber ?? "";
+            contactUsInfo.Email = user.Email;
             if (address == null)
-            {
                 return contactUsInfo;
-            }
 
             var city = await db.Cities
                 .FirstAsync(x => x.Id == address.CityId);

@@ -8,7 +8,6 @@ namespace NutriBest.Server.Features.Admin
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Shared.Responses;
-    using NutriBest.Server.Features.Admin.Models;
     using static ErrorMessages.AdminController;
     using static SuccessMessages.AdminController;
 
@@ -161,8 +160,10 @@ namespace NutriBest.Server.Features.Admin
 
         private async Task<(User user, IdentityRole existingRole)> CheckUserAndRole(string id, string role)
         {
-            var user = await userManager.FindByIdAsync(id);
-            var existingRole = await roleManager.FindByNameAsync(role);
+            var user = await userManager
+                            .FindByIdAsync(id);
+            var existingRole = await roleManager
+                                    .FindByNameAsync(role);
 
             if (user == null)
                 throw new ArgumentNullException(ErrorMessages.UserNotFound);

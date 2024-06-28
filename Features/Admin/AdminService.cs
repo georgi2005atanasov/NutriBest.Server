@@ -27,6 +27,7 @@ namespace NutriBest.Server.Features.Admin
 
             db.Profiles
                 .Remove(profile);
+
             db.Users
                 .Remove(user);
 

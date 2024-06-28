@@ -1,20 +1,20 @@
-﻿namespace NutriBest.Server.Features.Cities
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Cities
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Caching.Memory;
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Cities.Models;
     using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages;
 
     public class CitiesController : ApiController
     {
         private readonly NutriBestDbContext db;
 
         public CitiesController(NutriBestDbContext db)
-        {
-            this.db = db;
-        }
+            => this.db = db;
 
         [HttpGet]
         public async Task<ActionResult<List<AllCitiesWithCountryServiceModel>>> AllCitiesWithCountries()
@@ -59,18 +59,13 @@
                     }
                 }
 
-                var cacheEntryOptions = new MemoryCacheEntryOptions
-                {
-                    SlidingExpiration = TimeSpan.FromMinutes(30)
-                };
-
                 return Ok(cities);
             }
             catch (Exception)
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = "Something went wrong!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }

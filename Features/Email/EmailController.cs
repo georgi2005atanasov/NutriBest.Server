@@ -1,10 +1,15 @@
-﻿namespace NutriBest.Server.Features.Email
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Email
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Email.Models;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages.EmailController;
+    using static SuccessMessages.EmailController;
 
     public class EmailController : ApiController
     {
@@ -75,7 +80,7 @@
             if (string.IsNullOrEmpty(request.To))
                 return BadRequest(new
                 {
-                    Error = "Email is Required!"
+                    Error = EmailIsRequired
                 });
 
             try
@@ -85,11 +90,13 @@
                     return Ok(new
                     {
                         IsSuccess = true,
-                        Message = "If the email is valid, a password reset link has been sent."
+                        Message = IfEmailIsValidLinkIsSent
                     });
 
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
                 //ENSURE WHEN IT GOES TO PRODUCTION TO CHANGE TO HTTPS
+
                 var host = config.GetSection("ClientHost").Value;
                 var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: "http", host: host);
 
@@ -97,7 +104,7 @@
                 return Ok(new
                 {
                     IsSuccess = true,
-                    Message = "If the email is valid, a password reset link has been sent."
+                    Message = IfEmailIsValidLinkIsSent
                 });
             }
             catch (Exception)
@@ -114,7 +121,7 @@
             if (string.IsNullOrEmpty(request.To))
                 return BadRequest(new
                 {
-                    Error = "Email is Required!"
+                    Error = EmailIsRequired
                 });
 
             try
@@ -124,7 +131,7 @@
                 return Ok(new
                 {
                     IsSuccess = true,
-                    Message = "Successfully sent promo code!"
+                    Message = SuccessfullySentPromoCode
                 });
             }
             catch (Exception)
@@ -140,7 +147,7 @@
             if (string.IsNullOrEmpty(request.To))
                 return BadRequest(new
                 {
-                    Error = "Email is Required!"
+                    Error = EmailIsRequired
                 });
 
             try
@@ -150,7 +157,7 @@
                 return Ok(new
                 {
                     IsSuccess = true,
-                    Message = "Successfully sent promo code!"
+                    Message = SuccessfullySentPromoCode
                 });
             }
             catch (Exception)
@@ -190,14 +197,14 @@
 
                 return Ok(new
                 {
-                    IsSuccess = true,
+                    IsSuccess = true
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

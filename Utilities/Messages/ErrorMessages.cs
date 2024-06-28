@@ -21,5 +21,11 @@
             public const string InvalidUser = "Invalid user!";
             public const string CouldNotAddRole = "Could not add the role.";
         }
+
+        public static class EmailController
+        {
+            public const string EmailIsRequired = "Email is Required!";
+            public const string SuccessfullySentPromoCode = "Successfully sent promo code!";
+        }
     }
 }

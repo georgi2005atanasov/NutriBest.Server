@@ -55,36 +55,30 @@ namespace NutriBest.Server.Features.Identity
 
         public async Task<IdentityResult> CreateUser(string userName, string email, string password)
         {
-            using (var transaction = await db.Database.BeginTransactionAsync())
+            var user = new User
             {
-                var user = new User
-                {
-                    UserName = userName,
-                    Email = email,
-                    EmailConfirmed = true,
-                };
+                UserName = userName,
+                Email = email,
+                EmailConfirmed = true,
+            };
 
-                var result = await userManager
-                    .CreateAsync(user, password);
+            var result = await userManager
+                .CreateAsync(user, password);
 
-                if (!result.Succeeded)
-                {
-                    await transaction.RollbackAsync();
-                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(x => x.Description)));
-                }
-
-                var roleResult = await userManager
-                                .AddToRoleAsync(user, "User");
-
-                if (!roleResult.Succeeded)
-                {
-                    await transaction.RollbackAsync();
-                    throw new InvalidOperationException(CouldNotAddRole);
-                }
-
-                await transaction.CommitAsync();
-                return result;
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(string.Join(", ", result.Errors.Select(x => x.Description)));
             }
+
+            var roleResult = await userManager
+                            .AddToRoleAsync(user, "User");
+
+            if (!roleResult.Succeeded)
+            {
+                throw new InvalidOperationException(CouldNotAddRole);
+            }
+
+            return result;
         }
 
         public async Task<ProfileServiceModel?> FindUserById(string id)

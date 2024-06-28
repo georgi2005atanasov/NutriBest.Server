@@ -34,8 +34,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
             // I do this check since i need to ensure that
             // the integration tests don't seed again the roles
             // and the Administrator
-            if (dbContext.Database.ProviderName != null &&
-               dbContext.Database.IsRelational())
+            if (dbContext.Database.IsRelational())
             {
                 SeedAdministrator(services.ServiceProvider);
                 SeedEmployeeRole(services.ServiceProvider);

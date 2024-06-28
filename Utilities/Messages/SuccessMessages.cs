@@ -17,8 +17,11 @@
             public const string SuccessfullyRemovedRole = "Successfully removed role '{0}' from '{1}'!";
             public const string UserHasJustLoggedIn = "'{0}' Has Just Logged In!";
             public const string SuccessfullyRestoredProfile = "Successfully restored profile with email '{0}'!";
+        }
 
-            //public const string 
+        public static class EmailController
+        {
+            public const string IfEmailIsValidLinkIsSent = "If the email is valid, a password reset link has been sent.";
         }
     }
 }
