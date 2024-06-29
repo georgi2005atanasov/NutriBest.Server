@@ -32,8 +32,13 @@
         public async Task SendConfirmOrder(EmailConfirmOrderModel request)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
-            email.To.Add(MailboxAddress.Parse(request.To));
+            email.From
+                .Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
+            email.To
+                .Add(MailboxAddress
+                .Parse(request.To));
             email.Subject = request.Subject;
 
             var htmlTemplate = Messages.ConfirmOrderEmail;
@@ -45,7 +50,10 @@
                 .Replace("{ConfirmationUrl}", request.ConfirmationUrl)
                 .Replace("{Date}", $"{DateTime.UtcNow.Year}");
 
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
+            email.Body = new TextPart(TextFormat.Html)
+            {
+                Text = body
+            };
 
             await SendEmail(email);
         }
@@ -53,8 +61,12 @@
         public async Task SendNewOrderToAdmin(EmailOrderModel request)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
-            email.To.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.From.Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
+            email.To.Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
             email.Subject = request.Subject;
 
             var htmlTemplate = Messages.AdminMessageAfterCreatedOrder;
@@ -70,7 +82,10 @@
                 .Replace("{OrderDetailsUrl}", request.OrderDetailsUrl)
                 .Replace("{Date}", $"{DateTime.UtcNow.Year}");
 
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
+            email.Body = new TextPart(TextFormat.Html)
+            {
+                Text = body
+            };
 
             await SendEmail(email);
         }
@@ -78,8 +93,11 @@
         public async Task SendForgottenPassword(EmailModel request, string callbackUrl)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
-            email.To.Add(MailboxAddress.Parse(request.To));
+            email.From.Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
+            email.To.Add(MailboxAddress
+                .Parse(request.To));
             email.Subject = request.Subject;
 
             var htmlTemplate = Messages.ForgottenPasswordMessage;
@@ -88,7 +106,10 @@
                 .Replace("{callbackUrl}", callbackUrl)
                 .Replace("{Year}", $"{DateTime.UtcNow.Year}");
 
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
+            email.Body = new TextPart(TextFormat.Html) 
+            { 
+                Text = body 
+            };
 
             await SendEmail(email);
         }
@@ -96,13 +117,17 @@
         public async Task SendPromoCode(SendPromoEmailModel request)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.From
+                .Add(MailboxAddress
+                    .Parse(config.GetSection("EmailUsername")
+                    .Value));
             email.To.Add(MailboxAddress.Parse(request.To));
             email.Subject = request.Subject;
 
             var htmlTemplate = Messages.PromoCodeMessage;
 
-            var (promoCodes, expiresIn) = await promoCodeService.GetByDescription(request.PromoCodeDescription);
+            var (promoCodes, expiresIn) = await promoCodeService
+                .GetByDescription(request.PromoCodeDescription);
 
             var code = promoCodes.FirstOrDefault();
 
@@ -115,7 +140,10 @@
                 .Replace("{promoCode}", code)
                 .Replace("{expiresIn}", $"{expiresIn}");
 
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
+            email.Body = new TextPart(TextFormat.Html) 
+            { 
+                Text = body 
+            };
 
             await SendEmail(email);
         }
@@ -123,16 +151,22 @@
         public async Task SendConfirmedOrderToAdmin(EmailConfirmedOrderModel request)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
-            email.To.Add(MailboxAddress.Parse(config.GetSection("EmailUsername").Value));
+            email.From
+                .Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
+            email.To
+                .Add(MailboxAddress
+                .Parse(config.GetSection("EmailUsername")
+                .Value));
             email.Subject = request.Subject;
 
             var htmlTemplate = Messages.ConfirmedOrderMessageToAdmin;
 
             var body = htmlTemplate
-       .Replace("{OrderId}", request.OrderId.ToString())
-       .Replace("{OrderLink}", request.OrderDetailsUrl)
-       .Replace("{Year}", DateTime.UtcNow.Year.ToString());
+                .Replace("{OrderId}", request.OrderId.ToString())
+                .Replace("{OrderLink}", request.OrderDetailsUrl)
+                .Replace("{Year}", DateTime.UtcNow.Year.ToString());
 
             email.Body = new TextPart(TextFormat.Html) { Text = body };
 
@@ -240,16 +274,22 @@
                 try
                 {
                     smtp.Timeout = 120000;
-                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 465, SecureSocketOptions.SslOnConnect);
-                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, config.GetSection("EmailPassword").Value);
+
+                    await smtp.ConnectAsync(config.GetSection("EmailHost").Value, 
+                        465, 
+                        SecureSocketOptions.SslOnConnect);
+
+                    await smtp.AuthenticateAsync(config.GetSection("EmailUsername").Value, 
+                        config.GetSection("EmailPassword").Value);
+
                     await smtp.SendAsync(email);
+
                     await smtp.DisconnectAsync(true);
                     return;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     attempt++;
-                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
                     if (attempt >= maxRetries)
                     {
                         throw; // Re-throw the exception after the last attempt

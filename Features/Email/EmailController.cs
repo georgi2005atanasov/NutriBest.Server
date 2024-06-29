@@ -31,6 +31,12 @@ namespace NutriBest.Server.Features.Email
         [Route(nameof(SendConfirmOrderEmail))]
         public async Task<IActionResult> SendConfirmOrderEmail([FromBody] EmailConfirmOrderModel request)
         {
+            if (string.IsNullOrEmpty(request.To))
+                return BadRequest(new
+                {
+                    Error = EmailIsRequired
+                });
+
             try
             {
                 await emailService.SendConfirmOrder(request);
@@ -101,6 +107,7 @@ namespace NutriBest.Server.Features.Email
                 var callbackUrl = Url.Action("ResetPassword", "Identity", new { token, email = user.Email }, protocol: "http", host: host);
 
                 await emailService.SendForgottenPassword(request, callbackUrl ?? "");
+
                 return Ok(new
                 {
                     IsSuccess = true,
@@ -167,6 +174,7 @@ namespace NutriBest.Server.Features.Email
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route(nameof(SendMessageToSubscribers))]
         public async Task<ActionResult> SendMessageToSubscribers([FromBody] EmailSubscribersServiceModel request,
             [FromQuery] string groupType)
@@ -187,6 +195,7 @@ namespace NutriBest.Server.Features.Email
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Employee")]
         [Route(nameof(SendPromoCodesToSubscribers))]
         public async Task<ActionResult> SendPromoCodesToSubscribers([FromBody] EmailSubscribersPromoCodeServiceModel request,
             [FromQuery] string groupType)
