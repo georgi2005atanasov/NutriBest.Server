@@ -42,9 +42,9 @@
                     .CountAsync();
 
                 var profile = await db.Profiles
-                    .FirstAsync(x => x.UserId == user.Id);
+                    .FirstOrDefaultAsync(x => x.UserId == user.Id);
 
-                name = profile.Name ?? "";
+                name = profile != null ? profile.Name ?? "" : "";
                 phoneNumber = user.PhoneNumber;
             }
 

@@ -6,12 +6,14 @@
 
     public class CurrentUserService : ICurrentUserService, IScopedService
     {
-        private readonly ClaimsPrincipal user;
+        private readonly ClaimsPrincipal? user;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor) 
-            => this.user = httpContextAccessor.HttpContext?.User;
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+            => this.user = httpContextAccessor != null ?
+            httpContextAccessor.HttpContext?.User :
+            null;
 
-        public string? GetUserId() 
+        public string? GetUserId()
             => this.user.GetId();
 
         public string? GetUserName()

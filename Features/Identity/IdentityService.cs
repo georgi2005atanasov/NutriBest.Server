@@ -23,7 +23,7 @@ namespace NutriBest.Server.Features.Identity
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationSettings appSettings;
-        private readonly IMapper mapper;
+        private readonly IMapper? mapper;
 
         public IdentityService(NutriBestDbContext db,
             UserManager<User> userManager,
@@ -84,7 +84,7 @@ namespace NutriBest.Server.Features.Identity
         public async Task<ProfileServiceModel?> FindUserById(string id)
             => await db.Users
                 .Where(x => x.Id == id)
-                .ProjectTo<ProfileServiceModel>(mapper.ConfigurationProvider)
+                .ProjectTo<ProfileServiceModel>(mapper!.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
         public async Task<string> GetEncryptedToken(User user)
