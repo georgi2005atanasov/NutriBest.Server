@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Brands
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Brands
 {
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Http;
@@ -8,6 +10,7 @@
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Brands.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.BrandsController;
 
     public class BrandService : IBrandService, ITransientService
     {
@@ -48,7 +51,7 @@
         public async Task<int> Create(string name, string? description, IFormFile? image)
         {
             if (await db.Brands.AnyAsync(x => x.Name == name))
-                throw new InvalidOperationException("Brand with this name already exists!");
+                throw new InvalidOperationException(BrandAlreadyExists);
 
             var brand = new Brand
             {
@@ -84,7 +87,7 @@
                 .FirstOrDefaultAsync(x => x.Name == brandName);
 
             if (brand == null)
-                throw new ArgumentNullException("Invalid brand!");
+                throw new ArgumentNullException(InvalidBrandName);
 
             var brandLogo = await db.BrandsLogos
                 .FirstOrDefaultAsync(x => x.BrandLogoId == brand.BrandLogoId);

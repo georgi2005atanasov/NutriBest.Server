@@ -33,7 +33,7 @@
             public const string CouldNotGetBrands = "Could not get the brands!";
             public const string CouldNotCreateBrands = "Could not create brand!";
             public const string InvalidBrandName = "Invalid brand name!";
-            
+            public const string BrandAlreadyExists = "Brand with this name already exists!";
         }
     }
 }

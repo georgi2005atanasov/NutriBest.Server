@@ -11,7 +11,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Infrastructure.Middlewares;
     using static ServicesConstants.Shipping;
-
+    
     public static class ApplicationBuilderExtensions
     {
         public static void ApplyMigrations(this IApplicationBuilder app)
@@ -41,15 +41,15 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 SeedUserRole(services.ServiceProvider);
             }
 
-            SeedCategories(dbContext);
-            SeedBrands(dbContext);
-            SeedFlavours(dbContext);
-            SeedPackages(dbContext);
-            SeedBgCities(dbContext);
-            SeedDeCities(dbContext);
+            dbContext.SeedCategories();
+            dbContext.SeedBrands();
+            dbContext.SeedFlavours();
+            dbContext.SeedPackages();
+            dbContext.SeedBgCities();
+            dbContext.SeedDeCities();
         }
 
-        private static void SeedDeCities(NutriBestDbContext db)
+        public static void SeedDeCities(this NutriBestDbContext db)
         {
             if (db.Cities != null && db.Cities.Any(x => x.Country.CountryName == "Germany"))
                 return;
@@ -98,7 +98,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedBgCities(NutriBestDbContext db)
+        public static void SeedBgCities(this NutriBestDbContext db)
         {
             if (db.Cities != null && db.Cities.Any(x => x.Country.CountryName == "Bulgaria"))
                 return;
@@ -147,7 +147,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedPackages(NutriBestDbContext db)
+        public static void SeedPackages(this NutriBestDbContext db)
         {
             if (db.Packages != null && db.Packages.Any())
                 return;
@@ -169,7 +169,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedFlavours(NutriBestDbContext db)
+        public static void SeedFlavours(this NutriBestDbContext db)
         {
             if (db.Flavours != null && db.Flavours.Any())
                 return;
@@ -208,7 +208,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
             return builder.UseMiddleware<SwaggerBasicAuthMiddleware>(adminEmail, adminPassword);
         }
 
-        private static void SeedUserRole(IServiceProvider serviceProvider)
+        public static void SeedUserRole(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             Task.Run(async () =>
@@ -227,7 +227,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedEmployeeRole(IServiceProvider serviceProvider)
+        public static void SeedEmployeeRole(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -248,7 +248,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedCategories(NutriBestDbContext db)
+        public static void SeedCategories(this NutriBestDbContext db)
         {
             if (db.Categories != null && db.Categories.Any())
                 return;
@@ -277,7 +277,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                 .GetResult();
         }
 
-        private static void SeedBrands(NutriBestDbContext db)
+        public static void SeedBrands(this NutriBestDbContext db)
         {
             if (db.Brands != null && db.Brands.Any())
                 return;
@@ -301,7 +301,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
         }
 
 
-        private static void SeedAdministrator(IServiceProvider serviceProvider)
+        public static void SeedAdministrator(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();

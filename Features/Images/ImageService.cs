@@ -29,6 +29,7 @@
             }
         }
 
+        // may be able to make single method for getting images using reflection
         public async Task<ImageListingServiceModel> GetImageByBrandId(string name)
         {
             var brand = await db.Brands

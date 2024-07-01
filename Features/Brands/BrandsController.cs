@@ -49,9 +49,9 @@ namespace NutriBest.Server.Features.Brands
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -73,6 +73,15 @@ namespace NutriBest.Server.Features.Brands
                 var result = await brandService.Remove(name);
 
                 return Ok(result);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName != null ?
+                    err.ParamName :
+                    ErrorMessages.Exception
+                });
             }
             catch (Exception)
             {
