@@ -35,5 +35,19 @@
             public const string InvalidBrandName = "Invalid brand name!";
             public const string BrandAlreadyExists = "Brand with this name already exists!";
         }
+
+        public static class FlavoursController
+        {
+            public const string FlavourAlreadyExists =  "Flavour with this name already exists!";
+            public const string InvalidFlavour = "Invalid flavour!";
+            public const string CouldNotFetchFlavours = "Could not fetch flavours!";
+        }
+
+        public static class PackagesController
+        {
+            public const string PackageAlreadyExists = "Package with these grams already exists!";
+            public const string InvalidGrams = "Invalid Grams!";
+            public const string CouldNotFetchPackages = "Could not fetch packages!";
+        }
     }
 }

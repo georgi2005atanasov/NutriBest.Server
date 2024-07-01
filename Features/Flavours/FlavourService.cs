@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Flavours
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Flavours
 {
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
@@ -6,6 +8,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Flavours.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.FlavoursController;
 
     public class FlavourService : IFlavourService, ITransientService
     {
@@ -19,7 +22,7 @@
         public async Task<int> Create(string name)
         {
             if (await db.Flavours.AnyAsync(x => x.FlavourName == name))
-                throw new InvalidOperationException("Flavour with this name already exists!");
+                throw new InvalidOperationException(FlavourAlreadyExists);
 
             var flavour = new Flavour
             {
@@ -39,7 +42,7 @@
                 .FirstOrDefaultAsync(x => x.FlavourName == name);
 
             if (flavour == null)
-                throw new ArgumentNullException("Invalid flavour!");
+                throw new ArgumentNullException(InvalidFlavour);
 
             var productsPackagesFlavours = await db.ProductsPackagesFlavours
                 .Where(x => x.FlavourId == flavour.Id)
@@ -61,8 +64,7 @@
         }
 
         public async Task<List<FlavourCountServiceModel>> GetProductsByFlavourCount()
-        {
-            var products = await db.ProductsPackagesFlavours
+            => await db.ProductsPackagesFlavours
                 .GroupBy(ppf => ppf.FlavourId)
                 .Select(g => new FlavourCountServiceModel
                 {
@@ -77,11 +79,8 @@
                 .OrderBy(x => x.Name)
                 .ToListAsync();
 
-            return products;
-        }
-
         public async Task<List<FlavourServiceModel>> All()
-        => await db.Flavours
+            => await db.Flavours
                     .Select(x => new FlavourServiceModel
                     {
                         Name = x.FlavourName

@@ -1,8 +1,12 @@
-﻿namespace NutriBest.Server.Features.Flavours
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Flavours
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Flavours.Models;
+    using static ErrorMessages.FlavoursController;
 
     public class FlavoursController : ApiController
     {
@@ -14,7 +18,6 @@
         }
 
         [HttpGet]
-        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
         public async Task<ActionResult<List<FlavourServiceModel>>> All()
         {
             try
@@ -25,9 +28,9 @@
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Could not fetch flavours!"
+                    Message = CouldNotFetchFlavours
                 });
             }
         }
@@ -44,9 +47,9 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -65,6 +68,15 @@
                 var result = await flavourService.Remove(name);
 
                 return Ok(result);
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName != null ?
+                    err.ParamName :
+                    ErrorMessages.Exception
+                });
             }
             catch (Exception)
             {

@@ -1,9 +1,11 @@
-﻿namespace NutriBest.Server.Features.Packages
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Packages
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
-    using NutriBest.Server.Data;
     using NutriBest.Server.Features.Packages.Models;
+    using static ErrorMessages.PackagesController;
 
     public class PackagesController : ApiController
     {
@@ -15,7 +17,7 @@
         }
 
         [HttpGet]
-        public async Task<ActionResult<PackageServiceModel>> All()
+        public async Task<ActionResult<List<PackageServiceModel>>> All()
         {
             try
             {
@@ -27,7 +29,7 @@
             {
                 return BadRequest(new
                 {
-                    Message = "Could not fetch packages!"
+                    Message = CouldNotFetchPackages
                 });
             }
         }
@@ -42,7 +44,7 @@
                 {
                     return BadRequest(new
                     {
-                        Message = "Invalid Grams!"
+                        Message = InvalidGrams
                     });
                 }
 
