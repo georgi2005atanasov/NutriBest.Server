@@ -6,8 +6,6 @@
     {
         Task<IEnumerable<BrandServiceModel>> All();
 
-        Task<BrandDetailsServiceModel?> Get(string brandName);
-
         Task<bool> Remove(string brandName);
 
         Task<int> Create(string name, string? description, IFormFile? image);

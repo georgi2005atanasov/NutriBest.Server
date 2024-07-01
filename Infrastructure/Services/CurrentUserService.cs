@@ -14,7 +14,7 @@
             null;
 
         public string? GetUserId()
-            => this.user.GetId();
+            => this.user?.GetId();
 
         public string? GetUserName()
             => user?.Identity?.Name;

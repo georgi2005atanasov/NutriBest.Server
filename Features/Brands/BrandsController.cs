@@ -1,8 +1,12 @@
-﻿namespace NutriBest.Server.Features.Brands
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Brands
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Brands.Models;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages.BrandsController;
 
     public class BrandsController : ApiController
     {
@@ -24,41 +28,9 @@
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Could not get the brands!"
-                });
-            }
-        }
-
-        [HttpGet]
-        [Route("{name}")]
-        public async Task<ActionResult<BrandServiceModel>> Get(string name)
-        {
-            try
-            {
-                var brand = await brandService.Get(name);
-
-                if (brand == null)
-                    return BadRequest(new
-                    {
-                        Message = "Invalid brand name!"
-                    });
-
-                return Ok(brand);
-            }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new
-                {
-                    Message = "Invalid brand name!"
+                    Message = CouldNotGetBrands
                 });
             }
         }
@@ -86,7 +58,7 @@
             {
                 return BadRequest(new
                 {
-                    Message = "Could not create brand!"
+                    Message = CouldNotCreateBrands
                 });
             }
         }
@@ -104,7 +76,10 @@
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = ErrorMessages.Exception
+                });
             }
         }
 
@@ -120,7 +95,10 @@
             }
             catch (Exception)
             {
-                return BadRequest();
+                return BadRequest(new FailResponse
+                {
+                    Message = ErrorMessages.Exception
+                });
             }
         }
     }

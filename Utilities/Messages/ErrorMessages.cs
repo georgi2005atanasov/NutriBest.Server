@@ -27,5 +27,13 @@
             public const string EmailIsRequired = "Email is Required!";
             public const string SuccessfullySentPromoCode = "Successfully sent promo code!";
         }
+
+        public static class BrandsController
+        {
+            public const string CouldNotGetBrands = "Could not get the brands!";
+            public const string CouldNotCreateBrands = "Could not create brand!";
+            public const string InvalidBrandName = "Invalid brand name!";
+            
+        }
     }
 }

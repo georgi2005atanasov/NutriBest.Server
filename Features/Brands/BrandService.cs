@@ -75,17 +75,6 @@
             return brand.Id;
         }
 
-        public async Task<BrandDetailsServiceModel?> Get(string brandName)
-            => await db.Brands
-            .Where(x => x.Name == brandName)
-            .Select(x => new BrandDetailsServiceModel
-            {
-                Name = x.Name,
-                BrandLogoId = x.BrandLogoId
-            })
-            .OrderBy(x => x.Name)
-            .FirstOrDefaultAsync();
-
         // The deletion of a brand will delete the products
         // with this brand and also the promotions
         // gotta be aware of the fact that i might have problems in here
