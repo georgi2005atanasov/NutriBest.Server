@@ -1,10 +1,13 @@
-﻿namespace NutriBest.Server.Features.Categories
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Categories
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.CategoriesController;
 
     public class CategoryService : ICategoryService, ITransientService
     {
@@ -16,7 +19,7 @@
         public async Task<int> Create(string name)
         {
             if (await db.Categories.AnyAsync(x => x.Name == name))
-                throw new InvalidOperationException("Category with this name already exists!");
+                throw new InvalidOperationException(CategoryAlreadyExists);
 
             var category = new Category
             {
@@ -35,8 +38,8 @@
             var allCategories = await db.Categories
                 .Select(x => new
                 {
-                    Id = x.Id,
-                    Name = x.Name,
+                    x.Id,
+                    x.Name,
                 })
                 .OrderBy(x => x.Name)
                 .ToListAsync();
@@ -64,7 +67,7 @@
                 .FirstOrDefaultAsync(x => x.Name == name);
 
             if (category == null)
-                throw new ArgumentNullException("Invalid brand!");
+                throw new ArgumentNullException(InvalidCategory);
 
             var productsToDelete = db.Products
                 .Where(x => x.ProductsCategories

@@ -1,8 +1,12 @@
-﻿namespace NutriBest.Server.Features.Categories
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Categories
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Categories.Models;
+    using static ErrorMessages.CategoriesController;
+    using NutriBest.Server.Shared.Responses;
 
     public class CategoriesController : ApiController
     {
@@ -14,8 +18,7 @@
         }
 
         [HttpGet]
-        //[ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any, VaryByHeader = "User-Agent")]
-        public async Task<ActionResult<CategoryServiceModel>> All()
+        public async Task<ActionResult<List<CategoryServiceModel>>> All()
         {
             try
             {
@@ -25,9 +28,9 @@
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Could not fetch products categories!"
+                    Message = CouldNotFetchCategories
                 });
             }
         }
@@ -44,9 +47,9 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

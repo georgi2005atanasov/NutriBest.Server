@@ -25,7 +25,7 @@
 
         [HttpGet]
         [Route("/Products/NutriFacts/{id}/{name}")]
-        public async Task<ActionResult<NutritionFactsServiceModel>> Facts([FromRoute] int id,
+        public async Task<ActionResult<NutritionFactsServiceModel>> All([FromRoute] int id,
             [FromRoute] string name)
         {
             try
@@ -87,32 +87,6 @@
             catch (Exception)
             {
                 return BadRequest();
-            }
-        }
-
-        [HttpDelete]
-        [Authorize(Roles = "Administrator,Employee")]
-        [Route("/Products/NutriFacts/{id}")]
-        public async Task<ActionResult<bool>> RemoveFacts([FromRoute] int id)
-        {
-            try
-            {
-                var product = await productService.Get(id);
-
-                await nutritionFactsService.Remove(id);
-
-                return Ok(true);
-            }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new FailResponse
-                {
-                    Message = err.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest(false);
             }
         }
     }

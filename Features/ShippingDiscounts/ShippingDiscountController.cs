@@ -42,30 +42,6 @@ namespace NutriBest.Server.Features.ShippingDiscounts
             }
         }
 
-        [HttpGet]
-        [Route("{countryName}")]
-        public async Task<ActionResult<ShippingDiscountServiceModel>> Get([FromRoute] string countryName)
-        {
-            try
-            {
-                var shippingDiscount = await shippingDiscountService.Get(countryName);
-
-                return Ok(shippingDiscount);
-            }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new FailResponse
-                {
-                    Message = err.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-
-
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
         public async Task<ActionResult<int>> Create([FromBody] CreateShippingDiscountServiceModel shippingDiscountModel)

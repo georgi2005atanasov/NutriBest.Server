@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Products
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Products
 {
     using System.Globalization;
     using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,10 @@
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using static ServicesConstants.PaginationConstants; // make separate constants class
+    using static ErrorMessages.BrandsController;
+    using static ErrorMessages.ProductsController;
+    using static ErrorMessages.PackagesController;
+    using static ErrorMessages.FlavoursController;
 
     public class ProductService : IProductService, ITransientService
     {
@@ -142,7 +148,7 @@
                     .FirstOrDefaultAsync(x => x.Name == brandName);
 
             if (brand == null)
-                throw new ArgumentNullException("Invalid Brand!");
+                throw new ArgumentNullException(InvalidBrandName);
 
             var productImage = new ProductImage
             {
@@ -218,7 +224,7 @@
                 .FirstOrDefaultAsync(x => x.ProductId == id && x.Name == name);
 
             if (product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             var productPackageFlavours = await db.ProductsPackagesFlavours
                 .Where(x => x.ProductId == id && x.Quantity > 0)
@@ -271,7 +277,7 @@
                     .FirstOrDefaultAsync(x => x.Name == brandName);
 
             if (brand == null)
-                throw new ArgumentNullException("Invalid Brand!");
+                throw new ArgumentNullException(InvalidBrandName);
 
             product.Brand = brand;
 
@@ -416,19 +422,19 @@
                     .FirstOrDefaultAsync(x => x.Grams == productSpec.Grams); // must be initially seeded
 
                 if (package == null)
-                    throw new ArgumentNullException("Invalid package!");
+                    throw new ArgumentNullException(InvalidPackage);
 
                 var flavour = await db.Flavours
                     .FirstOrDefaultAsync(x => x.FlavourName == productSpec.Flavour); // must be initially seeded
 
                 if (flavour == null)
-                    throw new ArgumentNullException("Invalid flavour!");
+                    throw new ArgumentNullException(InvalidFlavour);
 
                 product.Quantity += productSpec.Quantity;
 
                 string currentPrice = productSpec.Price.Replace(',', '.');
                 if (!decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
-                    throw new FormatException($"Invalid price format: {productSpec.Price}");
+                    throw new FormatException(string.Format(InvalidPriceFormat, productSpec.Price));
 
                 var productPackageFlavour = new ProductPackageFlavour
                 {
@@ -452,10 +458,10 @@
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (promotion == null || product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             if (product.PromotionId != promotionId)
-                throw new InvalidOperationException("The product does not have this promotion!");
+                throw new InvalidOperationException(ProductDoesNotHaveThisPromotion);
 
             return (product, promotion);
         }
@@ -466,7 +472,7 @@
                 .FirstAsync(x => x.ProductId == id);
 
             if (product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             if (description != null)
                 product.Description = description;

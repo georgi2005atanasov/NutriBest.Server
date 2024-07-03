@@ -9,6 +9,7 @@ namespace NutriBest.Server.Features.NutritionsFacts
     using NutriBest.Server.Features.NutritionsFacts.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ErrorMessages.NutritionFactsController;
+    using System.Globalization;
 
     public class NutritionFactsService : INutritionFactsService, ITransientService
     {
@@ -38,25 +39,25 @@ namespace NutriBest.Server.Features.NutritionsFacts
             try
             {
                 if (!string.IsNullOrEmpty(carbohydrates))
-                    details.NutritionFacts.Carbohydrates = double.Parse(carbohydrates);
+                    details.NutritionFacts.Carbohydrates = double.Parse(carbohydrates, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(fats))
-                    details.NutritionFacts.Fats = double.Parse(fats);
+                    details.NutritionFacts.Fats = double.Parse(fats, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(saturatedFats))
-                    details.NutritionFacts.SaturatedFats = double.Parse(saturatedFats);
+                    details.NutritionFacts.SaturatedFats = double.Parse(saturatedFats, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(sugars))
-                    details.NutritionFacts.Sugars = double.Parse(sugars);
+                    details.NutritionFacts.Sugars = double.Parse(sugars, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(proteins))
-                    details.NutritionFacts.Proteins = double.Parse(proteins);
+                    details.NutritionFacts.Proteins = double.Parse(proteins, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(energyValue))
-                    details.NutritionFacts.EnergyValue = double.Parse(energyValue);
+                    details.NutritionFacts.EnergyValue = double.Parse(energyValue, CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(salt))
-                    details.NutritionFacts.Salt = double.Parse(salt);
+                    details.NutritionFacts.Salt = double.Parse(salt, CultureInfo.InvariantCulture);
 
                 await db.SaveChangesAsync();
             }
@@ -75,30 +76,6 @@ namespace NutriBest.Server.Features.NutritionsFacts
                 .FirstAsync();
 
             return facts;
-        }
-
-        public async Task<bool> Remove(int productId)
-        {
-            var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == productId);
-
-            var details = await db.NutritionFacts
-                .FirstOrDefaultAsync(x => x.ProductId == productId);
-
-            if (details == null || product == null)
-                throw new ArgumentNullException(InvalidProduct);
-
-            details.Proteins = null;
-            details.Sugars = null;
-            details.Salt = null;
-            details.Fats = null;
-            details.SaturatedFats = null;
-            details.Carbohydrates = null;
-            details.EnergyValue = null;
-
-            await db.SaveChangesAsync();
-
-            return true;
         }
     }
 }

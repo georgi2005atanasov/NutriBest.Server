@@ -48,6 +48,7 @@
             public const string PackageAlreadyExists = "Package with these grams already exists!";
             public const string InvalidGrams = "Invalid Grams!";
             public const string CouldNotFetchPackages = "Could not fetch packages!";
+            public const string InvalidPackage = "Invalid package!";
         }
 
         public static class ShippingDiscountController
@@ -66,6 +67,27 @@
             public const string InvalidNutritionFacts = "Invalid nutrition facts!";
             public const string InvalidProduct = "Invalid product!";
         }
-            
+         
+        public static class CategoriesController
+        {
+            public const string CouldNotFetchCategories = "Could not fetch categories!";
+            public const string CategoryAlreadyExists = "Category with this name already exists!";
+            public const string InvalidCategory = "Invalid category!";
+        }
+
+        public static class ProductsController
+        {
+            public const string ProductsSpecificationAreRequired = "You must add some product specifications!";
+            public const string ImageIsRequired = "Image is required!";
+            public const string ProductAlreadyExists = "Product with this name already exists!";
+            public const string PricesMustBeNumbers = "Prices must be numbers!";
+            public const string InvalidPriceRange = "Price must be bigger than zero and less than 4000!";
+            public const string AtLeastOneCategory = "You have to choose at least 1 category!";
+            public const string MustHaveBiggerPriceBecauseOfTheAppliedPromotion = "The price must be bigger, because of the applied promotion!";
+            public const string InvalidProduct = "Invalid product!";
+            public const string ProductDoesNotHaveThisPromotion = "The product does not have this promotion!";
+            public const string InvalidPriceFormat = "Invalid price format: {0}";
+
+        }
     }
 }

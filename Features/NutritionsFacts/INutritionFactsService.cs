@@ -14,7 +14,5 @@
             string? saturatedFats,
             string? energyValue,
             string? salt);
-
-        Task<bool> Remove(int productId);
     }
 }

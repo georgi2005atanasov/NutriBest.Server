@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Products
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Products
 {
     using System.Text.Json;
     using System.Globalization;
@@ -11,6 +13,7 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Features.Products.Models;
+    using static ErrorMessages.ProductsController;
 
     public class ProductsController : ApiController
     {
@@ -101,7 +104,7 @@
                     return BadRequest(new
                     {
                         Key = "ProductSpecs",
-                        Message = "You must add some product specifications!"
+                        Message = ProductsSpecificationAreRequired
                     });
 
                 var passedCategories = productModel.Categories[0]
@@ -113,7 +116,7 @@
                     return BadRequest(new
                     {
                         Key = "Image",
-                        Message = "Image is required!"
+                        Message = ImageIsRequired
                     });
                 }
 
@@ -122,7 +125,7 @@
                     return BadRequest(new
                     {
                         Key = "Name",
-                        Message = "Product with this name already exists!"
+                        Message = ProductAlreadyExists
                     });
                 }
 
@@ -133,7 +136,7 @@
                         return BadRequest(new
                         {
                             Key = "Price",
-                            Message = "Prices must be numbers!"
+                            Message = PricesMustBeNumbers
                         });
                     }
 
@@ -142,7 +145,7 @@
                         return BadRequest(new
                         {
                             Key = "ProductSpecs",
-                            Message = "Price must be bigger than zero and less than 4000!"
+                            Message = InvalidPriceRange
                         });
                 }
 
@@ -154,7 +157,7 @@
                     return BadRequest(new
                     {
                         Key = "Category",
-                        Message = "You have to choose at least 1 category!"
+                        Message = AtLeastOneCategory
                     });
                 }
 
@@ -241,7 +244,7 @@
                     return BadRequest(new
                     {
                         Key = "ProductSpecs",
-                        Message = "You must add some product specifications!"
+                        Message = ProductsSpecificationAreRequired
                     });
 
                 foreach (var productSpec in productSpecs)
@@ -252,7 +255,7 @@
                         return BadRequest(new
                         {
                             Key = "Price",
-                            Message = "Prices must be numbers!"
+                            Message = PricesMustBeNumbers
                         });
                     }
 
@@ -260,7 +263,7 @@
                         return BadRequest(new
                         {
                             Key = "ProductSpecs",
-                            Message = "Price must be bigger than zero and less than 4000!"
+                            Message = InvalidPriceRange
                         });
                 }
 
@@ -274,7 +277,7 @@
                     return BadRequest(new
                     {
                         Key = "Name",
-                        Message = "Product with this name already exists!"
+                        Message = ProductAlreadyExists
                     });
 
                 var categoriesIds = await categoryService
@@ -284,7 +287,7 @@
                     BadRequest(new
                     {
                         Key = "Category",
-                        Message = "You have to choose at least 1 category!"
+                        Message = AtLeastOneCategory
                     });
 
                 if (product.PromotionId != null)
@@ -297,7 +300,7 @@
                         return BadRequest(new
                         {
                             Key = "Price",
-                            Message = "The price must be bigger, because of the applied promotion!"
+                            Message = MustHaveBiggerPriceBecauseOfTheAppliedPromotion
                         });
                     }
                 }
