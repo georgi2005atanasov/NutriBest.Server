@@ -190,7 +190,7 @@ namespace NutriBest.Server.Features.Products
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<IEnumerable<ProductListingServiceModel>>>> All(
+        public async Task<ActionResult<AllProductsServiceModel>> All(
             [FromQuery] int page = 1,
             [FromQuery] string? categories = "",
             [FromQuery] string? brand = "",

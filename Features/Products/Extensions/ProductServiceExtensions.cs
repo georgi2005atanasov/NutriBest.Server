@@ -126,7 +126,7 @@
             if (!string.IsNullOrEmpty(flavours))
             {
                 var flavoursToCheck = flavours
-                    .Split(" and ")
+                    .Split(" andAlso ")
                     .ToList();
 
                 query = query

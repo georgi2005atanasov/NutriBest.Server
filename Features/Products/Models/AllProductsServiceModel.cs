@@ -6,6 +6,6 @@
 
         public int MaxPrice { get; set; }
 
-        public IEnumerable<IEnumerable<ProductListingServiceModel>>? ProductsRows { get; set; }
+        public List<List<ProductListingServiceModel>>? ProductsRows { get; set; }
     }
 }

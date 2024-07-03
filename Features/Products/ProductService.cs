@@ -8,12 +8,12 @@ namespace NutriBest.Server.Features.Products
     using AutoMapper.QueryableExtensions;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Products.Extensions;
-    using NutriBest.Server.Features.Products.Factories;
-    using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions;
-    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Features.Products.Factories;
+    using NutriBest.Server.Features.Products.Extensions;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants; // make separate constants class
     using static ErrorMessages.BrandsController;
     using static ErrorMessages.ProductsController;
