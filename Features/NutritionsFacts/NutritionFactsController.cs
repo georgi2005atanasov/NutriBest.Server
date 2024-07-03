@@ -6,6 +6,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.Products;
     using NutriBest.Server.Features.NutritionsFacts.Models;
+    using NutriBest.Server.Shared.Responses;
 
     public class NutritionFactsController : ApiController
     {
@@ -44,7 +45,7 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = err.Message
                 });
@@ -76,12 +77,16 @@
 
                 return Ok(true);
             }
-            catch (Exception err)
+            catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
             }
         }
 
@@ -100,16 +105,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
-                });
-            }
-            catch (InvalidOperationException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

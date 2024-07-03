@@ -49,5 +49,23 @@
             public const string InvalidGrams = "Invalid Grams!";
             public const string CouldNotFetchPackages = "Could not fetch packages!";
         }
+
+        public static class ShippingDiscountController
+        {
+            public const string InvalidDiscountPercentage = "The Discount Percentage must be between 1 and 100!";
+            public const string PricesMustBeNumbers = "Prices must be numbers!";
+            public const string InvalidDescriptionLength = "Description length must be between 5 and 50!";
+            public const string ShippingDiscountDoesNotExists = "There is no shipping discount for {0}!";
+            public const string CountryAlreadyHasShippingDiscount = "{0} already has a shipping discount!";
+            public const string InvalidCountry = "Invalid country!";
+            
+        }
+
+        public static class NutritionFactsController
+        {
+            public const string InvalidNutritionFacts = "Invalid nutrition facts!";
+            public const string InvalidProduct = "Invalid product!";
+        }
+            
     }
 }

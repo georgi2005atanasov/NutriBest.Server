@@ -11,7 +11,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Infrastructure.Middlewares;
     using static ServicesConstants.Shipping;
-    
+
     public static class ApplicationBuilderExtensions
     {
         public static void ApplyMigrations(this IApplicationBuilder app)
@@ -292,6 +292,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                     new Brand{ Name="Nature Made" },
                     new Brand{ Name="Optimim Nutrition" },
                     new Brand{ Name="Musle Tech" },
+                    new Brand{ Name="NutriBest" }
                 });
 
                 await db.SaveChangesAsync();

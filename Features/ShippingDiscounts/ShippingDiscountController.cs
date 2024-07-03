@@ -1,10 +1,14 @@
-﻿namespace NutriBest.Server.Features.ShippingDiscounts
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.ShippingDiscounts
 {
     using System.Globalization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
+    using NutriBest.Server.Shared.Responses;
     using static ServicesConstants.Promotion;
+    using static ErrorMessages.ShippingDiscountController;
 
     public class ShippingDiscountController : ApiController
     {
@@ -16,8 +20,8 @@
         }
 
         [HttpGet]
-        [Route("All")]
-        public async Task<ActionResult<ShippingDiscountServiceModel>> All()
+        [Route(nameof(All))]
+        public async Task<ActionResult<AllShippingDiscountsServiceModel>> All()
         {
             try
             {
@@ -27,9 +31,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -50,9 +54,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -67,25 +71,25 @@
         public async Task<ActionResult<int>> Create([FromBody] CreateShippingDiscountServiceModel shippingDiscountModel)
         {
             if (!decimal.TryParse(shippingDiscountModel.DiscountPercentage, NumberStyles.Any, CultureInfo.InvariantCulture, out var discountPercentage))
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "DiscountPercentage",
-                    Message = "The Discount Percentage must be between 1 and 100!"
+                    Message = InvalidDiscountPercentage
                 });
 
             if (!string.IsNullOrEmpty(shippingDiscountModel.MinimumPrice) &&
-                !decimal.TryParse(shippingDiscountModel.DiscountPercentage, NumberStyles.Any, CultureInfo.InvariantCulture, out var minimumPrice))
-                return BadRequest(new
+                !decimal.TryParse(shippingDiscountModel.MinimumPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out var minimumPrice))
+                return BadRequest(new FailResponse
                 {
                     Key = "MinimumPrice",
-                    Message = "Prices must be numbers!"
+                    Message = PricesMustBeNumbers
                 });
 
             if (MinPercentage >= discountPercentage || MaxPercentage < discountPercentage)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "DiscountPercentage",
-                    Message = "The Discount Percentage must be between 1 and 100!"
+                    Message = InvalidDiscountPercentage
                 });
 
             if (string.IsNullOrEmpty(shippingDiscountModel.Description) ||
@@ -94,7 +98,7 @@
                 return BadRequest(new
                 {
                     Key = "Description",
-                    Message = "Description length must be between 5 and 50!"
+                    Message = InvalidDescriptionLength
                 });
 
             try
@@ -112,16 +116,16 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -132,11 +136,12 @@
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult<bool>> Delete([FromBody] DeleteShippingDiscountServiceModel shippingDiscountModel)
+        public async Task<ActionResult<bool>> Remove([FromBody] DeleteShippingDiscountServiceModel shippingDiscountModel)
         {
             try
             {
-                var result = await shippingDiscountService.Delete(shippingDiscountModel.CountryName);
+                var result = await shippingDiscountService
+                    .Remove(shippingDiscountModel.CountryName);
 
                 return Ok(new
                 {

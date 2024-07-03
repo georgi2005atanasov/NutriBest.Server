@@ -14,6 +14,6 @@
             string description,
             string? minimumPrice);
 
-        Task<bool> Delete(string country);
+        Task<bool> Remove(string country);
     }
 }

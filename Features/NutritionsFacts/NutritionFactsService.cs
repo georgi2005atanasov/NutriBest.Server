@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.NutritionsFacts
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.NutritionsFacts
 {
     using Microsoft.EntityFrameworkCore;
     using AutoMapper;
@@ -6,6 +8,7 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Features.NutritionsFacts.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.NutritionFactsController;
 
     public class NutritionFactsService : INutritionFactsService, ITransientService
     {
@@ -34,32 +37,32 @@
 
             try
             {
-                if (carbohydrates != null)
+                if (!string.IsNullOrEmpty(carbohydrates))
                     details.NutritionFacts.Carbohydrates = double.Parse(carbohydrates);
 
-                if (fats != null)
+                if (!string.IsNullOrEmpty(fats))
                     details.NutritionFacts.Fats = double.Parse(fats);
 
-                if (saturatedFats != null)
+                if (!string.IsNullOrEmpty(saturatedFats))
                     details.NutritionFacts.SaturatedFats = double.Parse(saturatedFats);
 
-                if (sugars != null)
+                if (!string.IsNullOrEmpty(sugars))
                     details.NutritionFacts.Sugars = double.Parse(sugars);
 
-                if (proteins != null)
+                if (!string.IsNullOrEmpty(proteins))
                     details.NutritionFacts.Proteins = double.Parse(proteins);
 
-                if (energyValue != null)
+                if (!string.IsNullOrEmpty(energyValue))
                     details.NutritionFacts.EnergyValue = double.Parse(energyValue);
 
-                if (salt != null)
+                if (!string.IsNullOrEmpty(salt))
                     details.NutritionFacts.Salt = double.Parse(salt);
 
                 await db.SaveChangesAsync();
             }
             catch (Exception)
             {
-                throw new InvalidOperationException("Invalid nutrition facts!");
+                throw new InvalidOperationException(InvalidNutritionFacts);
             }
         }
 
@@ -83,7 +86,7 @@
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (details == null || product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             details.Proteins = null;
             details.Sugars = null;

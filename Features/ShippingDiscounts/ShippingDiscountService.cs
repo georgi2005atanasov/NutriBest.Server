@@ -1,19 +1,20 @@
-﻿namespace NutriBest.Server.Features.ShippingDiscounts
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.ShippingDiscounts
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.ShippingDiscounts.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.ShippingDiscountController;
 
     public class ShippingDiscountService : IShippingDiscountService, ITransientService
     {
         private readonly NutriBestDbContext db;
 
-        public ShippingDiscountService(NutriBestDbContext db)
-        {
-            this.db = db;
-        }
+        public ShippingDiscountService(NutriBestDbContext db) 
+            => this.db = db;
 
         public async Task<AllShippingDiscountsServiceModel> All()
         {
@@ -39,13 +40,13 @@
             var country = await GetCountry(countryName);
 
             if (country == null)
-                throw new ArgumentNullException("Invalid country!");
+                throw new ArgumentNullException(InvalidCountry);
 
             var shippingDiscount = await db.ShippingDiscounts
                 .FirstOrDefaultAsync(x => x.Id == country.ShippingDiscountId);
 
             if (shippingDiscount == null)
-                throw new ArgumentNullException($"There is no shipping discount for {countryName}!");
+                throw new ArgumentNullException(string.Format(ShippingDiscountDoesNotExists, countryName));
 
             var shippingDiscountModel = new ShippingDiscountServiceModel
             {
@@ -68,10 +69,10 @@
             var country = await GetCountry(countryName);
 
             if (country == null)
-                throw new ArgumentNullException("Invalid country!");
+                throw new ArgumentNullException(InvalidCountry);
 
             if (await db.ShippingDiscounts.AnyAsync(x => x.Id == country.ShippingDiscountId))
-                throw new InvalidOperationException($"{countryName} already has a shipping discount!");
+                throw new InvalidOperationException(string.Format(CountryAlreadyHasShippingDiscount, countryName));
 
             if (!string.IsNullOrEmpty(minimumPrice))
             {
@@ -116,12 +117,12 @@
             }
         }
 
-        public async Task<bool> Delete(string countryName)
+        public async Task<bool> Remove(string countryName)
         {
             var country = await GetCountry(countryName);
 
             if (country == null)
-                throw new ArgumentNullException("Invalid country!");
+                throw new ArgumentNullException(InvalidCountry);
 
             var shippingDiscount = await db.ShippingDiscounts
                 .FirstOrDefaultAsync(x => x.Id == country.ShippingDiscountId);
