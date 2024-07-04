@@ -87,7 +87,25 @@
             public const string InvalidProduct = "Invalid product!";
             public const string ProductDoesNotHaveThisPromotion = "The product does not have this promotion!";
             public const string InvalidPriceFormat = "Invalid price format: {0}";
+        }
 
+        public static class PromoCodeController
+        {
+            public const string EnterValidPercentage = "Discount percentage must be betweeen 0% and 100%!";
+        }
+
+        public static class PromotionsController
+        {
+            public const string InvalidDiscount = "The discount cannot be more than 99.9%!";
+            public const string DiscountIsRequired = "You have to make some kind of discount!";
+            public const string InvalidPromotion = "The promotion is not valid!";
+            public const string PromotionDoesNotExists = "Promotion does not exist!";
+            public const string NewDiscountCannotBeApplied = "The discount cannot be applied to all the products!";
+            public const string PromotionAlreadyExists = "Promotion with this description already exists!";
+            public const string TypeOfDiscountIsRequired = "You have to choose one type of discount!";
+            public const string StartDateMustBeBeforeEndDate = "The start date must be before the end date!";
+            public const string LeastPromotionDurationRequired = "The end date must be at least with one day duration!";
+            public const string CannotChangePromotionStatus = "You cannot change the status of the promotion!";
         }
     }
 }

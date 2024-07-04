@@ -1,9 +1,12 @@
-﻿namespace NutriBest.Server.Features.PromoCodes
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.PromoCodes
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.PromoCodes.Models;
     using static ServicesConstants.PromoCodes;
+    using static ErrorMessages.PromoCodeController;
 
     public class PromoCodeController : ApiController
     {
@@ -27,7 +30,7 @@
                     return BadRequest(new
                     {
                         Key = "DiscountPercentage",
-                        Message = "Enter valid percentage between 0 and 100!"
+                        Message = EnterValidPercentage
                     });
 
                 if (!int.TryParse(promoCodeModel.Count, out count))
@@ -42,7 +45,7 @@
                 {
                     return BadRequest(new
                     {
-                        Message = "Discount percentage must be betweeen 0% and 100%!"
+                        Message = EnterValidPercentage
                     });
                 }
 

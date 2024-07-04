@@ -12,10 +12,8 @@ namespace NutriBest.Server.Features.Brands
     {
         private readonly IBrandService brandService;
 
-        public BrandsController(IBrandService brandService)
-        {
-            this.brandService = brandService;
-        }
+        public BrandsController(IBrandService brandService) 
+            => this.brandService = brandService;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BrandServiceModel>>> All()

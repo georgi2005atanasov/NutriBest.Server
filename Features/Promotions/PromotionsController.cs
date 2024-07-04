@@ -1,19 +1,21 @@
-﻿namespace NutriBest.Server.Features.Promotions
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Promotions
 {
     using System.Globalization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages.PromotionsController;
 
     public class PromotionsController : ApiController
     {
         private readonly IPromotionService promotionService;
 
-        public PromotionsController(IPromotionService promotionService)
-        {
-            this.promotionService = promotionService;
-        }
+        public PromotionsController(IPromotionService promotionService) 
+            => this.promotionService = promotionService;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PromotionServiceModel>>> All()
@@ -24,9 +26,9 @@
 
                 return Ok(promotions);
             }
-            catch (Exception err)
+            catch (Exception)
             {
-                return BadRequest(err.Message);
+                return BadRequest();
             }
         }
 
@@ -42,16 +44,16 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -69,46 +71,44 @@
                 );
 
             if (discountPercentage >= 100)
-            {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "The discount cannot be more than 99.9%!"
+                    Message = InvalidDiscount
                 });
-            }
 
             if (promotion.StartDate > promotion.EndDate)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "StartDate",
-                    Message = "The start date must be before the end date!"
+                    Message = StartDateMustBeBeforeEndDate
                 });
 
             if (promotion.EndDate < DateTime.UtcNow)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "EndDate",
-                    Message = "The end date must be at least with one day duration!"
+                    Message = LeastPromotionDurationRequired
                 });
 
             if (discountPercentage < 0 ||
                 discountAmount < 0)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Invalid discount!"
+                    Message = InvalidDiscount
                 });
 
             if (promotion.DiscountPercentage == null &&
                 promotion.DiscountAmount == null)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "You have to make some kind of discount!"
+                    Message = DiscountIsRequired
                 });
 
             if (promotion.DiscountPercentage != null &&
                 promotion.DiscountAmount != null)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "You have to choose one type of discount!"
+                    Message = TypeOfDiscountIsRequired
                 });
 
             try
@@ -125,16 +125,18 @@
             }
             catch (ArgumentException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName != null ?
+                    err.ParamName :
+                    ""
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -153,17 +155,17 @@
                 );
 
             if (promotion.StartDate > promotion.EndDate)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "StartDate",
-                    Message = "The start date must be before the end date!"
+                    Message = StartDateMustBeBeforeEndDate
                 });
 
             if (promotion.EndDate < DateTime.UtcNow)
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Key = "EndDate",
-                    Message = "The end date must be at least with one day duration!"
+                    Message = LeastPromotionDurationRequired
                 });
 
             try
@@ -181,16 +183,16 @@
             }
             catch (ArgumentException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -229,16 +231,16 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -260,9 +262,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -285,7 +287,7 @@
             else if (!string.IsNullOrEmpty(promoDiscountAmount) &&
                 !decimal.TryParse(promoDiscountAmount, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal check))
             {
-                throw new InvalidOperationException("Invalid discount!");
+                throw new InvalidOperationException(InvalidDiscount);
             }
 
 
@@ -297,7 +299,7 @@
             else if (!string.IsNullOrEmpty(promoDiscountPercentage) &&
                 !decimal.TryParse(promoDiscountPercentage, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal check))
             {
-                throw new InvalidOperationException("Invalid discount!");
+                throw new InvalidOperationException(InvalidDiscount);
             }
 
             return (amount, percentage);

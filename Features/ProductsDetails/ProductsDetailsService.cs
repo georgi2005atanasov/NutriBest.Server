@@ -1,20 +1,23 @@
-﻿namespace NutriBest.Server.Features.ProductsDetails
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.ProductsDetails
 {
     using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using NutriBest.Server.Data;
-    using NutriBest.Server.Features.ProductsDetails.Models;
     using NutriBest.Server.Features.Promotions;
+    using NutriBest.Server.Features.ProductsDetails.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.ProductsController;
 
-    public class ProductDetailsService : IProductDetailsService, ITransientService
+    public class ProductsDetailsService : IProductsDetailsService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly IPromotionService promotionService;
         private readonly IMapper mapper;
 
-        public ProductDetailsService(NutriBestDbContext db,
+        public ProductsDetailsService(NutriBestDbContext db,
             IPromotionService promotionService,
             IMapper mapper)
         {
@@ -31,7 +34,7 @@
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             await GetPromotionPercentage(product);
 

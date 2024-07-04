@@ -121,9 +121,7 @@ namespace NutriBest.Server.Features.Products
                 var products = await All(currentPage, categories, brand, priceFilter, alphaFilter, null, search, priceRange, quantities, flavours);
 
                 if (products.ProductsRows == null || products.ProductsRows.Count() == 0)
-                {
                     return allProducts;
-                }
 
                 var productsToAdd = products.ProductsRows.SelectMany(x => x);
 
@@ -519,19 +517,13 @@ namespace NutriBest.Server.Features.Products
                         var promotion = await promotionService.Get((int)product.PromotionId);
 
                         if (!promotion.IsActive)
-                        {
                             throw new Exception();
-                        }
 
                         if (promotion != null && promotion.DiscountPercentage != null)
-                        {
                             product.DiscountPercentage = promotion.DiscountPercentage;
-                        }
 
                         if (promotion != null && promotion.DiscountAmount != null)
-                        {
                             product.DiscountPercentage = promotion.DiscountAmount * 100 / product.Price;
-                        }
                     }
                     catch (Exception)
                     {

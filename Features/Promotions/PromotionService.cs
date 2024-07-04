@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Promotions
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Promotions
 {
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
@@ -8,9 +10,11 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Products.Models;
-    using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Features.Promotions.Models;
+    using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.PromotionsController;
+    using static ErrorMessages.BrandsController;
 
     public class PromotionService : IPromotionService, ITransientService
     {
@@ -39,9 +43,7 @@
             string? brandName)
         {
             if (await db.Promotions.AnyAsync(x => x.Description == description))
-            {
-                throw new ArgumentException("Promotion with this description already exists!");
-            }
+                throw new ArgumentException(PromotionAlreadyExists);
 
             var productsToApplyPromotion = db.Products
                 .AsQueryable();
@@ -62,7 +64,7 @@
                     .FirstOrDefaultAsync(x => x.Name == brandName);
 
                 if (brand == null)
-                    throw new InvalidOperationException("Invalid brand!");
+                    throw new InvalidOperationException(InvalidBrandName);
 
                 promotion.Brand = brandName;
             }
@@ -87,7 +89,7 @@
                 .FirstOrDefaultAsync();
 
             if (promotion == null)
-                throw new ArgumentNullException("The promotion is not valid!");
+                throw new ArgumentNullException(InvalidPromotion);
 
             return promotion;
         }
@@ -102,30 +104,24 @@
             DateTime? endDate)
         {
             if (await db.Promotions.AnyAsync(x => x.Description == description && x.PromotionId != promotionId))
-            {
-                throw new ArgumentException("Promotion with this description already exists!");
-            }
+                throw new ArgumentException(PromotionAlreadyExists);
 
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
             if (promotion == null)
-                throw new InvalidOperationException("Promotion does not exist!");
+                throw new InvalidOperationException(PromotionDoesNotExists);
 
             if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.StartingPrice <= discountAmount))
             {
-                throw new ArgumentException($"The discount cannot be applied to all the products!");
+                throw new ArgumentException(NewDiscountCannotBeApplied);
             }
 
             if (discountAmount != null && promotion.DiscountPercentage != null)
-            {
                 promotion.DiscountPercentage = null;
-            }
 
             if (discountPercentage != null && promotion.DiscountAmount != null)
-            {
                 promotion.DiscountAmount = null;
-            }
 
             if (!string.IsNullOrEmpty(description))
                 promotion.Description = description;
@@ -140,9 +136,7 @@
                 promotion.Category = category;
 
             if (endDate != null)
-            {
                 promotion.EndDate = endDate;
-            }
 
             if (brandName != null)
             {
@@ -318,14 +312,12 @@
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
 
             if (promotion == null)
-            {
-                throw new ArgumentNullException("The promotion is not valid!");
-            }
+                throw new ArgumentNullException(InvalidPromotion);
 
             if ((promotion.EndDate != null && promotion.EndDate < DateTime.UtcNow) ||
                 promotion.StartDate > DateTime.UtcNow)
             {
-                throw new InvalidOperationException("You cannot change the status of the promotion!");
+                throw new InvalidOperationException(CannotChangePromotionStatus);
             }
 
             promotion.IsActive = !promotion.IsActive;

@@ -291,7 +291,7 @@ namespace NutriBest.Server.Infrastructure.Extensions
                     new Brand{ Name="Klean Athlete" },
                     new Brand{ Name="Nature Made" },
                     new Brand{ Name="Optimim Nutrition" },
-                    new Brand{ Name="Musle Tech" },
+                    new Brand{ Name="Muscle Tech" },
                     new Brand{ Name="NutriBest" }
                 });
 

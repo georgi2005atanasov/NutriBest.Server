@@ -2,7 +2,7 @@
 {
     using NutriBest.Server.Features.ProductsDetails.Models;
 
-    public interface IProductDetailsService
+    public interface IProductsDetailsService
     {
         Task AddDetails(
             int productId,
