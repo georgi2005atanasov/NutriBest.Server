@@ -10,10 +10,8 @@
         private const string OrderCookie = "OrderCookie";
         private readonly IOrderService orderService;
 
-        public OrdersController(IOrderService orderService)
-        {
-            this.orderService = orderService;
-        }
+        public OrdersController(IOrderService orderService) 
+            => this.orderService = orderService;
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]

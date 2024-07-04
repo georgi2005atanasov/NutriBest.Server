@@ -104,7 +104,7 @@
             public const string PromotionAlreadyExists = "Promotion with this description already exists!";
             public const string TypeOfDiscountIsRequired = "You have to choose one type of discount!";
             public const string StartDateMustBeBeforeEndDate = "The start date must be before the end date!";
-            public const string LeastPromotionDurationRequired = "The end date must be at least with one day duration!";
+            public const string LeastPromotionDurationRequired = "The promotion must be with at least one day duration!";
             public const string CannotChangePromotionStatus = "You cannot change the status of the promotion!";
         }
     }

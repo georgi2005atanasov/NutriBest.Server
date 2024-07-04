@@ -11,10 +11,8 @@ namespace NutriBest.Server.Features.Packages
     {
         private readonly IPackageService packageService;
 
-        public PackagesController(IPackageService packageService)
-        {
-            this.packageService = packageService;
-        }
+        public PackagesController(IPackageService packageService) 
+            => this.packageService = packageService;
 
         [HttpGet]
         public async Task<ActionResult<List<PackageServiceModel>>> All()

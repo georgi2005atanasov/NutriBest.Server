@@ -12,6 +12,7 @@ namespace NutriBest.Server.Features.Products
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Images;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Products.Models;
     using static ErrorMessages.ProductsController;
 
@@ -56,7 +57,7 @@ namespace NutriBest.Server.Features.Products
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = err.Message
                 });
@@ -101,7 +102,7 @@ namespace NutriBest.Server.Features.Products
                     ?? new List<ProductSpecsServiceModel>();
 
                 if (productSpecs.Count == 0)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "ProductSpecs",
                         Message = ProductsSpecificationAreRequired
@@ -112,28 +113,24 @@ namespace NutriBest.Server.Features.Products
                 .ToList();
 
                 if (productModel.Image == null)
-                {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "Image",
                         Message = ImageIsRequired
                     });
-                }
 
                 if (ProductExists(productModel.Name))
-                {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "Name",
                         Message = ProductAlreadyExists
                     });
-                }
 
                 foreach (var productSpec in productSpecs)
                 {
                     if (!decimal.TryParse(productModel.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out var price))
                     {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
                             Key = "Price",
                             Message = PricesMustBeNumbers
@@ -142,7 +139,7 @@ namespace NutriBest.Server.Features.Products
 
 
                     if (price <= 0 || price > 4000)
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
                             Key = "ProductSpecs",
                             Message = InvalidPriceRange
@@ -154,7 +151,7 @@ namespace NutriBest.Server.Features.Products
 
                 if (categoriesIds.Count == 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "Category",
                         Message = AtLeastOneCategory
@@ -178,9 +175,9 @@ namespace NutriBest.Server.Features.Products
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)
@@ -237,11 +234,17 @@ namespace NutriBest.Server.Features.Products
         {
             try
             {
+                var product = await db.Products
+                .FirstOrDefaultAsync(x => x.ProductId == id);
+
+                if (product == null)
+                    return NotFound();
+
                 var productSpecs = JsonSerializer.Deserialize<List<ProductSpecsServiceModel>>(productModel.ProductSpecs)
                     ?? new List<ProductSpecsServiceModel>();
 
                 if (productSpecs.Count == 0)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "ProductSpecs",
                         Message = ProductsSpecificationAreRequired
@@ -251,27 +254,19 @@ namespace NutriBest.Server.Features.Products
                 {
                     string currentPrice = productSpec.Price.Replace(',', '.');
                     if (!decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
-                    {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
                             Key = "Price",
                             Message = PricesMustBeNumbers
                         });
-                    }
 
                     if (price <= 0 || price > 4000)
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
                             Key = "ProductSpecs",
                             Message = InvalidPriceRange
                         });
                 }
-
-                var product = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == id);
-
-                if (product == null)
-                    return NotFound();
 
                 if (ProductExists(productModel.Name) && product?.Name != productModel.Name)
                     return BadRequest(new
@@ -347,9 +342,9 @@ namespace NutriBest.Server.Features.Products
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)

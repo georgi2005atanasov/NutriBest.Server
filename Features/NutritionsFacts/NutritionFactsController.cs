@@ -18,9 +18,9 @@
             IProductService productService,
             INutritionFactsService nutritionFactsService)
         {
+            this.db = db;
             this.productService = productService;
             this.nutritionFactsService = nutritionFactsService;
-            this.db = db;
         }
 
         [HttpGet]

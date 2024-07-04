@@ -88,14 +88,6 @@
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>("/Hubs/Notification");
-            });
-
-            app.ApplyMigrations();
-
             // app.UseSwaggerAuthorized(app.Services); // Uncomment this in the future
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -103,6 +95,14 @@
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecureSwagger v1");
                 c.RoutePrefix = string.Empty;
             });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/Hubs/Notification");
+            });
+
+            app.ApplyMigrations();
         }
     }
 }

@@ -82,9 +82,7 @@ namespace NutriBest.Server.Features.Products
                          .AsQueryable();
 
             queryProducts = this.OrderByName(queryProducts, alphaFilter ?? "");
-
             queryProducts = this.OrderByPrice(queryProducts, priceFilter ?? "");
-
             queryProducts = queryProducts
                 .Skip(pagesToSkip)
                 .Take((productsView == "all") ? ProductsPerPage : ProductsPerTable);
@@ -289,7 +287,11 @@ namespace NutriBest.Server.Features.Products
             foreach (var id in categoriesIds)
             {
                 product.ProductsCategories
-                    .Add(new ProductCategory { CategoryId = id });
+                    .Add(new ProductCategory
+                    {
+                        //Category = db.Categories.Find(id)!,
+                        CategoryId = id
+                    });
             }
 
             //

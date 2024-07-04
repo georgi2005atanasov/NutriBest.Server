@@ -11,10 +11,8 @@
     {
         private readonly NutriBestDbContext db;
 
-        public OrderDetailsService(NutriBestDbContext db)
-        {
-            this.db = db;
-        }
+        public OrderDetailsService(NutriBestDbContext db) 
+            => this.db = db;
 
         public async Task<int> Create(string countryName,
             string cityName,

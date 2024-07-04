@@ -33,7 +33,7 @@ namespace NutriBest.Server.Features.Promotions
         }
 
         [HttpGet]
-        [Route("/Promotions/{promotionId}")]
+        [Route("/{promotionId}")]
         public async Task<ActionResult> Get([FromRoute] int promotionId)
         {
             try
@@ -67,8 +67,7 @@ namespace NutriBest.Server.Features.Promotions
         public async Task<ActionResult> Create([FromForm] CreatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage) = ValidatePromotionPrices(promotion.DiscountAmount,
-                promotion.DiscountPercentage
-                );
+                promotion.DiscountPercentage);
 
             if (discountPercentage >= 100)
                 return BadRequest(new FailResponse
@@ -127,9 +126,7 @@ namespace NutriBest.Server.Features.Promotions
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = err.ParamName != null ?
-                    err.ParamName :
-                    ""
+                    Message = err.Message
                 });
             }
             catch (InvalidOperationException err)
@@ -240,7 +237,9 @@ namespace NutriBest.Server.Features.Promotions
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = err.Message
+                    Message = err.ParamName != null ?
+                    err.ParamName :
+                    ""
                 });
             }
             catch (Exception)

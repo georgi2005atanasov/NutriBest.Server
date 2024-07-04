@@ -11,7 +11,6 @@ namespace NutriBest.Server.Features.Promotions
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.Products.Models;
     using NutriBest.Server.Features.Promotions.Models;
-    using NutriBest.Server.Features.ProductsPromotions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ErrorMessages.PromotionsController;
     using static ErrorMessages.BrandsController;
@@ -20,19 +19,21 @@ namespace NutriBest.Server.Features.Promotions
     {
         private readonly NutriBestDbContext db;
         private readonly IMapper mapper;
-        private readonly IProductPromotionService productPromotionService;
         private readonly ICategoryService categoryService;
 
         public PromotionService(NutriBestDbContext db,
-            IMapper mapper,
-            IProductPromotionService productPromotionService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IMapper mapper)
         {
             this.db = db;
-            this.mapper = mapper;
-            this.productPromotionService = productPromotionService;
             this.categoryService = categoryService;
+            this.mapper = mapper;
         }
+
+        public async Task<IEnumerable<PromotionServiceModel>> All()
+            => await db.Promotions
+                .ProjectTo<PromotionServiceModel>(mapper.ConfigurationProvider)
+                .ToListAsync();
 
         public async Task<int> Create(string? description,
             decimal? discountAmount,
@@ -113,9 +114,7 @@ namespace NutriBest.Server.Features.Promotions
                 throw new InvalidOperationException(PromotionDoesNotExists);
 
             if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.StartingPrice <= discountAmount))
-            {
                 throw new ArgumentException(NewDiscountCannotBeApplied);
-            }
 
             if (discountAmount != null && promotion.DiscountPercentage != null)
                 promotion.DiscountPercentage = null;
@@ -144,7 +143,7 @@ namespace NutriBest.Server.Features.Promotions
                     .FirstOrDefaultAsync(x => x.Name == brandName);
 
                 if (brand == null)
-                    throw new InvalidOperationException("Invalid brand!");
+                    throw new InvalidOperationException(InvalidBrandName);
 
                 promotion.Brand = brandName;
             }
@@ -187,15 +186,6 @@ namespace NutriBest.Server.Features.Promotions
             await db.SaveChangesAsync();
 
             return true;
-        }
-
-        public async Task<IEnumerable<PromotionServiceModel>> All()
-        {
-            var promotions = await db.Promotions
-                .ProjectTo<PromotionServiceModel>(mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            return promotions;
         }
 
         private static async Task ApplyPromotion(NutriBestDbContext db, ICategoryService categoryService, Promotion promotion)
@@ -283,7 +273,7 @@ namespace NutriBest.Server.Features.Promotions
             {
                 foreach (var product in productsToApplyPromotion)
                 {
-                    if ((promotion.DiscountAmount != null && 
+                    if ((promotion.DiscountAmount != null &&
                         promotion.DiscountAmount < product.StartingPrice) ||
                         promotion.DiscountAmount == null)
                     {

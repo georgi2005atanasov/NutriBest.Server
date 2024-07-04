@@ -9,9 +9,7 @@
         private readonly IMemoryCache memoryCache;
 
         public PaymentMethodsController(IMemoryCache memoryCache)
-        {
-            this.memoryCache = memoryCache;
-        }
+            => this.memoryCache = memoryCache;
 
         [HttpGet]
         public ActionResult<string[]> GetPaymentMethods()

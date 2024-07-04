@@ -8,10 +8,8 @@
     {
         private readonly INotificationService notificationService;
 
-        public NotificationsController(INotificationService notificationService)
-        {
-            this.notificationService = notificationService;
-        }
+        public NotificationsController(INotificationService notificationService) 
+            => this.notificationService = notificationService;
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
