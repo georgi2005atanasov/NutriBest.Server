@@ -209,7 +209,7 @@ namespace NutriBest.Server.Features.Products
                          .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
-                throw new ArgumentNullException("Invalid product!");
+                throw new ArgumentNullException(InvalidProduct);
 
             return product;
         }
@@ -433,8 +433,7 @@ namespace NutriBest.Server.Features.Products
                 product.Quantity += productSpec.Quantity;
 
                 string currentPrice = productSpec.Price.Replace(',', '.');
-                if (!decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
-                    throw new FormatException(string.Format(InvalidPriceFormat, productSpec.Price));
+                decimal.TryParse(currentPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price);
 
                 var productPackageFlavour = new ProductPackageFlavour
                 {
