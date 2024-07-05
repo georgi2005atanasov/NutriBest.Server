@@ -61,7 +61,7 @@
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("Admin/RemoveFromNewsletter")]
-        public async Task<ActionResult<bool>> RemoveFromNewsletterByAdmin([FromForm] string email)
+        public async Task<ActionResult<bool>> RemoveFromNewsletterByAdmin([FromQuery] string email)
         {
             try
             {

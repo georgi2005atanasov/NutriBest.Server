@@ -93,8 +93,7 @@ namespace NutriBest.Server.Features.Categories
         }
 
         public async Task<IEnumerable<CategoryCountServiceModel>> GetProductsCountByCategory()
-        {
-            var categoriesCount = await db.Categories
+        => await db.Categories
                 .Select(x => new CategoryCountServiceModel
                 {
                     Category = x.Name,
@@ -103,9 +102,6 @@ namespace NutriBest.Server.Features.Categories
                 })
                 .OrderBy(x => x.Category)
                 .ToListAsync();
-
-            return categoriesCount;
-        }
 
         public async Task<List<CategoryServiceModel>> All()
             => await db.Categories

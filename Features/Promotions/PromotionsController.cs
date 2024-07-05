@@ -145,7 +145,7 @@ namespace NutriBest.Server.Features.Promotions
         [HttpPut]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("/Promotions/{promotionId}")]
-        public async Task<ActionResult> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
+        public async Task<ActionResult<bool>> Update([FromRoute] int promotionId, [FromForm] UpdatePromotionServiceModel promotion) // may receive it from a form
         {
             var (discountAmount, discountPercentage) = ValidatePromotionPrices(promotion.DiscountAmount,
                 promotion.DiscountPercentage
@@ -176,7 +176,7 @@ namespace NutriBest.Server.Features.Promotions
                     promotion.StartDate,
                     promotion.EndDate);
 
-                return Ok();
+                return Ok(result);
             }
             catch (ArgumentException err)
             {

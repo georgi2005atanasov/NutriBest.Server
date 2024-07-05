@@ -5,6 +5,7 @@ namespace NutriBest.Server.Features.PromoCodes
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.PromoCodes.Models;
+    using NutriBest.Server.Shared.Responses;
     using static ServicesConstants.PromoCodes;
     using static ErrorMessages.PromoCodeController;
 
@@ -12,10 +13,8 @@ namespace NutriBest.Server.Features.PromoCodes
     {
         private readonly IPromoCodeService promoCodeService;
 
-        public PromoCodeController(IPromoCodeService promoCodeService)
-        {
-            this.promoCodeService = promoCodeService;
-        }
+        public PromoCodeController(IPromoCodeService promoCodeService) 
+            => this.promoCodeService = promoCodeService;
 
         [HttpPost]
         [Authorize(Roles = "Administrator,Employee")]
@@ -27,14 +26,14 @@ namespace NutriBest.Server.Features.PromoCodes
                 int count = 0;
 
                 if (!decimal.TryParse(promoCodeModel.DiscountPercentage, out discountPercentage))
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "DiscountPercentage",
                         Message = EnterValidPercentage
                     });
 
                 if (!int.TryParse(promoCodeModel.Count, out count))
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "Count",
                         Message = "Enter some positive number!"
@@ -43,7 +42,7 @@ namespace NutriBest.Server.Features.PromoCodes
                 if (discountPercentage > (decimal)MaxDiscount ||
                     discountPercentage < (decimal)MinDiscount)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = EnterValidPercentage
                     });
@@ -51,7 +50,7 @@ namespace NutriBest.Server.Features.PromoCodes
 
                 if (count <= 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = "The count must be a positive number!"
                     });
@@ -67,7 +66,7 @@ namespace NutriBest.Server.Features.PromoCodes
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = "Invalid request!"
                 });
@@ -82,75 +81,68 @@ namespace NutriBest.Server.Features.PromoCodes
                 var promoCodes = await promoCodeService.All();
                 return Ok(promoCodes);
             }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
-                });
-            }
             catch (Exception)
             {
                 return BadRequest();
             }
         }
 
-        [HttpGet]
-        [Route("ByCode")]
-        public async Task<ActionResult<PromoCodeListingModel>> GetByCode([FromForm] string code)
-        {
-            try
-            {
-                var promoCode = await promoCodeService.GetByCode(code);
+        //[HttpGet]
+        //[Route("ByCode")]
+        //public async Task<ActionResult<PromoCodeListingModel>> GetByCode([FromQuery] string code)
+        //{
+        //    try
+        //    {
+        //        var promoCode = await promoCodeService.GetByCode(code);
 
-                return Ok(promoCode);
-            }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok(promoCode);
+        //    }
+        //    catch (ArgumentNullException err)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            err.Message
+        //        });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
-        [HttpGet]
-        [Route("ByDescription")]
-        public async Task<ActionResult<Dictionary<string, List<string>>>> GetByDescription([FromForm] string description)
-        {
-            try
-            {
-                (List<string> promoCodes, int expireIn) = await promoCodeService.GetByDescription(description);
+        //[HttpGet]
+        //[Route("ByDescription")]
+        //public async Task<ActionResult<Dictionary<string, List<string>>>> GetByDescription([FromForm] string description)
+        //{
+        //    try
+        //    {
+        //        (List<string> promoCodes, int expireIn) = await promoCodeService.GetByDescription(description);
 
-                var result = new PromoCodeByDescriptionServiceModel
-                {
-                    Description = description,
-                    PromoCodes = promoCodes,
-                    ExpireIn = expireIn
-                };
+        //        var result = new PromoCodeByDescriptionServiceModel
+        //        {
+        //            Description = description,
+        //            PromoCodes = promoCodes,
+        //            ExpireIn = expireIn
+        //        };
 
-                return Ok(result);
-            }
-            catch (ArgumentNullException err)
-            {
-                return BadRequest(new
-                {
-                    err.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
+        //        return Ok(result);
+        //    }
+        //    catch (ArgumentNullException err)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            err.Message
+        //        });
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
         [HttpDelete]
         [Authorize(Roles = "Administrator,Employee")]
-        public async Task<ActionResult> DisableByDescription([FromForm] string description)
+        public async Task<ActionResult> DisableByDescription([FromQuery] string description)
         {
             try
             {

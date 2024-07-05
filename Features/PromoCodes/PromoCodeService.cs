@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.PromoCodes
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.PromoCodes
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
@@ -6,6 +8,7 @@
     using NutriBest.Server.Features.PromoCodes.Extensions;
     using NutriBest.Server.Features.PromoCodes.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.PromoCodeController;
 
     public class PromoCodeService : IPromoCodeService, ITransientService
     {
@@ -17,8 +20,7 @@
         }
 
         public async Task<List<PromoCodeByDescriptionServiceModel>> All()
-        {
-            var promoCodes = await db.PromoCodes
+            => await db.PromoCodes
                 .GroupBy(x => x.Description)
                 .Select(x => new PromoCodeByDescriptionServiceModel
                 {
@@ -36,9 +38,6 @@
                         .ToList()
                 })
                 .ToListAsync();
-
-            return promoCodes;
-        }
 
         public async Task<List<string>> Create(decimal discountPercentage,
             int count,
@@ -80,7 +79,7 @@
                 .FirstOrDefaultAsync(x => x.Code == code);
 
             if (promoCode == null)
-                throw new InvalidOperationException("Invalid Promo Code!");
+                throw new InvalidOperationException(InvalidPromoCode);
 
             db.PromoCodes.Remove(promoCode);
 
@@ -112,7 +111,7 @@
                 .FirstOrDefaultAsync(x => x.Code == code);
 
             if (promoCode == null)
-                throw new ArgumentNullException("Invalid promo code!");
+                throw new ArgumentNullException(InvalidPromoCode);
 
             return promoCode;
         }

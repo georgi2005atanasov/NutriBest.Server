@@ -92,10 +92,12 @@
         public static class PromoCodeController
         {
             public const string EnterValidPercentage = "Discount percentage must be betweeen 0% and 100%!";
+            public const string InvalidPromoCode = "Invalid Promo Code!";
         }
 
         public static class PromotionsController
         {
+            public const string PromotionIsNotActive = "Promotion is not active!";
             public const string InvalidDiscount = "The discount cannot be more than 99.9%!";
             public const string DiscountIsRequired = "You have to make some kind of discount!";
             public const string InvalidPromotion = "The promotion is not valid!";

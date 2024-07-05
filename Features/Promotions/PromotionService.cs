@@ -104,7 +104,9 @@ namespace NutriBest.Server.Features.Promotions
             DateTime? startDate,
             DateTime? endDate)
         {
-            if (await db.Promotions.AnyAsync(x => x.Description == description && x.PromotionId != promotionId))
+            if (await db.Promotions
+                .AnyAsync(x => x.Description == description &&
+                          x.PromotionId != promotionId))
                 throw new ArgumentException(PromotionAlreadyExists);
 
             var promotion = await db.Promotions
@@ -113,7 +115,10 @@ namespace NutriBest.Server.Features.Promotions
             if (promotion == null)
                 throw new InvalidOperationException(PromotionDoesNotExists);
 
-            if (await db.Products.AnyAsync(x => x.PromotionId == promotionId && discountAmount != null && x.StartingPrice <= discountAmount))
+            if (await db.Products
+                .AnyAsync(x => x.PromotionId == promotionId &&
+                          discountAmount != null &&
+                          x.StartingPrice <= discountAmount))
                 throw new ArgumentException(NewDiscountCannotBeApplied);
 
             if (discountAmount != null && promotion.DiscountPercentage != null)

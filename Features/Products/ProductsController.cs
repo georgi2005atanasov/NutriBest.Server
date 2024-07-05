@@ -15,6 +15,7 @@ namespace NutriBest.Server.Features.Products
     using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Products.Models;
     using static ErrorMessages.ProductsController;
+    using NutriBest.Server.Features.Categories.Models;
 
     public class ProductsController : ApiController
     {
@@ -40,7 +41,8 @@ namespace NutriBest.Server.Features.Products
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("{id}")]
-        public async Task<ActionResult<ProductListingServiceModel>> Get([FromRoute] int id)
+        // Changed From ProductListingServiceModel
+        public async Task<ActionResult<ProductServiceModel>> Get([FromRoute] int id)
         {
             try
             {
@@ -50,16 +52,9 @@ namespace NutriBest.Server.Features.Products
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
-                {
-                    Message = err.Message
-                });
-            }
-            catch (InvalidOperationException err)
-            {
                 return BadRequest(new FailResponse
                 {
-                    Message = err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)
@@ -221,6 +216,13 @@ namespace NutriBest.Server.Features.Products
 
                 return Ok(products);
             }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.Message
+                });
+            }
             catch (Exception)
             {
                 return BadRequest();
@@ -368,7 +370,7 @@ namespace NutriBest.Server.Features.Products
 
                 var result = await productService.Delete(id);
 
-                memoryCache.Remove($"image_{id}");
+                memoryCache.Remove($"product_image_{id}");
 
                 return result;
             }
@@ -379,7 +381,8 @@ namespace NutriBest.Server.Features.Products
         }
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchProduct(int id, [FromForm] PartialUpdateProductServiceModel productModel)
+        [Authorize(Roles = "Administrator,Employee")]
+        public async Task<ActionResult<int>> PatchProduct([FromRoute] int id, [FromForm] PartialUpdateProductServiceModel productModel)
         {
             try
             {
@@ -389,9 +392,9 @@ namespace NutriBest.Server.Features.Products
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)
@@ -402,16 +405,15 @@ namespace NutriBest.Server.Features.Products
 
         [HttpGet]
         [Route("ByCategoryCount")]
-        public async Task<ActionResult<bool>> GetByCategoryCount()
+        public async Task<ActionResult<IEnumerable<CategoryCountServiceModel>>> GetByCategoryCount()
         {
             var products = await categoryService.GetProductsCountByCategory();
-
             return Ok(products);
         }
 
         [HttpGet]
         [Route("Identifiers")]
-        public async Task<ActionResult<IEnumerable<int>>> GetProductsIds()
+        public async Task<ActionResult<List<int>>> GetProductsIds()
             => Ok(await db.Products
             .Select(x => x.ProductId)
             .OrderBy(x => x)
@@ -430,14 +432,14 @@ namespace NutriBest.Server.Features.Products
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = err.Message
                 });
@@ -458,6 +460,13 @@ namespace NutriBest.Server.Features.Products
 
                 return Ok(products);
             }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.Message
+                });
+            }
             catch (Exception)
             {
                 return BadRequest();
@@ -470,9 +479,10 @@ namespace NutriBest.Server.Features.Products
         {
             try
             {
-                var product = await productService.GetCurrentPriceWithQuantity(productModel.ProductId,
-                    productModel.Flavour,
-                    productModel.Package);
+                var product = await productService
+                    .GetCurrentPriceWithQuantity(productModel.ProductId,
+                                                 productModel.Flavour,
+                                                 productModel.Package);
 
                 return Ok(product);
             }

@@ -18,7 +18,7 @@
 
         [Route("{id}")]
         [HttpGet]
-        public async Task<ActionResult<ProductImage>>? GetImageByProductId(int id)
+        public async Task<ActionResult<ImageListingServiceModel>>? GetImageByProductId(int id)
         {
             try
             {
@@ -37,7 +37,6 @@
                     memoryCache.Set(cacheKey, image, cacheEntryOptions);
                     return Ok(image);
                 }
-
 
                 return Ok(cachedImage);
             }

@@ -19,6 +19,7 @@ namespace NutriBest.Server.Features.Products
     using static ErrorMessages.ProductsController;
     using static ErrorMessages.PackagesController;
     using static ErrorMessages.FlavoursController;
+    using static ErrorMessages.PromotionsController;
 
     public class ProductService : IProductService, ITransientService
     {
@@ -452,12 +453,15 @@ namespace NutriBest.Server.Features.Products
         {
             var promotion = await db.Promotions
                 .FirstOrDefaultAsync(x => x.PromotionId == promotionId);
-
+            
             var product = await db.Products
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
-            if (promotion == null || product == null)
+            if (product == null)
                 throw new ArgumentNullException(InvalidProduct);
+
+            if (promotion == null)
+                throw new ArgumentNullException(InvalidPromotion);
 
             if (product.PromotionId != promotionId)
                 throw new InvalidOperationException(ProductDoesNotHaveThisPromotion);
@@ -468,7 +472,7 @@ namespace NutriBest.Server.Features.Products
         public async Task<int> PartialUpdate(int id, string? description)
         {
             var product = await db.Products
-                .FirstAsync(x => x.ProductId == id);
+                .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (product == null)
                 throw new ArgumentNullException(InvalidProduct);
@@ -518,7 +522,7 @@ namespace NutriBest.Server.Features.Products
                         var promotion = await promotionService.Get((int)product.PromotionId);
 
                         if (!promotion.IsActive)
-                            throw new Exception();
+                            throw new InvalidOperationException(PromotionIsNotActive);
 
                         if (promotion != null && promotion.DiscountPercentage != null)
                             product.DiscountPercentage = promotion.DiscountPercentage;
@@ -537,6 +541,8 @@ namespace NutriBest.Server.Features.Products
         public async Task<ProductPriceQuantityServiceModel?> GetCurrentPriceWithQuantity(int productId, string flavour, int grams)
         {
             var productPackageFlavour = await db.ProductsPackagesFlavours
+                .Include(x => x.Flavour)
+                .Include(x => x.Package)
                 .SingleOrDefaultAsync(x => x.Flavour!.FlavourName == flavour &&
                 x.ProductId == productId &&
                 x.Package!.Grams == grams);
