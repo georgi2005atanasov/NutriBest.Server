@@ -1,34 +1,26 @@
-﻿namespace NutriBest.Server.Features.Carts
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Carts
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.EntityFrameworkCore;
-    using AutoMapper;
     using Newtonsoft.Json;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.PromoCodes;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Products.Models;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages.CartController;
+    using static ErrorMessages.PromoCodeController;
 
     public class CartsController : ApiController
     {
         private const string CartCookieName = "ShoppingCart";
         private readonly NutriBestDbContext db;
-        private readonly ICartService cartService;
-        private readonly IPromoCodeService promoCodeService;
-        private readonly IMapper mapper;
 
-        public CartsController(ICartService cartService,
-            NutriBestDbContext db,
-            IPromoCodeService promoCodeService,
-            IMapper mapper)
-        {
-            this.cartService = cartService;
-            this.promoCodeService = promoCodeService;
-            this.db = db;
-            this.mapper = mapper;
-        }
+        public CartsController(NutriBestDbContext db)
+            => this.db = db;
 
         [HttpGet]
         [AllowAnonymous]
@@ -90,12 +82,10 @@
         public async Task<ActionResult> SetProductCount([FromBody] CartProductServiceModel cartProduct)
         {
             if (cartProduct.Count <= 0)
-            {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Invalid product count!"
+                    Message = InvalidProductCount
                 });
-            }
 
             try
             {
@@ -110,9 +100,9 @@
                 var productPackageFlavourFromDb = await GetProductPackageFlavourFromDb(cartProduct);
 
                 if (productPackageFlavourFromDb == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "This product does not exist!"
+                        Message = ProductDoesNotExists
                     });
 
                 var productFromDb = await db.Products
@@ -128,24 +118,22 @@
                     existingProduct.Count = cartProduct.Count;
 
                     if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, existingProduct.Count))
-                    {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
                             Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
                         });
-                    }
                 }
                 else
                 {
                     cart.CartProducts.Add(cartProduct);
 
                     if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, cartProduct.Count))
-                    {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
-                            Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
+
+                            Message = string.Format(ProductsAreNotAvailableWithThisCount, productPackageFlavourFromDb.Quantity)
                         });
-                    }
+                    existingProduct = cartProduct;
                 }
 
                 await CalculateTotalAmounts(isSubtracting: false,
@@ -156,7 +144,7 @@
                 await EnablePromoCode(cart);
 
                 await SetSessionCart(cart);
-                return Ok();
+                return Ok(cart);
             }
             catch (Exception)
             {
@@ -167,15 +155,13 @@
         [HttpPost]
         [AllowAnonymous]
         [Route("/Cart/Add")]
-        public async Task<ActionResult<string>> AddSessionCart([FromBody] CartProductServiceModel cartProduct)
+        public async Task<ActionResult<string>> AddToCart([FromBody] CartProductServiceModel cartProduct)
         {
             if (cartProduct.Count <= 0)
-            {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Invalid product count!"
+                    Message = InvalidProductCount
                 });
-            }
 
             try
             {
@@ -191,9 +177,9 @@
                 var productPackageFlavourFromDb = await GetProductPackageFlavourFromDb(cartProduct);
 
                 if (productPackageFlavourFromDb == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "This product does not exist!"
+                        Message = ProductDoesNotExists
                     });
 
                 var productFromDb = await db.Products
@@ -204,24 +190,20 @@
                     existingProduct.Count += cartProduct.Count;
 
                     if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, existingProduct.Count))
-                    {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
-                            Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
+                            Message = string.Format(ProductsAreNotAvailableWithThisCount, productPackageFlavourFromDb.Quantity)
                         });
-                    }
                 }
                 else
                 {
                     cart.CartProducts.Add(cartProduct);
 
                     if (!CanRemoveProduct(productPackageFlavourFromDb.Quantity, cartProduct.Count))
-                    {
-                        return BadRequest(new
+                        return BadRequest(new FailResponse
                         {
-                            Message = $"Sorry, we have {productPackageFlavourFromDb.Quantity} units of this product available."
+                            Message = string.Format(ProductsAreNotAvailableWithThisCount, productPackageFlavourFromDb.Quantity)
                         });
-                    }
                 }
 
                 cartProduct.Price = productPackageFlavourFromDb.Price;
@@ -249,10 +231,10 @@
             }
         }
 
-        [HttpDelete]
+        [HttpPost]
         [AllowAnonymous]
         [Route("/Cart/Remove")]
-        public async Task<ActionResult> RemoveSessionCart([FromBody] CartProductServiceModel productToRemove)
+        public async Task<ActionResult> RemoveFromCart([FromBody] CartProductServiceModel productToRemove)
         {
             CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
@@ -268,9 +250,9 @@
                 var productPackageFlavourFromDb = await GetProductPackageFlavourFromDb(productToRemove);
 
                 if (productPackageFlavourFromDb == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "This product does not exist!"
+                        Message = ProductDoesNotExists
                     });
 
                 existingProduct.Count -= productToRemove.Count;
@@ -297,9 +279,9 @@
                 return Ok();
             }
 
-            return NotFound(new
+            return NotFound(new FailResponse
             {
-                Message = "Product not found in the cart."
+                Message = ProductNotFound
             });
         }
 
@@ -313,9 +295,9 @@
 
                 if (cart.TotalProducts == 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "You have to add products to the cart!"
+                        Message = YouHaveToAddProducts
                     });
                 }
 
@@ -323,10 +305,10 @@
                     .FirstOrDefaultAsync(x => x.Code == promoCodeModel.Code);
 
                 if (promoCode == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Key = "PromoCode",
-                        Message = "Invalid promo code!"
+                        Message = InvalidPromoCode
                     });
 
                 await DisablePromoCode(cart);
@@ -334,8 +316,6 @@
                 cart.TotalProducts -= promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.TotalSaved += promoCode.DiscountPercentage / 100 * cart.OriginalPrice;
                 cart.Code = promoCode.Code;
-
-                //promoCode.IsValid = false;
 
                 await db.SaveChangesAsync();
 
@@ -359,9 +339,9 @@
 
                 if (cart.TotalProducts == 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "You have to add products to the cart!"
+                        Message = YouHaveToAddProducts
                     });
                 }
 
@@ -389,9 +369,9 @@
                 var cart = GetSessionCart() ?? new CartServiceModel();
 
                 if (cart.TotalProducts == 0)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "The cart is already empty!"
+                        Message = CartIsAlreadyEmpty
                     });
 
                 await SetSessionCart(new CartServiceModel());
@@ -523,6 +503,13 @@
                     cart.OriginalPrice += (decimal)cartProduct.Price * cartProduct.Count;
                 }
             }
+
+            if (cart.TotalSaved < 0)
+                cart.TotalSaved = 0;
+            if (cart.TotalProducts < 0)
+                cart.TotalProducts = 0;
+            if (cart.OriginalPrice < 0)
+                cart.OriginalPrice = 0;
         }
 
         private static CartProductServiceModel? GetExistingProduct(CartServiceModel cart, CartProductServiceModel cartProduct)

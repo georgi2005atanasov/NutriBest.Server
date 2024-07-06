@@ -10,8 +10,9 @@ namespace NutriBest.Server.Features.Newsletter
     using NutriBest.Server.Features.Newsletter.Models;
     using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
-    using static ServicesConstants.PaginationConstants;
     using static ErrorMessages.NewsletterController;
+    using static SuccessMessages.NotificationService;
+    using static ServicesConstants.PaginationConstants;
 
     public class NewsletterService : INewsletterService, ITransientService
     {
@@ -31,8 +32,21 @@ namespace NutriBest.Server.Features.Newsletter
         public async Task<int> Add(string email)
         {
             if (await db.Newsletter.AnyAsync(x => x.Email == email && !x.IsDeleted))
-            {
                 throw new InvalidOperationException(string.Format(UserIsAlreadySubscribed, email));
+
+            if (db.Newsletter
+                .IgnoreQueryFilters()
+                .Any(x => x.Email == email && x.IsDeleted))
+            {
+                var subscriber = await db.Newsletter
+                    .IgnoreQueryFilters()
+                    .FirstAsync(x => x.Email == email);
+
+                subscriber.IsDeleted = false;
+                subscriber.DeletedOn = null;
+                subscriber.DeletedBy = null;
+                await db.SaveChangesAsync();
+                return subscriber.Id;
             }
 
             var (isAnonymous, ordersCount, name, phoneNumber) = await this.GetNewsletterData(db, userManager, email);
@@ -44,13 +58,14 @@ namespace NutriBest.Server.Features.Newsletter
                 HasOrders = ordersCount != 0,
                 TotalOrders = ordersCount,
                 Name = name,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                VerificationToken = Guid.NewGuid().ToString()
             };
 
             db.Newsletter.Add(subscription);
 
             // can be stopped anytime
-            await notificationService.SendNotificationToAdmin("success", $"'{email}' Has Just Signed up For the Newsletter");
+            await notificationService.SendNotificationToAdmin("success", string.Format(UserSignedUpForNewsletter, email));
 
             await db.SaveChangesAsync();
 
@@ -112,7 +127,7 @@ namespace NutriBest.Server.Features.Newsletter
         public async Task<bool> Unsubscribe(string email, string token)
         {
             var newsletter = await db.Newsletter
-                .FirstOrDefaultAsync(x => x.Email == email && 
+                .FirstOrDefaultAsync(x => x.Email == email &&
                 token == x.VerificationToken &&
                 !x.IsDeleted);
 

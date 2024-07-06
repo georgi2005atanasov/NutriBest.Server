@@ -80,9 +80,10 @@
         }
 
         [HttpDelete]
+        [AllowAnonymous]
         [Route(nameof(Unsubscribe))]
-        public async Task<ActionResult<bool>> Unsubscribe([FromForm] string email,
-            [FromForm] string token)
+        public async Task<ActionResult<bool>> Unsubscribe([FromQuery] string email,
+            [FromQuery] string token)
         {
             try
             {

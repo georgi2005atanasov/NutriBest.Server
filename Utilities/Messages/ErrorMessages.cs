@@ -114,5 +114,15 @@
         {
             public const string UserIsAlreadySubscribed = "'{0}' is already subscribed!";
         }
+
+        public static class CartController
+        {
+            public const string InvalidProductCount = "Invalid product count!";
+            public const string ProductDoesNotExists = "This product does not exist!";
+            public const string ProductNotFound = "Product not found in the cart.";
+            public const string ProductsAreNotAvailableWithThisCount = "Sorry, we have {0} units of this product available.";
+            public const string CartIsAlreadyEmpty = "The cart is already empty!";
+            public const string YouHaveToAddProducts = "You have to add products to the cart!";
+        }
     }
 }

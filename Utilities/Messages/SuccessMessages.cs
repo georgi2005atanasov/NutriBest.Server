@@ -23,5 +23,10 @@
         {
             public const string IfEmailIsValidLinkIsSent = "If the email is valid, a password reset link has been sent.";
         }
+
+        public static class NotificationService
+        {
+            public const string UserSignedUpForNewsletter = "'{0}' Has Just Signed up For the Newsletter";
+        }
     }
 }
