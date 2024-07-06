@@ -440,7 +440,7 @@ NutriBest
             <p>{Body}</p>
         </div>
         <div class=""footer"">
-            <a href=""{Host}/newsletter/{Email}"">Unsubscribe From our Newsletter.</a>
+            <a href=""{Host}/newsletter/{Email}/{Token}"">Unsubscribe From our Newsletter.</a>
             <p>&copy; {Year} NutriBest. All rights reserved.</p>
         </div>
 

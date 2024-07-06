@@ -54,7 +54,7 @@ namespace NutriBest.Server.Features.Brands
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = CouldNotCreateBrands
                 });
@@ -76,9 +76,7 @@ namespace NutriBest.Server.Features.Brands
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = err.ParamName != null ?
-                    err.ParamName :
-                    ErrorMessages.Exception
+                    Message = err.ParamName ?? ErrorMessages.Exception
                 });
             }
             catch (Exception)

@@ -211,7 +211,14 @@
 
                 var htmlTemplate = Messages.SubscribersMessageTemplate;
 
+                var dbSubscriber = await db.Newsletter
+                    .FirstAsync(x => x.Email == subscriber);
+                var newToken = Guid.NewGuid().ToString();
+                dbSubscriber.VerificationToken = newToken;
+
+                // CHANGE IN THE FUTURE
                 var body = htmlTemplate
+                    .Replace("{Token}", newToken)
                     .Replace("{Email}", subscriber)
                     .Replace("{Year}", $"{DateTime.UtcNow.Year}")
                     .Replace("{Body}", request.Body)
@@ -221,6 +228,8 @@
 
                 await SendEmail(email);
             }
+
+            await db.SaveChangesAsync();
             await notificationService.SendNotificationToAdmin("success", "Successfully Sent Message to the Newsletter Subscribers!");
         }
 

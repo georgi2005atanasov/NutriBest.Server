@@ -6,7 +6,9 @@
     {
         public Task<int> Add(string email);
 
-        public Task<bool> Remove(string email);
+        public Task<bool> RemoveForAdmin(string email);
+
+        public Task<bool> Unsubscribe(string email, string token);
 
         public Task<AllSubscribersServiceModel> AllSubscribers(int page,
             string? search,

@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Newsletter.Models;
+    using NutriBest.Server.Shared.Responses;
 
     public class NewsletterController : ApiController
     {
@@ -47,9 +48,9 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -65,7 +66,7 @@
         {
             try
             {
-                var result = await newsletterService.Remove(email);
+                var result = await newsletterService.RemoveForAdmin(email);
 
                 return Ok(new
                 {
@@ -79,12 +80,14 @@
         }
 
         [HttpDelete]
-        [Route("RemoveFromNewsletter")]
-        public async Task<ActionResult<bool>> RemoveFromNewsletter([FromForm] string email)
+        [Route(nameof(Unsubscribe))]
+        public async Task<ActionResult<bool>> Unsubscribe([FromForm] string email,
+            [FromForm] string token)
         {
             try
             {
-                var result = await newsletterService.Remove(email);
+                var result = await newsletterService
+                    .Unsubscribe(email, token);
 
                 return Ok(new
                 {

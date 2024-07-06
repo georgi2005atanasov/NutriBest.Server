@@ -109,5 +109,10 @@
             public const string LeastPromotionDurationRequired = "The promotion must be with at least one day duration!";
             public const string CannotChangePromotionStatus = "You cannot change the status of the promotion!";
         }
+
+        public static class NewsletterController
+        {
+            public const string UserIsAlreadySubscribed = "'{0}' is already subscribed!";
+        }
     }
 }

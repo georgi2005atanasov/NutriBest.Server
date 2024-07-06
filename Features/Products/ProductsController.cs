@@ -14,8 +14,8 @@ namespace NutriBest.Server.Features.Products
     using NutriBest.Server.Features.Images;
     using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Products.Models;
-    using static ErrorMessages.ProductsController;
     using NutriBest.Server.Features.Categories.Models;
+    using static ErrorMessages.ProductsController;
 
     public class ProductsController : ApiController
     {
@@ -76,9 +76,9 @@ namespace NutriBest.Server.Features.Products
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

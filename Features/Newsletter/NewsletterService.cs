@@ -1,31 +1,30 @@
-﻿namespace NutriBest.Server.Features.Newsletter
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Newsletter
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Email;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.Newsletter.Models;
     using NutriBest.Server.Features.Newsletter.Extensions;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
+    using static ErrorMessages.NewsletterController;
 
     public class NewsletterService : INewsletterService, ITransientService
     {
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
-        private readonly IEmailService emailService;
         private readonly INotificationService notificationService;
 
         public NewsletterService(NutriBestDbContext db,
             UserManager<User> userManager,
-            IEmailService emailService,
             INotificationService notificationService)
         {
             this.db = db;
             this.userManager = userManager;
-            this.emailService = emailService;
             this.notificationService = notificationService;
         }
 
@@ -33,7 +32,7 @@
         {
             if (await db.Newsletter.AnyAsync(x => x.Email == email && !x.IsDeleted))
             {
-                throw new InvalidOperationException($"'{email}' is already subscribed!");
+                throw new InvalidOperationException(string.Format(UserIsAlreadySubscribed, email));
             }
 
             var (isAnonymous, ordersCount, name, phoneNumber) = await this.GetNewsletterData(db, userManager, email);
@@ -95,10 +94,27 @@
             }
         }
 
-        public async Task<bool> Remove(string email)
+        public async Task<bool> RemoveForAdmin(string email)
         {
             var newsletter = await db.Newsletter
                 .FirstOrDefaultAsync(x => x.Email == email && !x.IsDeleted);
+
+            if (newsletter == null)
+                return false;
+
+            db.Newsletter.Remove(newsletter);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> Unsubscribe(string email, string token)
+        {
+            var newsletter = await db.Newsletter
+                .FirstOrDefaultAsync(x => x.Email == email && 
+                token == x.VerificationToken &&
+                !x.IsDeleted);
 
             if (newsletter == null)
                 return false;

@@ -6,6 +6,7 @@ namespace NutriBest.Server.Features.Packages
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Features.Packages.Models;
     using static ErrorMessages.PackagesController;
+    using NutriBest.Server.Shared.Responses;
 
     public class PackagesController : ApiController
     {
@@ -25,7 +26,7 @@ namespace NutriBest.Server.Features.Packages
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = CouldNotFetchPackages
                 });
@@ -40,7 +41,7 @@ namespace NutriBest.Server.Features.Packages
             {
                 if (package.Grams == 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
                         Message = InvalidGrams
                     });
@@ -52,9 +53,9 @@ namespace NutriBest.Server.Features.Packages
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
