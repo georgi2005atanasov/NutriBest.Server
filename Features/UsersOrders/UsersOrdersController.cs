@@ -16,6 +16,7 @@ namespace NutriBest.Server.Features.UsersOrders
     using NutriBest.Server.Features.UsersOrders.Models;
     using NutriBest.Server.Infrastructure.Services;
     using static ErrorMessages.UsersOrdersController;
+    using static SuccessMessages.NotificationService;
 
     public class UsersOrdersController : ApiController
     {
@@ -60,7 +61,8 @@ namespace NutriBest.Server.Features.UsersOrders
                 });
             }
 
-            if (!Enum.GetNames(typeof(PaymentMethod)).Contains(orderModel.PaymentMethod))
+            var validPaymentMethods = Enum.GetNames(typeof(PaymentMethod));
+            if (!validPaymentMethods.Any(x => x == orderModel.PaymentMethod))
                 return BadRequest(new FailResponse
                 {
                     Message = InvalidPaymentMethod
@@ -85,6 +87,14 @@ namespace NutriBest.Server.Features.UsersOrders
                     });
                 }
 
+                var userId = currentUserService.GetUserId();
+
+                if (userId == null)
+                    return BadRequest(new FailResponse
+                    {
+                        Message = InvalidUser
+                    });
+
                 var cartId = await userOrderService.PrepareCart(cookieCart.TotalProducts,
                     cookieCart.OriginalPrice,
                     cookieCart.TotalSaved,
@@ -99,14 +109,6 @@ namespace NutriBest.Server.Features.UsersOrders
                     Comment = orderModel.Comment
                 };
 
-                var userId = currentUserService.GetUserId();
-
-                if (userId == null)
-                    return BadRequest(new FailResponse
-                    {
-                        Message = InvalidUser
-                    });
-
                 order.OrderDetailsId = await orderDetailsService.Create(orderModel.Country,
                     orderModel.City,
                     orderModel.Street,
@@ -117,7 +119,7 @@ namespace NutriBest.Server.Features.UsersOrders
                     orderModel.Invoice,
                     orderModel.Comment,
                     userId); // mandatory
-
+                
                 await userOrderService.SetShippingPrice(cartId, orderModel.Country); // new
 
                 db.Orders.Add(order);
@@ -139,7 +141,7 @@ namespace NutriBest.Server.Features.UsersOrders
 
                 await SetSessionCart(new CartServiceModel());
 
-                await notificationService.SendNotificationToAdmin("success", $"'{orderModel.Name}' Has Just Made an Order for {totalOrderPrice:f2}BGN!");
+                await notificationService.SendNotificationToAdmin("success", string.Format(UserHasJustMadeAnOrder, orderModel.Name, $"{totalOrderPrice:f2}"));
 
                 await db.SaveChangesAsync();
 
@@ -149,6 +151,13 @@ namespace NutriBest.Server.Features.UsersOrders
                 });
             }
             catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName ?? ""
+                });
+            }
+            catch (InvalidOperationException err)
             {
                 return BadRequest(new FailResponse
                 {

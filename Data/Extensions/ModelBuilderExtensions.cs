@@ -56,18 +56,18 @@
             builder.Entity<Address>(e =>
             {
                 e.HasOne(e => e.Country)
-                .WithMany()
+                .WithMany(x => x.Addresses)
                 .HasForeignKey(e => e.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                e.Ignore(x => x.Country);
+                //e.Ignore(x => x.Country);
 
                 e.HasOne(e => e.City)
                 .WithMany(x => x.Addresses)
                 .HasForeignKey(e => e.CityId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                e.Ignore(x => x.City);
+                //e.Ignore(x => x.City);
 
                 e.Property(x => x.ProfileId).IsRequired(false);
             });

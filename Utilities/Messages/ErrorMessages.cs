@@ -143,5 +143,12 @@
             public const string InvalidUser = "Invalid user!";
             public const string UserWithThisEmailAlreadyExists = "User with this email already exists!";
         }
+
+        public static class OrderDetailsService
+        {
+            public const string WeDoNotShipToThisCountry = "We do not ship to this country!";
+            public const string WeDoNotShipToThisCity = "We do not ship to this city!";
+            public const string InvalidCityOrCountry = "Invalid city/country!";
+        }
     }
 }

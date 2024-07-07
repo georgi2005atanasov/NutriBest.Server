@@ -27,6 +27,8 @@
         public static class NotificationService
         {
             public const string UserSignedUpForNewsletter = "'{0}' Has Just Signed up For the Newsletter";
+            public const string UserHasJustMadeAnOrder = "'{0}' Has Just Made an Order for {1}BGN!";
+            public const string OrderHasJustBeenConfirmed = "Order #000000{0} Has Just Been Confirmed!";
         }
     }
 }

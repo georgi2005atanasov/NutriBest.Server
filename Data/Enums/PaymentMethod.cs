@@ -2,7 +2,7 @@
 {
     public enum PaymentMethod
     {
-        CashОnDelivery = 0,
+        CashOnDelivery = 0,
         BankTransfer = 1,
     }
 }

@@ -120,7 +120,7 @@
 
                 return Ok(new
                 {
-                    Successful = true
+                    Successful = result
                 });
             }
             catch (Exception)

@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Orders
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Orders
 {
     using Microsoft.EntityFrameworkCore;
     using AutoMapper;
@@ -13,6 +15,7 @@
     using NutriBest.Server.Features.Carts.Factories;
     using NutriBest.Server.Features.Products.Factories;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static SuccessMessages.NotificationService;
 
     public class OrderService : IOrderService, ITransientService
     {
@@ -284,7 +287,7 @@
 
                 await this.SendLowStockNotifications(lowStocks, notificationService, orderId);
 
-                await notificationService.SendNotificationToAdmin("success", $"Order #000000{order.Id} Has Just Been Confirmed!");
+                await notificationService.SendNotificationToAdmin("success", string.Format(OrderHasJustBeenConfirmed, order.Id));
 
                 order.IsConfirmed = true;
 

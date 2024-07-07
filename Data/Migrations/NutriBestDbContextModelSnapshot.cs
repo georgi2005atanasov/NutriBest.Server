@@ -196,7 +196,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Brand", b =>
@@ -246,7 +246,7 @@ namespace NutriBest.Server.Data.Migrations
                         .IsUnique()
                         .HasFilter("[BrandLogoId] IS NOT NULL");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.BrandLogo", b =>
@@ -267,7 +267,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("BrandLogoId");
 
-                    b.ToTable("BrandsLogos");
+                    b.ToTable("BrandsLogos", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Cart", b =>
@@ -307,7 +307,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.CartProduct", b =>
@@ -355,7 +355,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartProducts");
+                    b.ToTable("CartProducts", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Category", b =>
@@ -373,7 +373,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.City", b =>
@@ -402,7 +402,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Country", b =>
@@ -431,7 +431,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("ShippingDiscountId");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Flavour", b =>
@@ -451,7 +451,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Flavours");
+                    b.ToTable("Flavours", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.GuestOrder", b =>
@@ -483,7 +483,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GuestsOrders");
+                    b.ToTable("GuestsOrders", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Invoice", b =>
@@ -529,7 +529,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Newsletter", b =>
@@ -585,7 +585,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Newsletter");
+                    b.ToTable("Newsletter", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Notification", b =>
@@ -619,7 +619,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.NutritionFacts", b =>
@@ -653,7 +653,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("NutritionFacts");
+                    b.ToTable("NutritionFacts", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Order", b =>
@@ -717,7 +717,7 @@ namespace NutriBest.Server.Data.Migrations
                     b.HasIndex("OrderDetailsId")
                         .IsUnique();
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.OrderDetails", b =>
@@ -757,7 +757,7 @@ namespace NutriBest.Server.Data.Migrations
                         .IsUnique()
                         .HasFilter("[InvoiceId] IS NOT NULL");
 
-                    b.ToTable("OrdersDetails");
+                    b.ToTable("OrdersDetails", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Package", b =>
@@ -776,7 +776,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Packages");
+                    b.ToTable("Packages", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Product", b =>
@@ -845,7 +845,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("PromotionId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductCategory", b =>
@@ -863,7 +863,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductsCategories");
+                    b.ToTable("ProductsCategories", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductDetails", b =>
@@ -888,7 +888,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("ProductsDetails");
+                    b.ToTable("ProductsDetails", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductImage", b =>
@@ -930,7 +930,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("ProductImageId");
 
-                    b.ToTable("ProductsImages");
+                    b.ToTable("ProductsImages", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ProductPackageFlavour", b =>
@@ -959,7 +959,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("PackageId");
 
-                    b.ToTable("ProductsPackagesFlavours");
+                    b.ToTable("ProductsPackagesFlavours", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Profile", b =>
@@ -1007,7 +1007,7 @@ namespace NutriBest.Server.Data.Migrations
                         .IsUnique()
                         .HasFilter("[CartId] IS NOT NULL");
 
-                    b.ToTable("Profiles");
+                    b.ToTable("Profiles", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.PromoCode", b =>
@@ -1059,7 +1059,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PromoCodes");
+                    b.ToTable("PromoCodes", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.Promotion", b =>
@@ -1119,7 +1119,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("PromotionId");
 
-                    b.ToTable("Promotions");
+                    b.ToTable("Promotions", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.ShippingDiscount", b =>
@@ -1167,7 +1167,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingDiscounts");
+                    b.ToTable("ShippingDiscounts", (string)null);
                 });
 
             modelBuilder.Entity("NutriBest.Server.Data.Models.User", b =>
@@ -1296,7 +1296,7 @@ namespace NutriBest.Server.Data.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("UsersOrders");
+                    b.ToTable("UsersOrders", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

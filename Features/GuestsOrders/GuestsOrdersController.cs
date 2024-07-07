@@ -11,12 +11,13 @@ namespace NutriBest.Server.Features.Orders
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Carts.Models;
-    using NutriBest.Server.Features.GuestOrders.Models;
+    using NutriBest.Server.Features.GuestsOrders.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.OrderDetails;
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.PromoCodes;
     using static ErrorMessages.GuestsOrdersController;
+    using static SuccessMessages.NotificationService;
 
     public class GuestsOrdersController : ApiController
     {
@@ -64,7 +65,6 @@ namespace NutriBest.Server.Features.Orders
                 {
                     Message = InvalidPaymentMethod
                 });
-
 
             int postalCode = 0;
             if (!string.IsNullOrEmpty(orderModel.PostalCode) && (!int.TryParse(orderModel.PostalCode, out postalCode)))
@@ -138,7 +138,7 @@ namespace NutriBest.Server.Features.Orders
                 await SetSessionOrder(token);
                 await SetSessionCart(new CartServiceModel());
 
-                await notificationService.SendNotificationToAdmin("success", $"'{orderModel.Name}' Has Just Made an Order for {totalOrderPrice:f2}BGN!");
+                await notificationService.SendNotificationToAdmin("success", string.Format(UserHasJustMadeAnOrder, orderModel.Name, $"{totalOrderPrice:f2}"));
 
                 await db.SaveChangesAsync();
 
@@ -147,11 +147,18 @@ namespace NutriBest.Server.Features.Orders
                     Id = order.Id
                 });
             }
-            catch (ArgumentNullException err)
+            catch (InvalidOperationException err)
             {
                 return BadRequest(new FailResponse
                 {
                     Message = err.Message
+                });
+            }
+            catch (ArgumentNullException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)

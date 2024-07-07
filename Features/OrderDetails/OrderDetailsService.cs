@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.OrderDetails
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.OrderDetails
 {
     using Microsoft.EntityFrameworkCore;
     using NutriBest.Server.Data;
@@ -6,6 +8,7 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Invoices.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
+    using static ErrorMessages.OrderDetailsService;
 
     public class OrderDetailsService : IOrderDetailsService, ITransientService
     {
@@ -29,16 +32,16 @@
                 .FirstOrDefaultAsync(x => x.CountryName == countryName);
 
             if (country == null)
-                throw new ArgumentNullException("We do not ship to this country!");
+                throw new ArgumentNullException(WeDoNotShipToThisCountry);
 
             var city = await db.Cities
                 .FirstOrDefaultAsync(x => x.CityName == cityName);
 
             if (city == null)
-                throw new ArgumentNullException("We do not ship to this city!");
+                throw new ArgumentNullException(WeDoNotShipToThisCity);
 
             if (city.CountryId != country.Id)
-                throw new InvalidOperationException("Invalid country/city!");
+                throw new InvalidOperationException(InvalidCityOrCountry);
 
             if (!string.IsNullOrEmpty(profileId))
             {
@@ -46,9 +49,7 @@
                     .FirstOrDefaultAsync(x => x.ProfileId == profileId && !x.IsDeleted);
 
                 if (address != null)
-                {
                     address.IsDeleted = true;
-                }
 
                 address = new Address
                 {
@@ -99,7 +100,8 @@
                     CountryId = country.Id,
                     IsAnonymous = true,
                     Street = street,
-                    StreetNumber = streetNumber
+                    StreetNumber = streetNumber,
+                    PostalCode = postalCode,
                 };
 
                 var orderDetails = new OrderDetails
