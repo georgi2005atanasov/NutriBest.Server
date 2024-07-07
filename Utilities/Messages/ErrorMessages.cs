@@ -124,5 +124,24 @@
             public const string CartIsAlreadyEmpty = "The cart is already empty!";
             public const string YouHaveToAddProducts = "You have to add products to the cart!";
         }
+
+        public static class UsersOrdersController
+        {
+            public const string FillInvoiceForm = "Fill the invoice form!";
+            public const string InvalidPostalCode = "Invalid postal code!";
+            public const string InvalidPaymentMethod = "Invalid payment method!";
+            public const string PurchaseIsRequiredToHaveSomething = "You have to purchase something!";
+            public const string InvalidUser = "Invalid user!";
+        }
+
+        public static class GuestsOrdersController
+        {
+            public const string FillInvoiceForm = "Fill the invoice form!";
+            public const string InvalidPostalCode = "Invalid postal code!";
+            public const string InvalidPaymentMethod = "Invalid payment method!";
+            public const string PurchaseIsRequiredToHaveSomething = "You have to purchase something!";
+            public const string InvalidUser = "Invalid user!";
+            public const string UserWithThisEmailAlreadyExists = "User with this email already exists!";
+        }
     }
 }

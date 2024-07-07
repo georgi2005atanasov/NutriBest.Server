@@ -3,7 +3,5 @@
     public class CityServiceModel
     {
         public string CityName { get; set; } = null!;
-
-        public int? PostalCode { get; set; }
     }
 }

@@ -329,7 +329,7 @@ namespace NutriBest.Server.Features.Carts
             }
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("/Cart/RemovePromoCode")]
         public async Task<ActionResult<bool>> RemovePromoCode([FromBody] ApplyPromoCodeServiceModel promoCodeModel)
         {
@@ -337,13 +337,22 @@ namespace NutriBest.Server.Features.Carts
             {
                 CartServiceModel cart = GetSessionCart() ?? new CartServiceModel();
 
-                if (cart.TotalProducts == 0)
-                {
+                //if (cart.TotalProducts == 0)
+                //{
+                //    return BadRequest(new FailResponse
+                //    {
+                //        Message = YouHaveToAddProducts
+                //    });
+                //}
+                var promoCode = await db.PromoCodes
+                    .FirstOrDefaultAsync(x => x.Code == promoCodeModel.Code);
+
+                if (promoCode == null)
                     return BadRequest(new FailResponse
                     {
-                        Message = YouHaveToAddProducts
+                        Key = "PromoCode",
+                        Message = InvalidPromoCode
                     });
-                }
 
                 await DisablePromoCode(cart);
                 cart.Code = "";

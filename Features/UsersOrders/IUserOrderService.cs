@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.UserOrders
+﻿namespace NutriBest.Server.Features.UsersOrders
 {
     using NutriBest.Server.Features.Orders;
 

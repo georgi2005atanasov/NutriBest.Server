@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.UserOrders
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.UsersOrders
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -6,12 +8,14 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.OrderDetails;
     using NutriBest.Server.Features.PromoCodes;
-    using NutriBest.Server.Features.UserOrders.Models;
+    using NutriBest.Server.Features.UsersOrders.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using static ErrorMessages.UsersOrdersController;
 
     public class UsersOrdersController : ApiController
     {
@@ -50,35 +54,34 @@
                 orderModel.Invoice.PhoneNumber == null ||
                 orderModel.Invoice.PersonInCharge == null))
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Fill the invoice form!"
+                    Message = FillInvoiceForm
                 });
             }
 
-            if (!Enum.TryParse<PaymentMethod>(orderModel.PaymentMethod, out var paymentMethod))
-                return BadRequest(new
+            if (!Enum.GetNames(typeof(PaymentMethod)).Contains(orderModel.PaymentMethod))
+                return BadRequest(new FailResponse
                 {
-                    Message = "Invalid postal code!"
+                    Message = InvalidPaymentMethod
                 });
 
             int postalCode = 0;
             if (!string.IsNullOrEmpty(orderModel.PostalCode) && !int.TryParse(orderModel.PostalCode, out postalCode))
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Invalid postal code!"
+                    Message = InvalidPostalCode
                 });
 
             try
             {
-
                 var cookieCart = GetSessionCart() ?? new CartServiceModel();
 
                 if (cookieCart.OriginalPrice == 0)
                 {
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "You have to purchase something!"
+                        Message = PurchaseIsRequiredToHaveSomething
                     });
                 }
 
@@ -99,9 +102,9 @@
                 var userId = currentUserService.GetUserId();
 
                 if (userId == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "Invalid user!"
+                        Message = InvalidUser
                     });
 
                 order.OrderDetailsId = await orderDetailsService.Create(orderModel.Country,
@@ -147,9 +150,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

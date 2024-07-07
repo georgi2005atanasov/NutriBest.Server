@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Orders
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Orders
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -7,12 +9,14 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
+    using NutriBest.Server.Shared.Responses;
     using NutriBest.Server.Features.Carts.Models;
     using NutriBest.Server.Features.GuestOrders.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.OrderDetails;
     using NutriBest.Server.Features.Orders.Extensions;
     using NutriBest.Server.Features.PromoCodes;
+    using static ErrorMessages.GuestsOrdersController;
 
     public class GuestsOrdersController : ApiController
     {
@@ -49,16 +53,16 @@
                 orderModel.Invoice.PhoneNumber == null ||
                 orderModel.Invoice.PersonInCharge == null))
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "Fill the invoice form!"
+                    Message = FillInvoiceForm
                 });
             }
 
             if (!Enum.TryParse<PaymentMethod>(orderModel.PaymentMethod, out var paymentMethod))
                 return BadRequest(new
                 {
-                    Message = "Invalid postal code!"
+                    Message = InvalidPaymentMethod
                 });
 
 
@@ -66,13 +70,13 @@
             if (!string.IsNullOrEmpty(orderModel.PostalCode) && (!int.TryParse(orderModel.PostalCode, out postalCode)))
                 return BadRequest(new
                 {
-                    Message = "Invalid postal code!"
+                    Message = InvalidPostalCode
                 });
 
             if (await db.Users.AnyAsync(x => x.Email == orderModel.Email))
                 return BadRequest(new
                 {
-                    Message = "User with this email already exists!"
+                    Message = UserWithThisEmailAlreadyExists
                 });
 
             var cookieCart = GetSessionCart() ?? new CartServiceModel();
@@ -81,7 +85,7 @@
             {
                 return BadRequest(new
                 {
-                    Message = "You have to purchase something!"
+                    Message = PurchaseIsRequiredToHaveSomething
                 });
             }
 
@@ -145,9 +149,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

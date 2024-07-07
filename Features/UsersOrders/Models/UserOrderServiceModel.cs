@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.UserOrders.Models
+﻿namespace NutriBest.Server.Features.UsersOrders.Models
 {
     using System.ComponentModel.DataAnnotations;
     using NutriBest.Server.Features.Invoices.Models;

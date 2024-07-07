@@ -29,8 +29,7 @@ namespace NutriBest.Server.Features.Cities
                             Country = x.Key,
                             Cities = x.Select(y => new CityServiceModel
                             {
-                                CityName = y.CityName,
-                                PostalCode = y.PostalCode
+                                CityName = y.CityName
                             })
                             .OrderBy(x => x.CityName)
                             .ToList()

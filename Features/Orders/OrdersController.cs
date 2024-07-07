@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Authorization;
     using NutriBest.Server.Utilities;
     using NutriBest.Server.Features.Orders.Models;
+    using NutriBest.Server.Shared.Responses;
 
     public class OrdersController : ApiController
     {
@@ -146,9 +147,9 @@
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)
@@ -170,9 +171,9 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (InvalidOperationException err)

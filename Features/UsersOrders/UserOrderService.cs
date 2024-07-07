@@ -1,4 +1,4 @@
-﻿namespace NutriBest.Server.Features.UserOrders
+﻿namespace NutriBest.Server.Features.UsersOrders
 {
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
@@ -17,7 +17,7 @@
             IConfiguration config,
             INotificationService notificationService,
             IMapper mapper)
-            :base(db, currentUserService, config, notificationService, mapper)
+            : base(db, currentUserService, config, notificationService, mapper)
         {
         }
 

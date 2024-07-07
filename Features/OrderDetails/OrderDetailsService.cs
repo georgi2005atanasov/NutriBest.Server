@@ -59,10 +59,9 @@
                     IsAnonymous = profileId == null,
                     ProfileId = profileId,
                     Street = street,
-                    StreetNumber = streetNumber
+                    StreetNumber = streetNumber,
+                    PostalCode = postalCode,
                 };
-
-                city.PostalCode = postalCode;
 
                 var orderDetails = new OrderDetails
                 {

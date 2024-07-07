@@ -26,6 +26,8 @@
 
         public City? City { get; set; }
 
+        public int? PostalCode { get; set; }
+
         public bool IsAnonymous { get; set; }
 
         public bool IsDeleted { get; set; }

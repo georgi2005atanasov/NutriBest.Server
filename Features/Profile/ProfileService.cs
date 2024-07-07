@@ -145,7 +145,7 @@
             {
                 City = city != null ? city.CityName : "",
                 Country = country != null ? country.CountryName : "",
-                PostalCode = city != null ? city.PostalCode : null,
+                //PostalCode = city != null ? city.PostalCode : null,
                 Street = address.Street,
                 StreetNumber = address.StreetNumber
             };
@@ -183,11 +183,11 @@
                 City = city,
                 Street = street,
                 StreetNumber = streetNumber,
-                IsDeleted = false
+                IsDeleted = false,
+                PostalCode = postalCode
             };
 
             db.Addresses.Add(newAddress);
-            city.PostalCode = postalCode;
 
             await db.SaveChangesAsync();
 
