@@ -173,14 +173,14 @@
             {
                 return BadRequest(new FailResponse
                 {
-                    Message = err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (InvalidOperationException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.Message
                 });
             }
             catch (Exception)

@@ -16,6 +16,7 @@ namespace NutriBest.Server.Features.Orders
     using NutriBest.Server.Features.Products.Factories;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static SuccessMessages.NotificationService;
+    using static ErrorMessages.OrdersController;
 
     public class OrderService : IOrderService, ITransientService
     {
@@ -386,10 +387,10 @@ namespace NutriBest.Server.Features.Orders
             var order = await this.GetOrder(db, orderId);
 
             if (order == null)
-                throw new ArgumentNullException("Order Could not be Deleted!");
+                throw new ArgumentNullException(OrderCouldNotBeDeleted);
 
             if (order.IsFinished == false)
-                throw new InvalidOperationException("The order must be finished before deleting it!");
+                throw new InvalidOperationException(OrderMustBeFinishedBeforeDeletingIt);
 
             var orderDetails = await this.GetOrderDetails(db, order.OrderDetailsId);
 

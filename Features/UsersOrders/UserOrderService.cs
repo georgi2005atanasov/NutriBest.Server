@@ -7,8 +7,8 @@
     using NutriBest.Server.Data.Models;
     using NutriBest.Server.Features.Notifications;
     using NutriBest.Server.Features.Orders;
-    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
 
     public class UserOrderService : OrderService, ITransientService, IUserOrderService
     {
@@ -29,19 +29,19 @@
             var user = await db.Users
                 .FirstAsync(x => x.Id == userId);
 
-            if (string.IsNullOrEmpty(profile.Name))
+            if (string.IsNullOrEmpty(profile.Name) || !string.IsNullOrEmpty(name))
                 profile.Name = name;
 
-            if (string.IsNullOrEmpty(user.Email))
+            if (string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(email))
                 user.Email = email;
 
-            if (string.IsNullOrEmpty(user.PhoneNumber))
+            if (string.IsNullOrEmpty(user.PhoneNumber) || !string.IsNullOrEmpty(phoneNumber))
                 user.PhoneNumber = phoneNumber;
 
             var userOrder = new UserOrder
             {
                 ProfileId = userId,
-                OrderId = orderId
+                OrderId = orderId,
             };
 
             this.db.UsersOrders.Add(userOrder);

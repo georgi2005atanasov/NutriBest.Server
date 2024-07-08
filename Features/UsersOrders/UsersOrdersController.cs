@@ -128,8 +128,8 @@ namespace NutriBest.Server.Features.UsersOrders
 
                 var userOrderId = await userOrderService.CreateUserOrder(userId, // mandatory
                     order.Id,
-                    orderModel.Email,
                     orderModel.Name,
+                    orderModel.Email,
                     orderModel.PhoneNumber);
 
                 order.UserOrderId = userOrderId;

@@ -27,7 +27,7 @@
 
                 var profile = await db.Profiles
                     .FirstAsync(x => x.UserId == userOrder.ProfileId);
-
+         
                 customerName = profile.Name!;
 
                 var user = await db.Users
@@ -72,9 +72,7 @@
                 phoneNumber = user.PhoneNumber ?? "";
 
                 if (userOrder.ProfileId != currentUserService.GetUserId())
-                {
                     throw new InvalidOperationException();
-                }
             }
             else if (orderFromDb.GuestOrderId != null)
             {

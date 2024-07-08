@@ -125,6 +125,12 @@
             public const string YouHaveToAddProducts = "You have to add products to the cart!";
         }
 
+        public static class OrdersController
+        {
+            public const string OrderCouldNotBeDeleted = "Order Could not be Deleted!";
+            public const string OrderMustBeFinishedBeforeDeletingIt = "The order must be finished before deleting it!";
+        }
+
         public static class UsersOrdersController
         {
             public const string FillInvoiceForm = "Fill the invoice form!";
@@ -149,6 +155,17 @@
             public const string WeDoNotShipToThisCountry = "We do not ship to this country!";
             public const string WeDoNotShipToThisCity = "We do not ship to this city!";
             public const string InvalidCityOrCountry = "Invalid city/country!";
+        }
+
+        public static class NotificationService
+        {
+            public const string LowInStock = "Low in Stock!";
+            public const string StockIsRunningLow = "Stock is running low!";
+            public const string OutOfStock = "Out of Stock!";
+            public const string BeAwareOfTheProductQuantity = "Be Aware That Product With Name '{0}' has Quantity of {1}.";
+            public const string CriticallyLowStockLevels = "'{0}' stock levels are critically low! ({1} left)";
+            public const string OutOfStockMesage = "'{0}' is Out of Stock! ({1})";
+            public const string CannotFulfillOrder = "Cannot Fulfill Order {0}. Product '{1}' is Out of Stock!";
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Notifications
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Notifications
 {
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using static ServicesConstants.PaginationConstants;
     using static ServicesConstants.Product;
+    using static ErrorMessages.NotificationService;
 
     public class NotificationService : INotificationService, ITransientService
     {
@@ -66,7 +69,7 @@
             var notification = new Notification()
             {
                 SentAt = DateTime.UtcNow
-            };
+            }; 
 
             if (await db.Notifications.AnyAsync(x => x.ProductId == productId))
             {
@@ -78,8 +81,8 @@
 
             if (quantity < StockMediumPriority && quantity > 0)
             {
-                notification.Title = "Low in Stock";
-                notification.Message = $"'{productName}' stock levels are critically low! ({quantity} left)";
+                notification.Title = StockIsRunningLow;
+                notification.Message = string.Format(CriticallyLowStockLevels, productName, quantity); ;
                 notification.Priority = Data.Enums.Priority.Medium;
                 notification.ProductId = productId;
                 db.Notifications.Add(notification);
@@ -88,8 +91,8 @@
             }
             else if (quantity < StockLowPriority && quantity > 0)
             {
-                notification.Title = "Stock is running low!";
-                notification.Message = $"Be Aware That Product With Name '{productName}' has Quantity of {quantity}.";
+                notification.Title = LowInStock;
+                notification.Message = string.Format(BeAwareOfTheProductQuantity, productName, quantity); ;
                 notification.Priority = Data.Enums.Priority.Low;
                 notification.ProductId = productId;
                 db.Notifications.Add(notification);
@@ -98,8 +101,8 @@
             }
             else if (quantity == 0)
             {
-                notification.Title = "Out of Stock!";
-                notification.Message = $"'{productName}' is Out of Stock! ({quantity})";
+                notification.Title = OutOfStock;
+                notification.Message = string.Format(OutOfStockMesage, productName, quantity);
                 notification.Priority = Data.Enums.Priority.High;
                 notification.ProductId = productId;
                 db.Notifications.Add(notification);
@@ -109,8 +112,8 @@
             else if (quantity < 0)
             {
                 notification.Priority = Data.Enums.Priority.High;
-                await hubContext.Clients.All.SendAsync("NotifyLowStock", notification.Priority.ToString(), $"Cannot Fulfill the Order. Product '{productName}' is Out of Stock!", productId);
-                throw new InvalidOperationException($"Cannot Fulfill Order {orderId}. Product '{productName}' is Out of Stock!");
+                await hubContext.Clients.All.SendAsync("NotifyLowStock", notification.Priority.ToString(), string.Format(CannotFulfillOrder, $"#000000{orderId}", productName), productId);
+                throw new InvalidOperationException(string.Format(CannotFulfillOrder, $"#000000{orderId}", productName));
             }
         }
 
