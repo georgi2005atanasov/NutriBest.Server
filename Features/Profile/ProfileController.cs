@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Admin
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Admin
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
@@ -6,6 +8,8 @@
     using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Services;
+    using NutriBest.Server.Shared.Responses;
+    using static ErrorMessages.ProfileController;
 
     public class ProfileController : ApiController
     {
@@ -39,9 +43,9 @@
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "User could not be found!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -49,7 +53,7 @@
         [HttpGet]
         [Authorize(Roles = "Administrator,Employee")]
         [Route("{userId}")]
-        public async Task<ActionResult<ProfileServiceModel?>> GetById([FromRoute] string userId)
+        public async Task<ActionResult<ProfileDetailsServiceModel?>> GetById([FromRoute] string userId)
         {
             try
             {
@@ -59,16 +63,16 @@
             }
             catch (ArgumentNullException err)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    err.Message
+                    Message = err.ParamName ?? ""
                 });
             }
             catch (Exception)
             {
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
-                    Message = "User could not be found!"
+                    Message = ErrorMessages.Exception
                 });
             }
         }
@@ -105,7 +109,7 @@
                 profile.Gender);
 
             if (result != "success")
-                return BadRequest(new
+                return BadRequest(new FailResponse
                 {
                     Message = result
                 });
@@ -121,19 +125,13 @@
             {
                 var currentUserId = currentUserService.GetUserId();
 
-                if (currentUserId == null)
-                    return BadRequest(new
-                    {
-                        Message = "Invalid user!"
-                    });
-
                 var user = await db.Users.FindAsync(currentUserId);
                 var profile = await db.Profiles.FindAsync(currentUserId);
 
                 if (user == null)
-                    return BadRequest(new
+                    return BadRequest(new FailResponse
                     {
-                        Message = "User could not be found!"
+                        Message = UserCouldNotBeFound
                     });
 
                 db.Profiles.Remove(profile!);
@@ -169,7 +167,7 @@
         [HttpPost]
         [Route("Address")]
         [Authorize(Roles = "Administrator,Employee,User")]
-        public async Task<ActionResult<ProfileAddressServiceModel>> SetAddress([FromBody] ProfileAddressServiceModel addressModel)
+        public async Task<ActionResult<int>> SetAddress([FromBody] ProfileAddressServiceModel addressModel)
         {
             try
             {
@@ -180,6 +178,13 @@
                     addressModel.PostalCode);
 
                 return Ok(addressId);
+            }
+            catch (InvalidOperationException err)
+            {
+                return BadRequest(new FailResponse
+                {
+                    Message = err.Message
+                });
             }
             catch (Exception)
             {

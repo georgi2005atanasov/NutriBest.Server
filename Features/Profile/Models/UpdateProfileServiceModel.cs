@@ -13,7 +13,6 @@ namespace NutriBest.Server.Features.Profile.Models
         [MaxLength(NameMaxLength)]
         public string? UserName { get; set; }
 
-        [Range(MinAge, MaxAge)]
         public int? Age { get; set; }
 
         [MaxLength(NameMaxLength)]

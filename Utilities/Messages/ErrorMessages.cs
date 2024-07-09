@@ -12,7 +12,23 @@
             public const string ErrorResetingPassword = "Error resetting password.";
             public const string ErrorWhenFetchingRoles = "An error occured while fetching the roles!";
         }
-        
+
+        public static class ProfileController
+        {
+            public const string UserCouldNotBeFound = "User could not be found!";
+            public const string InvalidUser = "Invalid user!";
+            public const string InvalidCityOrCountry = "Invalid city/country!";
+            public const string InvalidAge = "Invalid age!";
+            public const string UserNameAlreadyTaken = "This username is already taken!";
+            public const string UserNameCannotBeTheSame = "Username cannot be the same!";
+            public const string NameCannotBeTheSame = "Name cannot be the same!";
+            public const string EmailCannotBeTheSame = "Email cannot be the same!";
+            public const string EmailAlreadyTaken = "Email '{0}' is already taken!";
+            public const string AgeCannotBeTheSame = "Age must be different than the previous";
+            public const string GenderCannotBeTheSame = "The gender must be different from the previous!";
+            public const string InvalidGender = "{0} is invalid Gender!";
+        }
+
         public static class AdminController
         {
             public const string UserIsAlreadyInThisRole = "'{0}' is already in the role of '{1}'!";

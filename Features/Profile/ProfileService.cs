@@ -1,4 +1,6 @@
-﻿namespace NutriBest.Server.Features.Admin
+﻿using NutriBest.Server.Utilities.Messages;
+
+namespace NutriBest.Server.Features.Admin
 {
     using System.Linq;
     using Microsoft.AspNetCore.Identity;
@@ -6,25 +8,22 @@
     using NutriBest.Server.Data;
     using NutriBest.Server.Data.Enums;
     using NutriBest.Server.Data.Models;
-    using NutriBest.Server.Features.Identity;
     using NutriBest.Server.Features.Profile.Models;
     using NutriBest.Server.Infrastructure.Extensions.ServicesInterfaces;
     using NutriBest.Server.Infrastructure.Services;
     using static ServicesConstants.PaginationConstants;
+    using static ErrorMessages.ProfileController;
 
     public class ProfileService : IProfileService, ITransientService
     {
-        private readonly IIdentityService identityService;
         private readonly ICurrentUserService currentUser;
         private readonly NutriBestDbContext db;
         private readonly UserManager<User> userManager;
 
-        public ProfileService(IIdentityService identityService,
-            ICurrentUserService currentUser,
+        public ProfileService(ICurrentUserService currentUser,
             NutriBestDbContext db,
             UserManager<User> userManager)
         {
-            this.identityService = identityService;
             this.currentUser = currentUser;
             this.db = db;
             this.userManager = userManager;
@@ -88,7 +87,8 @@
                     .Profiles
                     .Where(x => x.Email.ToLower().Contains(search) ||
                     (x.City != null && x.City.ToLower().Contains(search)) ||
-                    (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
+                    (x.PhoneNumber != null && (x.PhoneNumber.ToLower().StartsWith(search) ||
+                                               x.PhoneNumber.ToLower().EndsWith(search))) ||
                     (x.Name != null && x.Name.ToLower().Contains(search)) ||
                     x.UserName.ToLower().Contains(search) ||
                     x.Roles.ToLower().Contains(search))
@@ -101,6 +101,7 @@
             allProfiles.Profiles = allProfiles.Profiles
                 .Skip((page - 1) * UsersPerPage)
                 .Take(UsersPerPage)
+                .OrderByDescending(x => x.MadeOn)
                 .ToList();
 
             return allProfiles;
@@ -134,7 +135,7 @@
             var userId = currentUser.GetUserId();
 
             if (userId == null)
-                throw new ArgumentNullException("Invalid user!");
+                throw new ArgumentNullException(InvalidUser);
 
             var (address, city, country) = await GetAddressWithCityAndCountry(userId);
 
@@ -145,7 +146,6 @@
             {
                 City = city != null ? city.CityName : "",
                 Country = country != null ? country.CountryName : "",
-                //PostalCode = city != null ? city.PostalCode : null,
                 Street = address.Street,
                 StreetNumber = address.StreetNumber
             };
@@ -164,7 +164,7 @@
                 .FirstOrDefaultAsync(x => x.CountryName == countryName);
 
             if (city == null || country == null)
-                throw new InvalidOperationException("Invalid city/country!");
+                throw new InvalidOperationException(InvalidCityOrCountry);
 
             var address = await db.Addresses
                 .FirstOrDefaultAsync(x => x.ProfileId == userId && !x.IsDeleted);
@@ -193,7 +193,7 @@
 
             return newAddress.Id;
         }
-        
+
         public async Task<string> UpdateProfile(string? name,
             string? userName,
             string? email,
@@ -203,53 +203,50 @@
             var id = currentUser.GetUserId();
 
             if (id == null)
-                throw new ArgumentNullException("Invalid user!");
+                throw new ArgumentNullException(InvalidUser);
 
             var (profile, user) = await GetProfileWithUser(id);
 
             if (user == null || profile == null)
-                return "User could not be found";
+                return UserCouldNotBeFound;
 
-            if (age <= 0)
-                return "Invalid age!";
+            if (age <= 0 || age >= 100)
+                return InvalidAge;
 
             if (!string.IsNullOrEmpty(userName))
             {
                 if (user.UserName == userName)
-                    return "Username cannot be the same!";
+                    return UserNameCannotBeTheSame;
 
                 if (await db.Users.AnyAsync(x => x.UserName == userName))
-                    return "This username is already taken!";
+                    return UserNameAlreadyTaken;
             }
 
             if (!string.IsNullOrEmpty(name))
             {
                 if (name == profile.Name)
-                    return "Name cannot be the same!";
-
-                if (await db.Users.AnyAsync(x => profile.Name == name))
-                    return "User with this name already exists!";
+                    return NameCannotBeTheSame;
             }
 
             if (!string.IsNullOrEmpty(email))
             {
                 if (email == user.Email)
-                    return "Email cannot be the same!";
+                    return EmailCannotBeTheSame;
 
                 if (await db.Users.AnyAsync(x => x.Email == email))
-                    return $"Email '{email}' is already taken!";
+                    return String.Format(EmailAlreadyTaken, email);
             }
 
             if (age != null && age == profile.Age)
-                return $"Age must be different than the previous";
+                return AgeCannotBeTheSame;
 
             Gender genderRes = Gender.Unspecified;
 
             if (!string.IsNullOrEmpty(gender) && !Enum.TryParse<Gender>(gender, true, out genderRes))
-                return $"{gender} is invalid Gender!";
+                return String.Format(InvalidGender, gender);
 
             if (gender == profile.Gender.ToString())
-                return "The gender must be different from the previous!";
+                return GenderCannotBeTheSame;
 
             if (!string.IsNullOrEmpty(email))
             {
@@ -263,13 +260,13 @@
                 user.NormalizedEmail = email.ToUpper();
             }
 
-
             if (!string.IsNullOrEmpty(name))
             {
-                if (await db.Newsletter.AnyAsync(x => x.Name == profile.Name))
+                if (await db.Newsletter.AnyAsync(x => x.Name == profile.Name || (x.Name == "" && profile.Name == null)))
                 {
                     var newsletter = await db.Newsletter
-                        .FirstAsync(x => x.Name == profile.Name);
+                        .FirstAsync(x => x.Email == user.Email || 
+                                    user.Email == email);
                     newsletter.Name = name;
                 }
                 profile.Name = name;
@@ -300,7 +297,7 @@
             var (profile, user) = await GetProfileWithUser(id);
 
             if (user == null || profile == null)
-                throw new ArgumentNullException("User could not be found");
+                throw new ArgumentNullException(UserCouldNotBeFound);
 
             var (address, city, country) = await GetAddressWithCityAndCountry(id);
 
