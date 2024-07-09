@@ -39,7 +39,8 @@
         [HttpGet]
         [Authorize(Roles = "User")]
         [Route("Mine")]
-        public async Task<ActionResult<AllOrdersServiceModel>> Mine([FromQuery] int page, [FromQuery] string? search)
+        public async Task<ActionResult<AllOrdersServiceModel>> Mine([FromQuery] int page, 
+            [FromQuery] string? search)
         {
             try
             {

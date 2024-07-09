@@ -27,7 +27,7 @@
 
                 var profile = await db.Profiles
                     .FirstAsync(x => x.UserId == userOrder.ProfileId);
-         
+
                 customerName = profile.Name!;
 
                 var user = await db.Users
@@ -135,11 +135,12 @@
                 search = search.ToLower();
 
                 allOrders.Orders = allOrders.Orders
-                    .Where(x => $"{x.OrderId}" == search ||
-                    (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
-                    x.CustomerName.ToLower().Contains(search))
-                    .OrderByDescending(x => x.MadeOn)
-                    .ToList();
+                .Where(x => x.OrderId.ToString() == search ||
+                    (x.PhoneNumber != null && (x.PhoneNumber.ToLower().StartsWith(search) ||
+                                                x.PhoneNumber.ToLower().EndsWith(search))) ||
+                    (x.CustomerName != null && x.CustomerName.ToLower().Contains(search)))
+                .OrderByDescending(x => x.MadeOn)
+                .ToList();
             }
 
             var filteredOrders = allOrders.Orders.AsQueryable();
