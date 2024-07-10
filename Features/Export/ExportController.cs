@@ -70,7 +70,8 @@
             try
             {
                 var brands = await brandService.All();
-                var csv = exportService.BrandsCsv(brands);
+                var csv = exportService.BrandsCsv(brands
+                    .OrderBy(x => x.Name));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -93,7 +94,8 @@
             try
             {
                 var categories = await categoryService.All();
-                var csv = exportService.CategoriesCsv(categories);
+                var csv = exportService.CategoriesCsv(categories
+                    .OrderBy(x => x.Name));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -116,7 +118,8 @@
             try
             {
                 var flavours = await flavourService.All();
-                var csv = exportService.FlavoursCsv(flavours);
+                var csv = exportService.FlavoursCsv(flavours
+                    .OrderBy(x => x.Name));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -140,7 +143,9 @@
             try
             {
                 var subscribers = await newsletterService.AllExportSubscribers(search, groupType);
-                var csv = exportService.NewsletterCsv(subscribers.AsEnumerable());
+                var csv = exportService.NewsletterCsv(subscribers
+                                                      .AsEnumerable()
+                                                      .OrderBy(x => x.Name));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -168,7 +173,8 @@
                 var (parsedStartDate, parsedEndDate) = DateTimeHelper.ParseDates(startDate, endDate);
 
                 var orders = await orderService.AllForExport(search, filters, parsedStartDate, parsedEndDate);
-                var csv = exportService.OrdersCsv(orders);
+                var csv = exportService.OrdersCsv(orders
+                                                  .OrderByDescending(x => x.MadeOn));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -213,7 +219,8 @@
             try
             {
                 var packages = await packageService.All();
-                var csv = exportService.PackagesCsv(packages);
+                var csv = exportService.PackagesCsv(packages
+                    .OrderBy(x => x.Grams));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -243,7 +250,8 @@
             try
             {
                 var products = await productService.AllForExport(categories, brand, price, alpha, search, priceRange, quantities, flavours);
-                var csv = exportService.ProductsCsv(products);
+                var csv = exportService.ProductsCsv(products
+                    .OrderByDescending(x => x.ProductId));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -267,7 +275,8 @@
             try
             {
                 var users = await profileService.All(1, search, groupType); // Assuming this fetches your data
-                var csv = exportService.ProfilesCsv(users.Profiles);
+                var csv = exportService.ProfilesCsv(users.Profiles
+                    .OrderByDescending(x => x.MadeOn));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -290,7 +299,8 @@
             try
             {
                 var promoCodes = await promoCodeService.All();
-                var csv = exportService.PromoCodesCsv(promoCodes);
+                var csv = exportService.PromoCodesCsv(promoCodes
+                    .OrderBy(x => x.Description));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -313,7 +323,8 @@
             try
             {
                 var promotions = await promotionService.All();
-                var csv = exportService.PromotionsCsv(promotions);
+                var csv = exportService.PromotionsCsv(promotions
+                    .OrderByDescending(x => x.StartDate));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
@@ -389,7 +400,8 @@
             try
             {
                 var shippingDiscounts = await shippingDiscountService.All();
-                var csv = exportService.ShippingDiscountsCsv(shippingDiscounts.ShippingDiscounts);
+                var csv = exportService.ShippingDiscountsCsv(shippingDiscounts.ShippingDiscounts
+                    .OrderBy(x => x.Description));
                 var bytes = Encoding.UTF8.GetBytes(csv);
                 var result = new FileContentResult(bytes, "text/csv")
                 {
