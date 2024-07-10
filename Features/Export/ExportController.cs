@@ -17,6 +17,7 @@
     using NutriBest.Server.Features.Categories;
     using NutriBest.Server.Features.ShippingDiscounts;
 
+    [Authorize(Roles = "Administrator,Employee")]
     public class ExportController
     {
         private readonly IExportService exportService;
@@ -63,7 +64,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Brands/CSV")]
         public async Task<FileContentResult?> GetCsvBrands()
         {
@@ -87,7 +87,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Categories/CSV")]
         public async Task<FileContentResult?> GetCsvCategories()
         {
@@ -111,7 +110,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Flavours/CSV")]
         public async Task<FileContentResult?> GetCsvFlavours()
         {
@@ -135,7 +133,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Newsletter/CSV")]
         public async Task<FileContentResult?> GetCsvNewsletter([FromQuery] string? search,
             [FromQuery] string? groupType)
@@ -161,7 +158,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Orders/CSV")]
         public async Task<FileContentResult?> GetCsvOrders([FromQuery] string? search,
              [FromQuery] string? filters = "",
@@ -190,7 +186,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Orders/CSV/Summary")]
         public async Task<FileContentResult?> GetCsvOrdersSummary()
         {
@@ -212,7 +207,6 @@
             }
         }
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Packages/CSV")]
         public async Task<FileContentResult?> GetCsvPackages()
         {
@@ -236,7 +230,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Products/CSV")]
         public async Task<FileContentResult?> GetCsvProducts([FromQuery] string? categories = "",
            [FromQuery] string? brand = "",
@@ -267,7 +260,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Profiles/CSV")]
         public async Task<FileContentResult?> GetCsvProfiles([FromQuery] string? search,
             [FromQuery] string? groupType)
@@ -292,7 +284,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/PromoCodes/CSV")] // changed!!!
         public async Task<FileContentResult?> GetCsvPromoCodes()
         {
@@ -316,7 +307,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Promotions/CSV")]
         public async Task<FileContentResult?> GetCsvPromotions()
         {
@@ -340,7 +330,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Reports/CSV/PerformanceInfo")]
         public async Task<FileContentResult?> GetCsvPerformanceInfo([FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null)
@@ -366,7 +355,6 @@
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/Reports/CSV/DemographicsInfo")]
         public async Task<FileContentResult?> GetCsvDemographicsInfo([FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null)
@@ -393,7 +381,6 @@
 
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Employee")]
         [Route("/ShippingDiscounts/CSV")] //changed!!!
         public async Task<FileContentResult?> GetCsv()
         {
