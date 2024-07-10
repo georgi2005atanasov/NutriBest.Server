@@ -34,6 +34,9 @@ namespace NutriBest.Server.Features.Newsletter
             if (await db.Newsletter.AnyAsync(x => x.Email == email && !x.IsDeleted))
                 throw new InvalidOperationException(string.Format(UserIsAlreadySubscribed, email));
 
+            var (isAnonymous, ordersCount, name, phoneNumber) = await this
+                .GetNewsletterData(db, userManager, email);
+
             if (db.Newsletter
                 .IgnoreQueryFilters()
                 .Any(x => x.Email == email && x.IsDeleted))
@@ -45,11 +48,13 @@ namespace NutriBest.Server.Features.Newsletter
                 subscriber.IsDeleted = false;
                 subscriber.DeletedOn = null;
                 subscriber.DeletedBy = null;
+                subscriber.TotalOrders = ordersCount;
+                subscriber.HasOrders = ordersCount > 0;
+                subscriber.PhoneNumber = phoneNumber;
+                subscriber.Name = name;
                 await db.SaveChangesAsync();
                 return subscriber.Id;
             }
-
-            var (isAnonymous, ordersCount, name, phoneNumber) = await this.GetNewsletterData(db, userManager, email);
 
             var subscription = new Newsletter
             {
@@ -184,10 +189,16 @@ namespace NutriBest.Server.Features.Newsletter
 
                 subscribersToReturn = subscribersToReturn
                     .Where(x => (x.Name != null && x.Name.ToLower().Contains(search)) ||
-                    (x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(search)) ||
+                    (x.PhoneNumber != null &&
+                        (x.PhoneNumber.ToLower().StartsWith(search) ||
+                         x.PhoneNumber.ToLower().EndsWith(search))) ||
                     x.Email.ToLower().Contains(search))
                     .ToList();
             }
+
+            subscribersToReturn = subscribersToReturn
+                .OrderByDescending(x => x.RegisteredOn)
+                .ToList();
 
             await db.SaveChangesAsync();
 

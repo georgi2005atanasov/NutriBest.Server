@@ -43,6 +43,7 @@ namespace NutriBest.Server.Features.Notifications
                 Notifications = await notifications
                                         .Skip((page - 1) * NotificationsPerPage)
                                         .Take(NotificationsPerPage)
+                                        .OrderByDescending(x => x.SentAt)
                                         .ToListAsync()
             };
 

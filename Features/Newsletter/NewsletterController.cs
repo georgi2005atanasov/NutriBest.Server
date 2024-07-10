@@ -26,10 +26,6 @@
 
                 return Ok(subscribers);
             }
-            catch(NullReferenceException)
-            {
-                return BadRequest();
-            }
             catch (Exception)
             {
                 return BadRequest();
