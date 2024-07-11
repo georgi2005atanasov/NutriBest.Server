@@ -10,10 +10,8 @@
     {
         private readonly NutriBestDbContext db;
 
-        public ReportService(NutriBestDbContext db)
-        {
-            this.db = db;
-        }
+        public ReportService(NutriBestDbContext db) 
+            => this.db = db;
 
         public async Task<PerformanceInfo> GetPerformanceInfo(DateTime? startDate, DateTime? endDate)
         {

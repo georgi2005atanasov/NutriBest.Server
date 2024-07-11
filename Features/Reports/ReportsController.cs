@@ -5,7 +5,7 @@
     using NutriBest.Server.Utilities;
     using NutriBest.Server.Features.Reports.Models;
 
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator,Employee")]
     public class ReportsController : ApiController
     {
         private readonly IReportService reportService;
