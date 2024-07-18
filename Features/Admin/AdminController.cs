@@ -85,7 +85,7 @@ namespace NutriBest.Server.Features.Admin
 
                 return Ok(new FailResponse
                 {
-                    Message = SuccessfullyRemovedRole
+                    Message = string.Format(SuccessfullyRemovedRole, role, user.UserName)
                 });
             }
             catch (ArgumentNullException err)

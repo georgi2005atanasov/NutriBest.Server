@@ -1,10 +1,10 @@
 ﻿namespace NutriBest.Server
 {
+    using System.Text;
     using AutoMapper;
     using Microsoft.OpenApi.Models;
     using NutriBest.Server.Features.Notifications.Hubs;
     using NutriBest.Server.Infrastructure.Extensions;
-    using System.Text;
 
     public class Startup
     {

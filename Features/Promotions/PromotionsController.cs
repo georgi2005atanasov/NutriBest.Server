@@ -33,7 +33,7 @@ namespace NutriBest.Server.Features.Promotions
         }
 
         [HttpGet]
-        [Route("/{promotionId}")]
+        [Route("{promotionId}")]
         public async Task<ActionResult> Get([FromRoute] int promotionId)
         {
             try
